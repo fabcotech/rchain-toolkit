@@ -3,6 +3,12 @@ import * as protoLoader from "@grpc/proto-loader";
 import * as rchainToolkit from "../dist/index";
 
 const main = async () => {
+  const grpcClient = await rchainToolkit.api.getGrpcClient(
+    "localhost:40401",
+    grpc,
+    protoLoader
+  );
+
   const deployData = await rchainToolkit.utils.getDeployData(
     "ed25519",
     1560802892221,
@@ -13,13 +19,12 @@ const main = async () => {
     100000
   );
 
-  const grpcClient = await rchainToolkit.api.getGrpcClient(
-    "localhost:40401",
-    grpc,
-    protoLoader
-  );
-
-  const a = await rchainToolkit.api.doDeploy(deployData, grpcClient);
+  let a;
+  try {
+    a = await rchainToolkit.api.doDeploy(deployData, grpcClient);
+  } catch (err) {
+    console.log(err);
+  }
 
   console.log(a);
 };

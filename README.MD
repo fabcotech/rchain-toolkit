@@ -40,3 +40,18 @@ const main = async () => {
 
 main();
 ```
+
+#### Development
+
+Run the jest tests
+
+```
+npm run test:jest
+```
+
+Run the full tests (a rnode instance must be running on localhost:40401)
+
+```
+npm run compile:tests
+npm run test:full
+```

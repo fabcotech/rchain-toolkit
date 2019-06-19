@@ -1,3 +1,5 @@
-const { fullTests } = require("./index");
+const a = require("./testsc/tests");
 
-fullTests.run();
+console.log(a);
+
+a.run();
