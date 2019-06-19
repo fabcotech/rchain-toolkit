@@ -1,0 +1,33 @@
+{
+  "name": "rchain-toolkit",
+  "version": "0.0.1",
+  "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
+  "main": "dist/index.js",
+  "scripts": {
+    "test:jest": "jest",
+    "test:full": "node test.js",
+    "compile": "tsc src/index.ts --outDir dist && cp -r src/protobuf dist/protobuf",
+    "compile:examples": "rm examples/*.js && tsc examples/*"
+  },
+  "author": "FABCO",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/preset-typescript": "^7.3.3",
+    "@grpc/proto-loader": "^0.5.1",
+    "@types/jest": "^24.0.15",
+    "@types/node": "^12.0.8",
+    "grpc": "^1.21.1",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "ts-loader": "^6.0.3",
+    "typescript": "^3.5.2"
+  },
+  "dependencies": {
+    "blakejs": "^1.1.0",
+    "deep-equal": "^1.0.1",
+    "keccak256": "^1.0.0",
+    "protobufjs": "^6.8.8",
+    "secp256k1": "^3.7.1",
+    "tweetnacl": "^1.0.1"
+  }
+}
