@@ -21,11 +21,11 @@
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.3",
+    "deep-equal": "^1.0.1",
     "typescript": "^3.5.2"
   },
   "dependencies": {
     "blakejs": "^1.1.0",
-    "deep-equal": "^1.0.1",
     "keccak256": "^1.0.0",
     "protobufjs": "^6.8.8",
     "secp256k1": "^3.7.1",

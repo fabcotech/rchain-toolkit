@@ -54,7 +54,6 @@ export const parseEitherDoDeploy = (either: any): any => {
           return;
         }
         const DeployServiceResponse = root.lookupType("DeployServiceResponse");
-        console.log(DeployServiceResponse);
         const b = DeployServiceResponse.decode(either.success.response.value);
         resolve(b);
       });

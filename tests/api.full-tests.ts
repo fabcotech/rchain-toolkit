@@ -1,3 +1,4 @@
+import * as path from "path";
 import * as grpc from "grpc";
 import * as protoLoader from "@grpc/proto-loader";
 import { deepStrictEqual } from "assert";
@@ -23,7 +24,7 @@ import { unforgeableWithId } from "../src/utils";
 const testPreviewPrivateNames = () => {
   return new Promise(async (resolve, reject) => {
     protoLoader
-      .load("./dist/protobuf/DeployService.proto", {
+      .load(path.resolve(__dirname, "../src/protobuf/DeployService.proto"), {
         keepCase: true,
         longs: String,
         enums: String,
@@ -88,7 +89,7 @@ const testPreviewPrivateNames = () => {
 const testDoDeploy = () => {
   return new Promise(async (resolve, reject) => {
     protoLoader
-      .load("./dist/protobuf/DeployService.proto", {
+      .load(path.resolve(__dirname, "../src/protobuf/DeployService.proto"), {
         keepCase: true,
         longs: String,
         enums: String,
@@ -123,7 +124,7 @@ const testDoDeploy = () => {
 const testCreateBlock = () => {
   return new Promise(async (resolve, reject) => {
     protoLoader
-      .load("./dist/protobuf/DeployService.proto", {
+      .load(path.resolve(__dirname, "../src/protobuf/DeployService.proto"), {
         keepCase: true,
         longs: String,
         enums: String,

@@ -99,7 +99,7 @@ export const getGrpcClient = (
 ) => {
   return new Promise((resolve, reject) => {
     protoLoader
-      .load("./dist/protobuf/DeployService.proto", {
+      .load(__dirname + "/protobuf/DeployService.proto", {
         keepCase: true,
         longs: String,
         enums: String,

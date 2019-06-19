@@ -160,7 +160,7 @@ exports.createBlock = function (options, client) {
 exports.getGrpcClient = function (grpcEndPoint, grpc, protoLoader) {
     return new Promise(function (resolve, reject) {
         protoLoader
-            .load("./dist/protobuf/DeployService.proto", {
+            .load(__dirname + "/protobuf/DeployService.proto", {
             keepCase: true,
             longs: String,
             enums: String,
