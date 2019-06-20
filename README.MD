@@ -1,10 +1,14 @@
-rchain-toolkit is a node JS library that allows to interact with the rnode (RChain) software easily and securely.
+rchain-toolkit is a general purpose javascript/typescript library to interact with the RChain blockchain, and play with rholang expressions in node JS or the browser.
 
-This library also includes some general-purpose utils to convert or use rholang expressions.
+It includes utils for easily deploying rholang code (smart contract), retreiving blocks, listen for data at unforgeable names, public names etc... All of the methods, parameters, and returned values are typed so the developer can comfortably code.
 
-See `examples` folder.
+rchain-toolkit provides some GRPC utils since rnode's main API is GRPC, but it does not strictly assume the transport. This library builds proto objects based on rnode's proto definition files and some user parameters. Therefore GRPC is not included in the library, making it potentially elligible for the browser, GRPC and GRPC's proto-loader libraries must be installed separatly in your own project.
 
-Deploy a smart-contract (Rholang term) :
+The examples folder contains example for each GRPC interface that is currently supported, each one of them exists in typescript and javascript.
+
+#### Examples
+
+Deploy some rholang code (smart contract) :
 
 ```typescript
 import * as grpc from "grpc";
@@ -43,13 +47,35 @@ main();
 
 #### Development
 
+**Compiling**
+
+typescript must be installed on your machine
+
+```
+npm install -g typescript
+```
+
+Compile the `.ts` files in `src` directory to the main `dist` directory.
+
+```
+npm run compile
+```
+
+**Jest tests**
+
+The jest tests are all the tests that do not require proto-loader or GRPC, because it does not work under jest's runtime.
+
 Run the jest tests
 
 ```
 npm run test:jest
 ```
 
-Run the full tests (a rnode instance must be running on localhost:40401)
+**Full tests**
+
+The full tests are the tests that interact with the `.proto` files, and rnode. A local rnode instance must be running on `localhost:40401`.
+
+Run the full tests
 
 ```
 npm run compile:tests

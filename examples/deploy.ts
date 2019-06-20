@@ -1,6 +1,6 @@
 import * as grpc from "grpc";
 import * as protoLoader from "@grpc/proto-loader";
-import * as rchainToolkit from "../dist/index";
+import * as rchainToolkit from "rchain-toolkit";
 
 const main = async () => {
   const grpcClient = await rchainToolkit.api.getGrpcClient(

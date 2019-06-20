@@ -5,10 +5,11 @@ import secp256k1 from "secp256k1";
 import { Writer } from "protobufjs";
 import { load } from "protobufjs";
 import { Payment, DeployData, SigAlgorithm } from "./models/models";
+import { DataWithBlockInfo, Par } from "./models";
 
-export const getValueFromBlocks = (blocks: any) => {
-  for (let i = 0; i < blocks.blockResults.length; i += 1) {
-    const block = blocks.blockResults[i];
+export const getValueFromBlocks = (blockResults: DataWithBlockInfo[]): Par => {
+  for (let i = 0; i < blockResults.length; i += 1) {
+    const block = blockResults[i];
     for (let j = 0; j < block.postBlockData.length; j += 1) {
       const data = block.postBlockData[j];
       if (data) {
@@ -41,7 +42,7 @@ export const rholangMapToJsObject = (map: any): { [key: string]: any } => {
   return obj;
 };
 
-export const unforgeableWithId = (id: string): string => {
+export const unforgeableWithId = (id: Buffer): string => {
   const bytes = Writer.create()
     .bytes(id)
     .finish()

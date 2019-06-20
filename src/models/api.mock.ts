@@ -1,6 +1,6 @@
-import { PrivateNamePreviewResponse, DeployServiceResponse } from "./api";
+import { PrivateNamePreviewResponse, EitherSuccess } from "./api";
 
-export const privateNamePreviewResponse: PrivateNamePreviewResponse = {
+export const privateNamePreviewResponse: EitherSuccess = {
   content: "success",
   success: {
     response: {
@@ -46,7 +46,7 @@ export const privateNamePreviewResponse: PrivateNamePreviewResponse = {
   }
 };
 
-export const privateNames = {
+export const privateNamesResponse: PrivateNamePreviewResponse = {
   ids: [
     Buffer.from([
       187,
@@ -85,7 +85,7 @@ export const privateNames = {
   ]
 };
 
-export const doDeployEd25519Response: DeployServiceResponse = {
+export const doDeployEd25519Response: EitherSuccess = {
   success: {
     response: {
       type_url:
