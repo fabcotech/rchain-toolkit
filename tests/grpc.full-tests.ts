@@ -20,7 +20,6 @@ import {
   getGrpcDeployClient,
   doDeploy,
   previewPrivateNames,
-  propose,
   getGrpcProposeClient,
   listenForDataAtName,
   proposeRaw
@@ -151,14 +150,19 @@ const testListenForDataAtName = () => {
     const deployData = await getDeployData(
       "ed25519",
       timestamp,
-      `new hello in { hello!(89)}`,
+      'new hello in { hello!("world") }',
       privateKey,
       publicKey,
       1,
       1000000
     );
 
-    await doDeploy(deployData, client);
+    try {
+      await doDeploy(deployData, client);
+    } catch (err) {
+      console.log(err);
+      reject(err);
+    }
 
     try {
       await proposeRaw({}, proposeClient);

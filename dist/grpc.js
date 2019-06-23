@@ -37,114 +37,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 var _this = this;
 exports.__esModule = true;
 var decoders_1 = require("./decoders");
-exports.listenForDataAtName = function (options, client, parseEither) {
-    if (parseEither === void 0) { parseEither = true; }
+// Listen for data at name
+exports.listenForDataAtNameRaw = function (options, client) {
     return new Promise(function (resolve, reject) {
         client.listenForDataAtName(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            var result, err_1;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!err) return [3 /*break*/, 1];
-                        reject(err);
-                        return [3 /*break*/, 7];
-                    case 1:
-                        if (!parseEither) return [3 /*break*/, 6];
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, decoders_1.parseEitherListeningNameData(resp)];
-                    case 3:
-                        result = _a.sent();
-                        resolve(result);
-                        return [3 /*break*/, 5];
-                    case 4:
-                        err_1 = _a.sent();
-                        reject(err_1);
-                        return [3 /*break*/, 5];
-                    case 5: return [3 /*break*/, 7];
-                    case 6:
-                        resolve(resp);
-                        _a.label = 7;
-                    case 7: return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-};
-exports.doDeploy = function (deployData, client, parseEither) {
-    if (parseEither === void 0) { parseEither = true; }
-    return new Promise(function (resolve, reject) {
-        client.DoDeploy(deployData, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            var result, err_2;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!err) return [3 /*break*/, 1];
-                        reject(err);
-                        return [3 /*break*/, 7];
-                    case 1:
-                        if (!parseEither) return [3 /*break*/, 6];
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, decoders_1.parseEitherDoDeploy(resp)];
-                    case 3:
-                        result = _a.sent();
-                        resolve(result);
-                        return [3 /*break*/, 5];
-                    case 4:
-                        err_2 = _a.sent();
-                        reject(err_2);
-                        return [3 /*break*/, 5];
-                    case 5: return [3 /*break*/, 7];
-                    case 6:
-                        resolve(resp);
-                        _a.label = 7;
-                    case 7: return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-};
-exports.previewPrivateNames = function (options, client, parseEither) {
-    if (parseEither === void 0) { parseEither = true; }
-    return new Promise(function (resolve, reject) {
-        client.previewPrivateNames(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            var result, err_3;
-            return __generator(this, function (_a) {
-                switch (_a.label) {
-                    case 0:
-                        if (!err) return [3 /*break*/, 1];
-                        reject(err);
-                        return [3 /*break*/, 7];
-                    case 1:
-                        if (!parseEither) return [3 /*break*/, 6];
-                        _a.label = 2;
-                    case 2:
-                        _a.trys.push([2, 4, , 5]);
-                        return [4 /*yield*/, decoders_1.parseEitherPrivateNamePreview(resp)];
-                    case 3:
-                        result = _a.sent();
-                        resolve(result);
-                        return [3 /*break*/, 5];
-                    case 4:
-                        err_3 = _a.sent();
-                        reject(err_3);
-                        return [3 /*break*/, 5];
-                    case 5: return [3 /*break*/, 7];
-                    case 6:
-                        resolve(resp);
-                        _a.label = 7;
-                    case 7: return [2 /*return*/];
-                }
-            });
-        }); });
-    });
-};
-exports.createBlock = function (options, client) {
-    return new Promise(function (resolve, reject) {
-        client.createBlock(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
                 if (err) {
                     reject(err);
@@ -157,10 +53,150 @@ exports.createBlock = function (options, client) {
         }); });
     });
 };
-exports.getGrpcClient = function (grpcEndPoint, grpc, protoLoader) {
+exports.listenForDataAtName = function (options, client) {
+    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+        var either, dataAtName;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.listenForDataAtNameRaw(options, client)];
+                case 1:
+                    either = _a.sent();
+                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, decoders_1.parseEitherListeningNameData(either)];
+                case 2:
+                    dataAtName = _a.sent();
+                    resolve(dataAtName);
+                    return [3 /*break*/, 4];
+                case 3:
+                    reject(either.error.messages);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); });
+};
+// Do deploy
+exports.doDeployRaw = function (deployData, client) {
+    return new Promise(function (resolve, reject) {
+        client.DoDeploy(deployData, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(resp);
+                }
+                return [2 /*return*/];
+            });
+        }); });
+    });
+};
+exports.doDeploy = function (deployData, client) {
+    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+        var either, doDeployResult;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.doDeployRaw(deployData, client)];
+                case 1:
+                    either = _a.sent();
+                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, decoders_1.parseEitherDoDeploy(either)];
+                case 2:
+                    doDeployResult = _a.sent();
+                    resolve(doDeployResult);
+                    return [3 /*break*/, 4];
+                case 3:
+                    reject(either.error.messages);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); });
+};
+// Preview private names
+exports.previewPrivateNamesRaw = function (options, client) {
+    return new Promise(function (resolve, reject) {
+        client.previewPrivateNames(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(resp);
+                }
+                return [2 /*return*/];
+            });
+        }); });
+    });
+};
+exports.previewPrivateNames = function (options, client) {
+    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+        var either, doDeployResult;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.previewPrivateNamesRaw(options, client)];
+                case 1:
+                    either = _a.sent();
+                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, decoders_1.parseEitherPrivateNamesPreview(either)];
+                case 2:
+                    doDeployResult = _a.sent();
+                    resolve(doDeployResult);
+                    return [3 /*break*/, 4];
+                case 3:
+                    reject(either.error.messages);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); });
+};
+// Propose
+exports.proposeRaw = function (options, client) {
+    return new Promise(function (resolve, reject) {
+        client.propose(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(resp);
+                }
+                return [2 /*return*/];
+            });
+        }); });
+    });
+};
+exports.propose = function (options, client) {
+    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+        var either, doDeployResult;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.proposeRaw(options, client)];
+                case 1:
+                    either = _a.sent();
+                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, decoders_1.parseEitherPropose(either)];
+                case 2:
+                    doDeployResult = _a.sent();
+                    resolve(doDeployResult);
+                    return [3 /*break*/, 4];
+                case 3:
+                    reject(either.error.messages);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); });
+};
+var getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
+    var path = "/protobuf/DeployService.proto";
+    if (protoService === "proposeService") {
+        path = "/protobuf/ProposeService.proto";
+    }
     return new Promise(function (resolve, reject) {
         protoLoader
-            .load(__dirname + "/protobuf/DeployService.proto", {
+            .load(__dirname + path, {
             keepCase: true,
             longs: String,
             enums: String,
@@ -169,10 +205,22 @@ exports.getGrpcClient = function (grpcEndPoint, grpc, protoLoader) {
         })
             .then(function (packageDefinition) {
             var packageObject = grpc.loadPackageDefinition(packageDefinition);
-            var client = new packageObject.coop.rchain.casper.protocol.DeployService(grpcEndPoint, grpc.credentials.createInsecure());
+            var client;
+            if (protoService === "deployService") {
+                client = new packageObject.coop.rchain.casper.protocol.DeployService(grpcEndPoint, grpc.credentials.createInsecure());
+            }
+            else {
+                client = new packageObject.coop.rchain.casper.protocol.ProposeService(grpcEndPoint, grpc.credentials.createInsecure());
+            }
             resolve(client);
         })["catch"](function (err) {
             reject(err);
         });
     });
+};
+exports.getGrpcDeployClient = function (grpcEndPoint, grpc, protoLoader) {
+    return getClient(grpcEndPoint, grpc, protoLoader, "deployService");
+};
+exports.getGrpcProposeClient = function (grpcEndPoint, grpc, protoLoader) {
+    return getClient(grpcEndPoint, grpc, protoLoader, "proposeService");
 };

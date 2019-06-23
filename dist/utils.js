@@ -53,9 +53,9 @@ var keccak256_1 = require("keccak256");
 var secp256k1_1 = require("secp256k1");
 var protobufjs_1 = require("protobufjs");
 var protobufjs_2 = require("protobufjs");
-exports.getValueFromBlocks = function (blocks) {
-    for (var i = 0; i < blocks.blockResults.length; i += 1) {
-        var block = blocks.blockResults[i];
+exports.getValueFromBlocks = function (blockResults) {
+    for (var i = 0; i < blockResults.length; i += 1) {
+        var block = blockResults[i];
         for (var j = 0; j < block.postBlockData.length; j += 1) {
             var data = block.postBlockData[j];
             if (data) {

@@ -14,7 +14,7 @@ const main = async () => {
     ids = await rchainToolkit.api.previewPrivateNames(
       {
         user: Buffer.from(
-          "499819f316b7fe95d723b232ba430cf7e3b68af155eb8253905d64e1fbace058",
+          "499819f316b7fe95d723b232ba430cf7e3b68af155eb8253905d64e1fbace058", // unforgeable name id
           "hex"
         ),
         timestamp: 1560802892221,
