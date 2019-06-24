@@ -1,8 +1,10 @@
-rchain-toolkit is a general purpose javascript/typescript library to interact with the RChain blockchain, and play with rholang expressions in node JS or the browser.
+### rchain-toolkit
 
-It includes utils for easily deploying rholang code (smart contract), retreiving blocks, listen for data at unforgeable names, public names etc... All of the methods, parameters, and returned values are typed so the developer can comfortably code.
+rchain-toolkit is a general purpose javascript/typescript library to interact with the RChain blockchain, and play with rholang expressions in node JS or the browser. **It is not ready for production, not stable and the dev is not completed yet.**
 
-rchain-toolkit provides some GRPC utils since rnode's main API is GRPC, but it does not strictly assume the transport. This library builds proto objects based on rnode's proto definition files and some user parameters. Therefore GRPC is not included in the library, making it potentially elligible for the browser, GRPC and GRPC's proto-loader libraries must be installed separatly in your own project.
+It includes utils for easily deploying rholang code (smart contract), retreiving blocks, listen for data at unforgeable names, public names etc... All of the methods, parameters, and returned values are typed using typescript so the developer can comfortably code.
+
+rchain-toolkit provides some GRPC utils since rnode's main API is GRPC, but it does not strictly assume the transport. This library builds proto objects based on rnode's proto definition files and some user parameters. GRPC is not included in the library, making it potentially elligible for the browser, GRPC and GRPC's proto-loader libraries must be installed separatly in your own project.
 
 The examples folder contains example for each GRPC interface that is currently supported, each one of them exists in typescript and javascript.
 
