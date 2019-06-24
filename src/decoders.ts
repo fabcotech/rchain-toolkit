@@ -7,25 +7,32 @@ import {
   DoDeployResponse
 } from "./models";
 
-export const parseEitherListeningNameData = (either: Either): Promise<any> => {
+export const parseEither = (either: Either, proto: string): Promise<any> => {
+  const path = "/protobuf/DeployService.proto";
   return new Promise((resolve, reject) => {
     if (either.hasOwnProperty("success")) {
       const eitherSuccess: EitherSuccess = either as EitherSuccess;
-      load(__dirname + "/protobuf/DeployService.proto", function(err, root) {
+      load(__dirname + path, function(err, root) {
         if (err || !root) {
           reject(err);
           return;
         }
-        const ListeningNameDataResponse = root.lookupType(
-          "ListeningNameDataResponse"
-        );
-
-        const b = ListeningNameDataResponse.decode(
-          eitherSuccess.success.response.value
-        );
-        resolve(b);
+        const resp = root.lookupType(proto);
+        const decoded = resp.decode(eitherSuccess.success.response.value);
+        resolve((decoded as unknown) as any);
       });
     } else {
+      reject((either as EitherError).error.messages);
+    }
+  });
+};
+
+export const parseEitherListeningNameData = (either: Either): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const resp = await parseEither(either, "ListeningNameDataResponse");
+      resolve(resp);
+    } catch (err) {
       reject((either as EitherError).error.messages);
     }
   });
@@ -34,23 +41,11 @@ export const parseEitherListeningNameData = (either: Either): Promise<any> => {
 export const parseEitherPrivateNamesPreview = (
   either: Either
 ): Promise<PrivateNamePreviewResponse> => {
-  return new Promise((resolve, reject) => {
-    if (either.hasOwnProperty("success")) {
-      const eitherSuccess: EitherSuccess = either as EitherSuccess;
-      load(__dirname + "/protobuf/DeployService.proto", function(err, root) {
-        if (err || !root) {
-          reject(err);
-          return;
-        }
-        const PrivateNamePreviewResponse = root.lookupType(
-          "PrivateNamePreviewResponse"
-        );
-        const b = PrivateNamePreviewResponse.decode(
-          eitherSuccess.success.response.value
-        );
-        resolve((b as unknown) as PrivateNamePreviewResponse);
-      });
-    } else {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const resp = await parseEither(either, "PrivateNamePreviewResponse");
+      resolve(resp);
+    } catch (err) {
       reject((either as EitherError).error.messages);
     }
   });
@@ -59,40 +54,22 @@ export const parseEitherPrivateNamesPreview = (
 export const parseEitherDoDeploy = (
   either: Either
 ): Promise<DoDeployResponse> => {
-  return new Promise((resolve, reject) => {
-    if (either.hasOwnProperty("success")) {
-      const eitherSuccess: EitherSuccess = either as EitherSuccess;
-      load(__dirname + "/protobuf/DeployService.proto", function(err, root) {
-        if (err || !root) {
-          reject(err);
-          return;
-        }
-        const DeployServiceResponse = root.lookupType("DeployServiceResponse");
-        const b = DeployServiceResponse.decode(
-          eitherSuccess.success.response.value
-        );
-        resolve((b as unknown) as DoDeployResponse);
-      });
-    } else {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const resp = await parseEither(either, "DeployServiceResponse");
+      resolve(resp);
+    } catch (err) {
       reject((either as EitherError).error.messages);
     }
   });
 };
 
-export const parseEitherPropose = (either: Either): Promise<any> => {
-  return new Promise((resolve, reject) => {
-    if (either.hasOwnProperty("success")) {
-      const eitherSuccess: EitherSuccess = either as EitherSuccess;
-      load(__dirname + "/protobuf/ProposeService.proto", function(err, root) {
-        if (err || !root) {
-          reject(err);
-          return;
-        }
-        const ProposeResponse = root.lookupType("PrivateNamePreviewResponse");
-        const b = ProposeResponse.decode(eitherSuccess.success.response.value);
-        resolve((b as unknown) as any);
-      });
-    } else {
+export const parseEitherGetBlocks = (either: Either): Promise<any> => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const resp = await parseEither(either, "getBlocks");
+      resolve(resp);
+    } catch (err) {
       reject((either as EitherError).error.messages);
     }
   });

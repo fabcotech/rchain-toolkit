@@ -10,14 +10,14 @@ const main = async () => {
     protoLoader
   );
 
-  let a;
+  let response;
   try {
-    a = await rchainToolkit.grpc.proposeRaw({}, grpcClient);
+    response = await rchainToolkit.grpc.propose({}, grpcClient);
   } catch (err) {
     console.log(err);
   }
 
-  console.log(a);
+  console.log(response);
 };
 
 main();

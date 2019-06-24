@@ -3,7 +3,7 @@ import * as protoLoader from "@grpc/proto-loader";
 import * as rchainToolkit from "rchain-toolkit";
 
 const main = async () => {
-  const grpcClient = await rchainToolkit.api.getGrpcClient(
+  const grpcClient = await rchainToolkit.grpc.getGrpcClient(
     "localhost:40401",
     grpc,
     protoLoader
@@ -11,7 +11,7 @@ const main = async () => {
 
   let ids;
   try {
-    ids = await rchainToolkit.api.previewPrivateNames(
+    ids = await rchainToolkit.grpc.previewPrivateNames(
       {
         user: Buffer.from(
           "499819f316b7fe95d723b232ba430cf7e3b68af155eb8253905d64e1fbace058", // unforgeable name id
