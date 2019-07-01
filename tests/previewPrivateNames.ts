@@ -32,9 +32,9 @@ export const testPreviewPrivateNames = () => {
 
     try {
       deepStrictEqual(either, privateNamePreviewResponse);
-      console.log("  ✓ api.previewPrivateNames");
+      console.log("  ✓ grpc.previewPrivateNames");
     } catch (err) {
-      console.log("  X api.previewPrivateNames");
+      console.log("  X grpc.previewPrivateNames");
       reject(err);
     }
 
