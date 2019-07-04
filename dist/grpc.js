@@ -36,158 +36,75 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 exports.__esModule = true;
-var decoders_1 = require("./decoders");
+var decoders = require("./decoders");
+exports.getFull = function (options, client, grpcMethod, parseMethod) {
+    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
+        var either, resp;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, exports.getRaw(options, client, grpcMethod)];
+                case 1:
+                    either = _a.sent();
+                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
+                    return [4 /*yield*/, decoders[parseMethod](either)];
+                case 2:
+                    resp = _a.sent();
+                    resolve(resp);
+                    return [3 /*break*/, 4];
+                case 3:
+                    reject(either.error.messages);
+                    _a.label = 4;
+                case 4: return [2 /*return*/];
+            }
+        });
+    }); });
+};
+exports.getRaw = function (options, client, method) {
+    return new Promise(function (resolve, reject) {
+        client[method](options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
+            return __generator(this, function (_a) {
+                if (err) {
+                    reject(err);
+                }
+                else {
+                    resolve(resp);
+                }
+                return [2 /*return*/];
+            });
+        }); });
+    });
+};
 // Listen for data at name
 exports.listenForDataAtNameRaw = function (options, client) {
-    return new Promise(function (resolve, reject) {
-        client.listenForDataAtName(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(resp);
-                }
-                return [2 /*return*/];
-            });
-        }); });
-    });
+    return exports.getRaw(options, client, "listenForDataAtName");
 };
 exports.listenForDataAtName = function (options, client) {
-    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-        var either, dataAtName;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.listenForDataAtNameRaw(options, client)];
-                case 1:
-                    either = _a.sent();
-                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, decoders_1.parseEitherListeningNameData(either)];
-                case 2:
-                    dataAtName = _a.sent();
-                    resolve(dataAtName);
-                    return [3 /*break*/, 4];
-                case 3:
-                    reject(either.error.messages);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); });
+    return exports.getFull(options, client, "listenForDataAtName", "parseEitherListeningNameData");
 };
 // Do deploy
-exports.doDeployRaw = function (deployData, client) {
-    return new Promise(function (resolve, reject) {
-        client.DoDeploy(deployData, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(resp);
-                }
-                return [2 /*return*/];
-            });
-        }); });
-    });
+exports.doDeployRaw = function (options, client) {
+    return exports.getRaw(options, client, "DoDeploy");
 };
 exports.doDeploy = function (deployData, client) {
-    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-        var either, doDeployResult;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.doDeployRaw(deployData, client)];
-                case 1:
-                    either = _a.sent();
-                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, decoders_1.parseEitherDoDeploy(either)];
-                case 2:
-                    doDeployResult = _a.sent();
-                    resolve(doDeployResult);
-                    return [3 /*break*/, 4];
-                case 3:
-                    reject(either.error.messages);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); });
+    return exports.getFull(deployData, client, "DoDeploy", "parseEitherDoDeploy");
 };
 // Preview private names
 exports.previewPrivateNamesRaw = function (options, client) {
-    return new Promise(function (resolve, reject) {
-        client.previewPrivateNames(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(resp);
-                }
-                return [2 /*return*/];
-            });
-        }); });
-    });
+    return exports.getRaw(options, client, "previewPrivateNames");
 };
 exports.previewPrivateNames = function (options, client) {
-    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-        var either, doDeployResult;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.previewPrivateNamesRaw(options, client)];
-                case 1:
-                    either = _a.sent();
-                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, decoders_1.parseEitherPrivateNamesPreview(either)];
-                case 2:
-                    doDeployResult = _a.sent();
-                    resolve(doDeployResult);
-                    return [3 /*break*/, 4];
-                case 3:
-                    reject(either.error.messages);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); });
+    return exports.getFull(options, client, "previewPrivateNames", "parseEitherPrivateNamesPreview");
+};
+// getBlocks
+exports.getBlocksRaw = function (options, client) {
+    return exports.getRaw(options, client, "getBlocks");
+};
+exports.getBlocks = function (options, client) {
+    return exports.getFull(options, client, "getBlocks", "parseGetBlocks");
 };
 // Propose
-exports.proposeRaw = function (options, client) {
-    return new Promise(function (resolve, reject) {
-        client.propose(options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
-            return __generator(this, function (_a) {
-                if (err) {
-                    reject(err);
-                }
-                else {
-                    resolve(resp);
-                }
-                return [2 /*return*/];
-            });
-        }); });
-    });
-};
 exports.propose = function (options, client) {
-    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-        var either, doDeployResult;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.proposeRaw(options, client)];
-                case 1:
-                    either = _a.sent();
-                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, decoders_1.parseEitherPropose(either)];
-                case 2:
-                    doDeployResult = _a.sent();
-                    resolve(doDeployResult);
-                    return [3 /*break*/, 4];
-                case 3:
-                    reject(either.error.messages);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); });
+    return exports.getRaw(options, client, "propose");
 };
 var getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
     var path = "/protobuf/DeployService.proto";
