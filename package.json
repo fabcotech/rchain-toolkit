@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.0.6",
+  "version": "0.0.7",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "main": "dist/index.js",
   "scripts": {
@@ -14,10 +14,10 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/preset-typescript": "^7.3.3",
+    "@grpc/grpc-js": "^0.5.0",
     "@grpc/proto-loader": "^0.5.1",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.0.8",
-    "grpc": "^1.21.1",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "ts-loader": "^6.0.3",

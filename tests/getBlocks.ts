@@ -1,5 +1,5 @@
 import * as protoLoader from "@grpc/proto-loader";
-import * as grpc from "grpc";
+import * as grpc from "@grpc/grpc-js";
 
 import { getGrpcDeployClient, getBlocksRaw } from "../src/grpc";
 import { deepStrictEqual } from "assert";
