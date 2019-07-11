@@ -13,6 +13,7 @@ import {
 import {
   unforgeableWithId,
   getDeployData,
+  getGPrivate,
   getValueFromBlocks
 } from "../src/utils";
 
@@ -46,21 +47,23 @@ export const testListenForDataAtName = () => {
       reject(err);
     }
 
-    const deployData = await getDeployData(
-      "ed25519",
-      timestamp,
-      'new hello in { hello!("world") }',
-      privateKey,
-      publicKey,
-      1,
-      1000000
-    );
-
     try {
+      const deployData = await getDeployData(
+        "secp256k1",
+        timestamp,
+        'new hello, stdout(`rho:io:stdout`) in { hello!("world") | stdout!(*hello) }',
+        privateKey,
+        publicKey,
+        1,
+        1000000,
+        -1
+      );
+
       await doDeploy(deployData, client);
     } catch (err) {
       console.log(err);
       reject(err);
+      return;
     }
 
     try {
@@ -69,17 +72,21 @@ export const testListenForDataAtName = () => {
     } catch (err) {
       console.log("  X grpc.propose");
       reject(err);
+      return;
     }
 
     const privateNameBuffer = Buffer.from(privateNameFromNode, "hex");
-    const privateNameRequest = {
-      ids: [{ id: new Uint8Array(privateNameBuffer) }]
-    };
-    // we could have done simply :
-    // const privateNameRequest = { ids: [{ id: new Uint8Array(privateNamesFromNode.ids[0]) }] };
+
+    const unforgeable = await getGPrivate(privateNameBuffer);
     const listenForDataAtNameResponse = await listenForDataAtName(
       {
-        name: privateNameRequest,
+        name: {
+          unforgeables: [
+            {
+              g_private_body: new Uint8Array(unforgeable)
+            }
+          ]
+        },
         depth: 90
       },
       client

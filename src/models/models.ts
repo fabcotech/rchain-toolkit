@@ -3,6 +3,7 @@ export interface Payment {
   term: string;
   phloPrice: number;
   phloLimit: number;
+  validAfterBlockNumber: number;
 }
 
 export type SigAlgorithm = "ed25519" | "secp256k1";

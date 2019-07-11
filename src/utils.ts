@@ -1,11 +1,11 @@
-import * as nacl from "tweetnacl";
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
-import keccak256 from "keccak256";
-import secp256k1 from "secp256k1";
+import * as elliptic from "elliptic";
 import { Writer } from "protobufjs";
 import { load } from "protobufjs";
 import { Payment, DeployData, SigAlgorithm } from "./models/models";
 import { DataWithBlockInfo, Par } from "./models";
+
+const ec = new elliptic.ec("secp256k1");
 
 export const getValueFromBlocks = (blockResults: DataWithBlockInfo[]): Par => {
   for (let i = 0; i < blockResults.length; i += 1) {
@@ -55,14 +55,34 @@ export const getPayment = (
   timestamp: number,
   term: string,
   phloPrice = 1,
-  phloLimit = 10000000
+  phloLimit = 10000000,
+  validAfterBlockNumber = -1
 ): Payment => {
   return {
     timestamp: timestamp,
     term: term,
     phloLimit: phloLimit,
-    phloPrice: phloPrice
+    phloPrice: phloPrice,
+    validAfterBlockNumber: validAfterBlockNumber
   };
+};
+
+export const getGPrivate = (privateNameBuffer: Buffer): Promise<Buffer> => {
+  return new Promise((resolve, reject) => {
+    load(__dirname + "/protobuf/RhoTypes.proto", function(err, root) {
+      if (err || !root) {
+        reject(err);
+        return;
+      }
+
+      const GPrivateType = root.lookupType("GPrivate");
+      const gPrivateBody = GPrivateType.encode({
+        id: privateNameBuffer
+      });
+
+      resolve(gPrivateBody.finish() as Buffer);
+    });
+  });
 };
 
 export const getDeployDataToSign = (payment: Payment): Promise<Uint8Array> => {
@@ -73,13 +93,7 @@ export const getDeployDataToSign = (payment: Payment): Promise<Uint8Array> => {
         return;
       }
       const DeployDataType = root.lookupType("DeployData");
-
-      const b = DeployDataType.encode({
-        ...payment,
-        deployer: null,
-        sig: null,
-        sigAlgorithm: null
-      }).finish();
+      const b = DeployDataType.encode(payment).finish();
 
       resolve(b);
     });
@@ -92,19 +106,12 @@ export const getBlake2Hash = (toHash: Uint8Array): Uint8Array => {
   return blake2bFinal(context);
 };
 
-export const getKeccak256Hash = (toHash: Uint8Array): Uint8Array => {
-  const hash = keccak256(Buffer.from(toHash));
-  return new Uint8Array(hash);
-};
-
 export const verifyPrivateAndPublicKey = (
   privateKey: string,
   publicKey: string
 ) => {
-  const publicKeyFromPrivateKey = secp256k1.publicKeyCreate(
-    Buffer.from(privateKey, "hex")
-  );
-  if (publicKeyFromPrivateKey.toString("hex") !== publicKey) {
+  const keyPair = ec.keyFromPrivate(privateKey);
+  if (keyPair.getPublic().encode("hex") !== publicKey) {
     throw new Error("Private key and public key do not match");
   }
 };
@@ -113,20 +120,22 @@ export const signSecp256k1 = (
   hash: Uint8Array,
   privateKey: string
 ): Uint8Array => {
-  const pubKey = secp256k1.publicKeyCreate(Buffer.from(privateKey, "hex"));
-  const sigObj = secp256k1.sign(hash, Buffer.from(privateKey, "hex"));
-  if (!secp256k1.verify(hash, sigObj.signature, pubKey)) {
+  const keyPair = ec.keyFromPrivate(privateKey);
+
+  const signature = keyPair.sign(Buffer.from(hash));
+  const derSign = signature.toDER();
+  if (
+    !ec.verify(
+      Buffer.from(hash),
+      signature,
+      keyPair.getPublic().encode("hex"),
+      "hex"
+    )
+  ) {
     throw new Error("Signature verification failed");
   }
 
-  return sigObj.signature;
-};
-
-export const signEd25519 = (
-  hash: Uint8Array,
-  privateKey: string
-): Uint8Array => {
-  return nacl.sign.detached(hash, Buffer.from(privateKey, "hex"));
+  return new Uint8Array(derSign);
 };
 
 export const getDeployData = async (
@@ -136,17 +145,24 @@ export const getDeployData = async (
   privateKey: string,
   publicKey: string,
   phloPrice = 1,
-  phloLimit = 10000
+  phloLimit = 10000,
+  validAfterBlockNumber = -1
 ): Promise<DeployData> => {
-  const payment = getPayment(timestamp, term, phloPrice, phloLimit);
+  const payment = getPayment(
+    timestamp,
+    term,
+    phloPrice,
+    phloLimit,
+    validAfterBlockNumber
+  );
   const toSign = await getDeployDataToSign(payment);
   const hash = getBlake2Hash(toSign);
 
   let signature: Uint8Array;
   if (sigAlgorithm === "ed25519") {
-    signature = await signEd25519(hash, privateKey);
+    throw new Error("Unsupported algorithm ed25519; please use secp256k1");
   } else if (sigAlgorithm === "secp256k1") {
-    signature = await signSecp256k1(hash, privateKey);
+    signature = signSecp256k1(hash, privateKey);
   } else {
     throw new Error("Unsupported algorithm");
   }
@@ -155,6 +171,6 @@ export const getDeployData = async (
     ...payment,
     deployer: Buffer.from(publicKey, "hex"),
     sig: signature,
-    sigAlgorithm: "ed25519"
+    sigAlgorithm: sigAlgorithm
   };
 };

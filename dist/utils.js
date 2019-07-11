@@ -47,12 +47,11 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 exports.__esModule = true;
-var nacl = require("tweetnacl");
 var blakejs_1 = require("blakejs");
-var keccak256_1 = require("keccak256");
-var secp256k1_1 = require("secp256k1");
+var elliptic = require("elliptic");
 var protobufjs_1 = require("protobufjs");
 var protobufjs_2 = require("protobufjs");
+var ec = new elliptic.ec("secp256k1");
 exports.getValueFromBlocks = function (blockResults) {
     for (var i = 0; i < blockResults.length; i += 1) {
         var block = blockResults[i];
@@ -95,14 +94,16 @@ exports.unforgeableWithId = function (id) {
         .slice(1);
     return Buffer.from(bytes).toString("hex");
 };
-exports.getPayment = function (timestamp, term, phloPrice, phloLimit) {
+exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000000; }
+    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = -1; }
     return {
         timestamp: timestamp,
         term: term,
         phloLimit: phloLimit,
-        phloPrice: phloPrice
+        phloPrice: phloPrice,
+        validAfterBlockNumber: validAfterBlockNumber
     };
 };
 exports.getDeployDataToSign = function (payment) {
@@ -113,7 +114,7 @@ exports.getDeployDataToSign = function (payment) {
                 return;
             }
             var DeployDataType = root.lookupType("DeployData");
-            var b = DeployDataType.encode(__assign({}, payment, { deployer: null, sig: null, sigAlgorithm: null })).finish();
+            var b = DeployDataType.encode(payment).finish();
             resolve(b);
         });
     });
@@ -123,53 +124,47 @@ exports.getBlake2Hash = function (toHash) {
     blakejs_1.blake2bUpdate(context, toHash);
     return blakejs_1.blake2bFinal(context);
 };
-exports.getKeccak256Hash = function (toHash) {
-    var hash = keccak256_1["default"](Buffer.from(toHash));
-    return new Uint8Array(hash);
-};
 exports.verifyPrivateAndPublicKey = function (privateKey, publicKey) {
-    var publicKeyFromPrivateKey = secp256k1_1["default"].publicKeyCreate(Buffer.from(privateKey, "hex"));
-    if (publicKeyFromPrivateKey.toString("hex") !== publicKey) {
+    var keyPair = ec.keyFromPrivate(privateKey);
+    if (keyPair.getPublic().encode("hex") !== publicKey) {
         throw new Error("Private key and public key do not match");
     }
 };
 exports.signSecp256k1 = function (hash, privateKey) {
-    var pubKey = secp256k1_1["default"].publicKeyCreate(Buffer.from(privateKey, "hex"));
-    var sigObj = secp256k1_1["default"].sign(hash, Buffer.from(privateKey, "hex"));
-    if (!secp256k1_1["default"].verify(hash, sigObj.signature, pubKey)) {
+    /*   console.log("privateKey", privateKey);
+    console.log("hash", hash); */
+    var keyPair = ec.keyFromPrivate(privateKey);
+    var signature = keyPair.sign(Buffer.from(hash));
+    var derSign = signature.toDER();
+    if (!ec.verify(Buffer.from(hash), signature, keyPair.getPublic().encode("hex"), "hex")) {
         throw new Error("Signature verification failed");
     }
-    return sigObj.signature;
+    return new Uint8Array(derSign);
 };
-exports.signEd25519 = function (hash, privateKey) {
-    return nacl.sign.detached(hash, Buffer.from(privateKey, "hex"));
-};
-exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, publicKey, phloPrice, phloLimit) {
+exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, publicKey, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000; }
+    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = -1; }
     return __awaiter(_this, void 0, void 0, function () {
         var payment, toSign, hash, signature;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    payment = exports.getPayment(timestamp, term, phloPrice, phloLimit);
+                    payment = exports.getPayment(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
                     return [4 /*yield*/, exports.getDeployDataToSign(payment)];
                 case 1:
                     toSign = _a.sent();
                     hash = exports.getBlake2Hash(toSign);
-                    if (!(sigAlgorithm === "ed25519")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, exports.signEd25519(hash, privateKey)];
-                case 2:
-                    signature = _a.sent();
-                    return [3 /*break*/, 6];
-                case 3:
-                    if (!(sigAlgorithm === "secp256k1")) return [3 /*break*/, 5];
-                    return [4 /*yield*/, exports.signSecp256k1(hash, privateKey)];
-                case 4:
-                    signature = _a.sent();
-                    return [3 /*break*/, 6];
-                case 5: throw new Error("Unsupported algorithm");
-                case 6: return [2 /*return*/, __assign({}, payment, { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: "ed25519" })];
+                    if (sigAlgorithm === "ed25519") {
+                        throw new Error("Unsupported algorithm ed25519; please use secp256k1");
+                    }
+                    else if (sigAlgorithm === "secp256k1") {
+                        signature = exports.signSecp256k1(hash, privateKey);
+                    }
+                    else {
+                        throw new Error("Unsupported algorithm");
+                    }
+                    return [2 /*return*/, __assign({}, payment, { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm })];
             }
         });
     });

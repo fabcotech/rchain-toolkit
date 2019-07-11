@@ -3,7 +3,7 @@ import { deepStrictEqual } from "assert";
 import {
   getDeployDataToSign,
   getDeployData,
-  signEd25519,
+  signSecp256k1,
   getBlake2Hash
 } from "../src/utils";
 import {
@@ -11,7 +11,7 @@ import {
   deployDataToSign,
   privateKey,
   publicKey,
-  deployDataEd25519,
+  deployDataSecp256k1,
   hash
 } from "../src/models/models.mock";
 import { DeployData } from "../src/models/models";
@@ -44,52 +44,55 @@ const testGetBlake2Hash = () => {
     } catch (err) {
       console.log("  X utils.getBlake2Hash");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.getBlake2Hash");
     resolve();
   });
 };
 
-const testGetDeployDataEd2519 = () => {
+const testGetDeployDataSecp256k1 = () => {
   return new Promise(async (resolve, reject) => {
     const deployDataFromPayment = await getDeployData(
-      "ed25519",
+      "secp256k1",
       payment.timestamp,
       payment.term,
       privateKey,
       publicKey,
       payment.phloPrice,
-      payment.phloLimit
+      payment.phloLimit,
+      payment.validAfterBlockNumber
     );
     try {
       deepStrictEqual(deployDataFromPayment, {
         ...payment,
-        deployer: deployDataEd25519.deployer,
-        sig: deployDataEd25519.sig,
-        sigAlgorithm: deployDataEd25519.sigAlgorithm
+        deployer: deployDataSecp256k1.deployer,
+        sig: deployDataSecp256k1.sig,
+        sigAlgorithm: deployDataSecp256k1.sigAlgorithm
       } as DeployData);
     } catch (err) {
-      console.log("  X utils.getDeployDataEd25519");
+      console.log("  X utils.getDeployDataSecp256k1");
       reject(err);
+      return;
     }
-    console.log("  ✓ utils.getDeployDataEd25519");
+    console.log("  ✓ utils.getDeployDataSecp256k1");
     resolve();
   });
 };
 
-const testSignEd2519 = () => {
+const testSignSecp256k1 = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const signatureEd25519 = signEd25519(
+      const signatureSecp256k1 = signSecp256k1(
         hashFromDeployDataToSign,
         privateKey
       );
-      deepStrictEqual(signatureEd25519, deployDataEd25519.sig);
+      deepStrictEqual(signatureSecp256k1, deployDataSecp256k1.sig);
     } catch (err) {
-      console.log("  X utils.signEd25519");
+      console.log("  X utils.signSecp256k1");
       reject(err);
     }
-    console.log("  ✓ utils.signEd25519");
+    console.log("  ✓ utils.signSecp256k1");
     resolve();
   });
 };
@@ -100,8 +103,8 @@ export const testUtils = () => {
       console.log("full tests running for utils.ts \n");
       await testGetDeployDataToSign();
       await testGetBlake2Hash();
-      await testGetDeployDataEd2519();
-      await testSignEd2519();
+      await testGetDeployDataSecp256k1();
+      await testSignSecp256k1();
       console.log("\n");
       resolve();
     } catch (err) {

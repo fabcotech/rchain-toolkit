@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "main": "dist/index.js",
   "scripts": {
@@ -26,9 +26,7 @@
   },
   "dependencies": {
     "blakejs": "^1.1.0",
-    "keccak256": "^1.0.0",
-    "protobufjs": "^6.8.8",
-    "secp256k1": "^3.7.1",
-    "tweetnacl": "^1.0.1"
+    "elliptic": "^6.5.0",
+    "protobufjs": "^6.8.8"
   }
 }

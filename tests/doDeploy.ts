@@ -6,9 +6,12 @@ import { deepStrictEqual } from "assert";
 import { parseEitherDoDeploy } from "../src/decoders";
 import {
   DoDeployResponse,
-  deployDataEd25519,
-  doDeployEd25519Response
+  deployDataSecp256k1,
+  doDeploySecp256k1Response,
+  payment,
+  EitherSuccess
 } from "../src/models";
+import { getDeployData } from "../src/utils";
 
 export const testDoDeploy = () => {
   return new Promise(async (resolve, reject) => {
@@ -18,14 +21,15 @@ export const testDoDeploy = () => {
       protoLoader
     );
 
-    const either = await doDeployRaw(deployDataEd25519, client);
+    const either = await doDeployRaw(deployDataSecp256k1, client);
 
     try {
-      deepStrictEqual(either, doDeployEd25519Response);
+      deepStrictEqual(either, doDeploySecp256k1Response);
       console.log("  ✓ grpc.doDeploy");
     } catch (err) {
       console.log("  X grpc.doDeploy");
       reject(err);
+      return;
     }
 
     let doeDeployResponse: DoDeployResponse | undefined;
@@ -36,6 +40,7 @@ export const testDoDeploy = () => {
     } catch (err) {
       console.log("  X decoders.parseEitherDoDeploy");
       reject(err);
+      return;
     }
 
     resolve();
