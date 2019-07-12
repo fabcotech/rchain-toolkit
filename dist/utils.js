@@ -106,6 +106,21 @@ exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfter
         validAfterBlockNumber: validAfterBlockNumber
     };
 };
+exports.getGPrivate = function (privateNameBuffer) {
+    return new Promise(function (resolve, reject) {
+        protobufjs_2.load(__dirname + "/protobuf/RhoTypes.proto", function (err, root) {
+            if (err || !root) {
+                reject(err);
+                return;
+            }
+            var GPrivateType = root.lookupType("GPrivate");
+            var gPrivateBody = GPrivateType.encode({
+                id: privateNameBuffer
+            });
+            resolve(gPrivateBody.finish());
+        });
+    });
+};
 exports.getDeployDataToSign = function (payment) {
     return new Promise(function (resolve, reject) {
         protobufjs_2.load(__dirname + "/protobuf/DeployService.proto", function (err, root) {
@@ -131,8 +146,6 @@ exports.verifyPrivateAndPublicKey = function (privateKey, publicKey) {
     }
 };
 exports.signSecp256k1 = function (hash, privateKey) {
-    /*   console.log("privateKey", privateKey);
-    console.log("hash", hash); */
     var keyPair = ec.keyFromPrivate(privateKey);
     var signature = keyPair.sign(Buffer.from(hash));
     var derSign = signature.toDER();
