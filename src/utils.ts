@@ -67,24 +67,6 @@ export const getPayment = (
   };
 };
 
-export const getGPrivate = (privateNameBuffer: Buffer): Promise<Buffer> => {
-  return new Promise((resolve, reject) => {
-    load(__dirname + "/protobuf/RhoTypes.proto", function(err, root) {
-      if (err || !root) {
-        reject(err);
-        return;
-      }
-
-      const GPrivateType = root.lookupType("GPrivate");
-      const gPrivateBody = GPrivateType.encode({
-        id: privateNameBuffer
-      });
-
-      resolve(gPrivateBody.finish() as Buffer);
-    });
-  });
-};
-
 export const getDeployDataToSign = (payment: Payment): Promise<Uint8Array> => {
   return new Promise((resolve, reject) => {
     load(__dirname + "/protobuf/DeployService.proto", function(err, root) {
@@ -124,10 +106,11 @@ export const signSecp256k1 = (
 
   const signature = keyPair.sign(Buffer.from(hash));
   const derSign = signature.toDER();
+
   if (
     !ec.verify(
       Buffer.from(hash),
-      signature,
+      Buffer.from(derSign),
       keyPair.getPublic().encode("hex"),
       "hex"
     )

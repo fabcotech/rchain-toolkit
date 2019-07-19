@@ -7,11 +7,8 @@ import { parseEitherDoDeploy } from "../src/decoders";
 import {
   DoDeployResponse,
   deployDataSecp256k1,
-  doDeploySecp256k1Response,
-  payment,
-  EitherSuccess
+  doDeploySecp256k1Response
 } from "../src/models";
-import { getDeployData } from "../src/utils";
 
 export const testDoDeploy = () => {
   return new Promise(async (resolve, reject) => {

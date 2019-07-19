@@ -13,7 +13,6 @@ import {
 import {
   unforgeableWithId,
   getDeployData,
-  getGPrivate,
   getValueFromBlocks
 } from "../src/utils";
 
@@ -77,13 +76,12 @@ export const testListenForDataAtName = () => {
 
     const privateNameBuffer = Buffer.from(privateNameFromNode, "hex");
 
-    const unforgeable = await getGPrivate(privateNameBuffer);
     const listenForDataAtNameResponse = await listenForDataAtName(
       {
         name: {
           unforgeables: [
             {
-              g_private_body: new Uint8Array(unforgeable)
+              g_private_body: { id: privateNameBuffer }
             }
           ]
         },
@@ -92,18 +90,18 @@ export const testListenForDataAtName = () => {
       client
     );
 
-    /*
-    TODO: there is no trace of the "world" string in the result, why ????
-    */
-    /*
-      JSON.stringify(listenForDataAtNameResponse):
-
-      {"blockResults":[{"postBlockData":[{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{"bundles":[{"body":{"unforgeables":[{"gPrivateBody":{"id":"Rku0kZoeQwiZlgtfVNG10FSpoPx4SrqRaXGz2IEdUm4="}}]},"writeFlag":true}]}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{"bundles":[{"body":{"unforgeables":[{"gPrivateBody":{"id":"AtGtSLqay0SERq9m4F3ddgtUDeZ3x4ILk9bVJnY9FV8="}}]},"writeFlag":true}]}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{"bundles":[{"body":{"unforgeables":[{"gPrivateBody":{"id":"slozgjNNKgNUAADu+1M7AcQf25EtDzi78ZA5HKlV10A="}}]},"writeFlag":true}]}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{"bundles":[{"body":{"unforgeables":[{"gPrivateBody":{"id":"FSpzdduM1wHQnVbVbz93gW+ee6TDaUheXIxFsmOiTmQ="}}]},"writeFlag":true}]}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{"bundles":[{"body":{"unforgeables":[{"gPrivateBody":{"id":"KYACq6uoO4wK4GW30l5C4bPkjUuwCiDzxOeQPYBr2hs="}}]},"writeFlag":true}]}]}}]},{"exprs":[{"eTupleBody":{"ps":[{"exprs":[{"gBool":true}]},{}]}}]}],"block":{"blockHash":"7b72fb54f23253829ac0197bb5b5fc4d1fd021462e101fdbca049d241486a789","blockSize":"260592","version":"1","deployCount":14,"tupleSpaceHash":"a118af32f29d1b8bfcbb5a9ed3a2c51fc586e361a1a0e5444f2e1264b716dea0","timestamp":"1561316050861","faultTolerance":-0.3333333432674408}}],"length":1}
-   */
-
     const valueFromBlocks = getValueFromBlocks(
       listenForDataAtNameResponse.blockResults
     );
+
+    if (valueFromBlocks.exprs[0].gString === "world") {
+      console.log("  ✓ grpc.listenForDataAtName");
+      console.log("  ✓ utils.getValueFromBlocks");
+    } else {
+      console.log("  X grpc.listenForDataAtName");
+      console.log("  ✓ utils.getValueFromBlocks");
+      reject();
+    }
 
     resolve();
   });

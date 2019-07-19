@@ -27,13 +27,14 @@ const main = async () => {
   );
 
   const deployData = await rchainToolkit.utils.getDeployData(
-    "ed25519",
-    1560802892221,
+    "secp256k1",
+    new Date().valueOf(),
     `new hello in { hello!("world") }`,
-    "e416638cd5a283be10a724b2b41e8f76c9e48fbbe3ccf6172bfa1293fd7ee476499819f316b7fe95d723b232ba430cf7e3b68af155eb8253905d64e1fbace058",
-    "499819f316b7fe95d723b232ba430cf7e3b68af155eb8253905d64e1fbace058",
+    "de34f27c7a542935e64b8adc6c01511bb669e5c97e61f5fd582b1fa990fded87",
+    "041e4b07f1d4e6f3d088ad0b9fcef8e1ded5ac337a35db332ab8d8b8d42553c35cd3032d437f3a33dc9fb0ce6817ec51a2fedbce74c646b797ca0adafe5c5be24f",
     1,
-    100000
+    100000,
+    -1
   );
 
   let a;
