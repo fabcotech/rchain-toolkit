@@ -13,10 +13,7 @@ export const testGetBlocks = () => {
       protoLoader
     );
 
-    console.log("yes");
     const either = await getBlocksRaw({ depth: 1 }, client);
-
-    console.log(either);
 
     let getBlocksResponse: any | undefined;
     try {

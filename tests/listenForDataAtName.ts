@@ -60,7 +60,6 @@ export const testListenForDataAtName = () => {
 
       await doDeploy(deployData, client);
     } catch (err) {
-      console.log(err);
       reject(err);
       return;
     }
@@ -74,7 +73,9 @@ export const testListenForDataAtName = () => {
       return;
     }
 
-    const privateNameBuffer = Buffer.from(privateNameFromNode, "hex");
+    const privateNameBuffer = Array.from(
+      new Uint8Array(Buffer.from(privateNameFromNode, "hex"))
+    );
 
     const listenForDataAtNameResponse = await listenForDataAtName(
       {

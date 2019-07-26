@@ -51,6 +51,7 @@ var blakejs_1 = require("blakejs");
 var elliptic = require("elliptic");
 var protobufjs_1 = require("protobufjs");
 var protobufjs_2 = require("protobufjs");
+var rhoTypes = require("./pbjs/RhoTypes");
 var ec = new elliptic.ec("secp256k1");
 exports.getValueFromBlocks = function (blockResults) {
     for (var i = 0; i < blockResults.length; i += 1) {
@@ -64,25 +65,54 @@ exports.getValueFromBlocks = function (blockResults) {
     }
     throw new Error("Not data found in any block");
 };
+var rholangUnforgeablesToJs = function (unfs) {
+    var unforgeables = [];
+    unfs.forEach(function (u) {
+        var x = {};
+        var encoded = rhoTypes.GUnforgeable.encode(u);
+        var decoded = rhoTypes.GUnforgeable.decode(encoded.finish());
+        if (decoded.gPrivateBody) {
+            x.gPrivate = Buffer.from(decoded.gPrivateBody.id).toString("hex");
+        }
+        else if (decoded.gDeployIdBody) {
+            x.gDeployId = Buffer.from(decoded.gDeployIdBody.id).toString("hex");
+        }
+        else if (decoded.gDeployerIdBody) {
+            x.gDeployerId = Buffer.from(decoded.gDeployerIdBody.id).toString("hex");
+        }
+        unforgeables.push(x);
+    });
+    return unforgeables;
+};
 exports.rholangMapToJsObject = function (map) {
     var obj = {};
     map.kvs.forEach(function (kv) {
-        var k = kv.key.exprs[0].g_string;
+        var k = kv.key.exprs[0].gString;
         var val = kv.value;
         if (val.ids && val.ids[0]) {
             obj[k] = val.ids[0].id;
         }
-        else if (val.exprs && val.exprs[0].g_string) {
-            obj[k] = val.exprs[0].g_string;
+        else if (val.exprs && val.exprs[0].gString) {
+            obj[k] = val.exprs[0].gString;
         }
-        else if (val.exprs && val.exprs[0].g_uri) {
-            obj[k] = val.exprs[0].g_uri;
+        else if (val.exprs && val.exprs[0].gUri) {
+            obj[k] = val.exprs[0].gUri;
         }
-        else if (val.exprs && val.exprs[0].hasOwnProperty("g_bool")) {
-            obj[k] = val.exprs[0].g_bool;
+        else if (val.exprs && val.exprs[0].hasOwnProperty("gBool")) {
+            obj[k] = val.exprs[0].gBool;
         }
-        else if (val.exprs && val.exprs[0].g_int) {
-            obj[k] = val.exprs[0].g_int;
+        else if (val.exprs && val.exprs[0].gInt) {
+            obj[k] = val.exprs[0].gInt;
+        }
+        else if (val.exprs && val.exprs[0].eMapBody) {
+            obj[k] = exports.rholangMapToJsObject(val.exprs[0].eMapBody);
+        }
+        else if (val.unforgeables) {
+            var unfs = rholangUnforgeablesToJs(val.unforgeables);
+            Object.defineProperty(obj, k, { value: unfs, writable: false });
+        }
+        else {
+            console.warn("Not implemented", val);
         }
     });
     return obj;

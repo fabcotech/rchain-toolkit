@@ -2,8 +2,11 @@ import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
 import * as elliptic from "elliptic";
 import { Writer } from "protobufjs";
 import { load } from "protobufjs";
+
 import { Payment, DeployData, SigAlgorithm } from "./models/models";
 import { DataWithBlockInfo, Par } from "./models";
+import { payment as p1 } from "./models";
+import * as rhoTypes from "./pbjs/RhoTypes";
 
 const ec = new elliptic.ec("secp256k1");
 
@@ -20,22 +23,55 @@ export const getValueFromBlocks = (blockResults: DataWithBlockInfo[]): Par => {
   throw new Error("Not data found in any block");
 };
 
-export const rholangMapToJsObject = (map: any): { [key: string]: any } => {
+const rholangUnforgeablesToJs = (unfs: any) => {
+  const unforgeables: {
+    gPrivate?: string;
+    gDeployId?: string;
+    gDeployerId?: string;
+  }[] = [];
+
+  unfs.forEach((u: any) => {
+    const x: { [key: string]: string } = {};
+    const encoded = rhoTypes.GUnforgeable.encode(u);
+
+    const decoded = rhoTypes.GUnforgeable.decode(encoded.finish());
+
+    if (decoded.gPrivateBody) {
+      x.gPrivate = Buffer.from(decoded.gPrivateBody.id).toString("hex");
+    } else if (decoded.gDeployIdBody) {
+      x.gDeployId = Buffer.from(decoded.gDeployIdBody.id).toString("hex");
+    } else if (decoded.gDeployerIdBody) {
+      x.gDeployerId = Buffer.from(decoded.gDeployerIdBody.id).toString("hex");
+    }
+
+    unforgeables.push(x);
+  });
+
+  return unforgeables;
+};
+
+export const rholangMapToJsObject = (map: any) => {
   const obj: { [key: string]: any } = {};
   map.kvs.forEach((kv: any) => {
-    const k = kv.key.exprs[0].g_string;
-
+    const k = kv.key.exprs[0].gString;
     const val = kv.value;
     if (val.ids && val.ids[0]) {
       obj[k] = val.ids[0].id;
-    } else if (val.exprs && val.exprs[0].g_string) {
-      obj[k] = val.exprs[0].g_string;
-    } else if (val.exprs && val.exprs[0].g_uri) {
-      obj[k] = val.exprs[0].g_uri;
-    } else if (val.exprs && val.exprs[0].hasOwnProperty("g_bool")) {
-      obj[k] = val.exprs[0].g_bool;
-    } else if (val.exprs && val.exprs[0].g_int) {
-      obj[k] = val.exprs[0].g_int;
+    } else if (val.exprs && val.exprs[0].gString) {
+      obj[k] = val.exprs[0].gString;
+    } else if (val.exprs && val.exprs[0].gUri) {
+      obj[k] = val.exprs[0].gUri;
+    } else if (val.exprs && val.exprs[0].hasOwnProperty("gBool")) {
+      obj[k] = val.exprs[0].gBool;
+    } else if (val.exprs && val.exprs[0].gInt) {
+      obj[k] = val.exprs[0].gInt;
+    } else if (val.exprs && val.exprs[0].eMapBody) {
+      obj[k] = rholangMapToJsObject(val.exprs[0].eMapBody);
+    } else if (val.unforgeables) {
+      const unfs = rholangUnforgeablesToJs(val.unforgeables);
+      Object.defineProperty(obj, k, { value: unfs, writable: false });
+    } else {
+      console.warn("Not implemented", val);
     }
   });
 
@@ -138,6 +174,7 @@ export const getDeployData = async (
     phloLimit,
     validAfterBlockNumber
   );
+
   const toSign = await getDeployDataToSign(payment);
   const hash = getBlake2Hash(toSign);
 
