@@ -4,7 +4,11 @@ import { deepStrictEqual } from "assert";
 
 import { publicKey, payment, privateName } from "../src/models/models.mock";
 import { parseEitherPrivateNamesPreview } from "../src/decoders";
-import { previewPrivateNamesRaw, getGrpcDeployClient } from "../src/grpc";
+import {
+  previewPrivateNamesRaw,
+  getGrpcDeployClient,
+  previewPrivateNames
+} from "../src/grpc";
 import {
   privateNamePreviewResponse,
   privateNamesResponse
@@ -54,6 +58,23 @@ export const testPreviewPrivateNames = () => {
       console.log("  ✓ utils.unforgeableWithId");
     } catch (err) {
       console.log("  X utils.unforgeableWithId");
+      reject(err);
+    }
+
+    const privateNamesFromNode2 = await previewPrivateNames(
+      {
+        user: Buffer.from(publicKey, "hex"),
+        timestamp: payment.timestamp,
+        nameQty: 1
+      },
+      client
+    );
+
+    try {
+      deepStrictEqual(privateNamesFromNode2.ids, privateNamesResponse.ids);
+      console.log("  ✓ grpc.previewPrivateNames");
+    } catch (err) {
+      console.log("  X grpc.previewPrivateNames");
       reject(err);
     }
 

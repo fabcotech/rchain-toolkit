@@ -57,19 +57,23 @@ export const rholangMapToJsObject = (map: any) => {
     const val = kv.value;
     if (val.ids && val.ids[0]) {
       obj[k] = val.ids[0].id;
-    } else if (val.exprs && val.exprs[0].gString) {
-      obj[k] = val.exprs[0].gString;
-    } else if (val.exprs && val.exprs[0].gUri) {
-      obj[k] = val.exprs[0].gUri;
-    } else if (val.exprs && val.exprs[0].hasOwnProperty("gBool")) {
-      obj[k] = val.exprs[0].gBool;
-    } else if (val.exprs && val.exprs[0].gInt) {
-      obj[k] = val.exprs[0].gInt;
-    } else if (val.exprs && val.exprs[0].eMapBody) {
-      obj[k] = rholangMapToJsObject(val.exprs[0].eMapBody);
-    } else if (val.unforgeables) {
+    } else if (val.exprs && val.exprs[0]) {
+      if (val.exprs[0].gString) {
+        obj[k] = val.exprs[0].gString;
+      } else if (val.exprs[0].gUri) {
+        obj[k] = val.exprs[0].gUri;
+      } else if (val.exprs[0].hasOwnProperty("gBool")) {
+        obj[k] = val.exprs[0].gBool;
+      } else if (val.exprs[0].gInt) {
+        obj[k] = val.exprs[0].gInt;
+      } else if (val.exprs[0].eMapBody) {
+        obj[k] = rholangMapToJsObject(val.exprs[0].eMapBody);
+      } else {
+        console.warn("Not implemented", val);
+      }
+    } else if (val.unforgeables && val.unforgeables[0]) {
       const unfs = rholangUnforgeablesToJs(val.unforgeables);
-      Object.defineProperty(obj, k, { value: unfs, writable: false });
+      obj[k] = unfs;
     } else {
       console.warn("Not implemented", val);
     }
