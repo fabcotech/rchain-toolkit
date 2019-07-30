@@ -6,9 +6,11 @@ import { deepStrictEqual } from "assert";
 import { parseEitherDoDeploy } from "../src/decoders";
 import {
   DoDeployResponse,
-  deployDataSecp256k1,
-  doDeploySecp256k1Response
+  payment,
+  privateKey,
+  publicKey
 } from "../src/models";
+import { getDeployData } from "../src/utils";
 
 export const testDoDeploy = () => {
   return new Promise(async (resolve, reject) => {
@@ -18,10 +20,23 @@ export const testDoDeploy = () => {
       protoLoader
     );
 
+    const deployDataSecp256k1 = await getDeployData(
+      "secp256k1",
+      new Date().valueOf(),
+      payment.term,
+      privateKey,
+      publicKey,
+      payment.phloPrice,
+      payment.phloLimit,
+      payment.validAfterBlockNumber
+    );
+
     const either = await doDeployRaw(deployDataSecp256k1, client);
 
     try {
-      deepStrictEqual(either, doDeploySecp256k1Response);
+      if (either.content !== "success") {
+        throw new Error("Either should be success");
+      }
       console.log("  ✓ grpc.doDeploy");
     } catch (err) {
       console.log("  X grpc.doDeploy");
