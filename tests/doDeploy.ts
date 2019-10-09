@@ -14,7 +14,7 @@ export const testDoDeploy = () => {
       protoLoader
     );
 
-    const deployDataSecp256k1 = await getDeployData(
+    const deployDataSecp256k1 = getDeployData(
       "secp256k1",
       new Date().valueOf(),
       payment.term,

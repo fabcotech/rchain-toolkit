@@ -147,7 +147,7 @@ export const signSecp256k1 = (
   return new Uint8Array(derSign);
 };
 
-export const getDeployData = async (
+export const getDeployData = (
   sigAlgorithm: SigAlgorithm,
   timestamp: number,
   term: string,
@@ -156,7 +156,7 @@ export const getDeployData = async (
   phloPrice = 1,
   phloLimit = 10000,
   validAfterBlockNumber = -1
-): Promise<DeployData> => {
+): DeployData => {
   const payment = getPayment(
     timestamp,
     term,

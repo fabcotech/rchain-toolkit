@@ -49,7 +49,7 @@ export const testListenForDataAtName = () => {
     }
 
     try {
-      const deployData = await getDeployData(
+      const deployData = getDeployData(
         "secp256k1",
         timestamp,
         'new hello, stdout(`rho:io:stdout`) in { hello!("world") | stdout!(*hello) }',
