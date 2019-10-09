@@ -1,4 +1,4 @@
-import { getPayment } from "./utils";
+import { getPayment, getDeployDataToSign } from "./utils";
 
 test("getPayment", () => {
   expect(getPayment(1, "a", 2, 3)).toEqual({

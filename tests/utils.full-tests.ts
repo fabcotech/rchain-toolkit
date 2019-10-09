@@ -21,7 +21,7 @@ let hashFromDeployDataToSign: Uint8Array;
 
 const testGetDeployDataToSign = () => {
   return new Promise(async (resolve, reject) => {
-    deployDataToSignFromPayment = await getDeployDataToSign(payment);
+    deployDataToSignFromPayment = getDeployDataToSign(payment);
     try {
       deepStrictEqual(
         Array.from(deployDataToSignFromPayment),
@@ -63,6 +63,7 @@ const testGetDeployDataSecp256k1 = () => {
       payment.phloLimit,
       payment.validAfterBlockNumber
     );
+
     try {
       deepStrictEqual(deployDataFromPayment, {
         ...payment,

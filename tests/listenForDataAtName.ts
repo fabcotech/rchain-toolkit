@@ -4,11 +4,11 @@ import * as protoLoader from "@grpc/proto-loader";
 import { publicKey, privateKey } from "../src/models/models.mock";
 import {
   getGrpcDeployClient,
-  doDeploy,
-  previewPrivateNames,
   getGrpcProposeClient,
-  listenForDataAtName,
-  propose
+  propose,
+  previewPrivateNamesRaw,
+  doDeployRaw,
+  listenForDataAtNameRaw
 } from "../src/grpc";
 import {
   unforgeableWithId,
@@ -30,7 +30,7 @@ export const testListenForDataAtName = () => {
     );
 
     const timestamp = new Date().valueOf();
-    const privateNamesFromNode = await previewPrivateNames(
+    const previewPrivateNamesResponse = await previewPrivateNamesRaw(
       {
         user: Buffer.from(publicKey, "hex"),
         timestamp: timestamp,
@@ -41,7 +41,9 @@ export const testListenForDataAtName = () => {
 
     let privateNameFromNode;
     try {
-      privateNameFromNode = unforgeableWithId(privateNamesFromNode.ids[0]);
+      privateNameFromNode = unforgeableWithId(
+        Buffer.from(previewPrivateNamesResponse.payload.ids[0])
+      );
     } catch (err) {
       reject(err);
     }
@@ -58,7 +60,13 @@ export const testListenForDataAtName = () => {
         -1
       );
 
-      await doDeploy(deployData, client);
+      const deployDataResponse = await doDeployRaw(deployData, client);
+      if (deployDataResponse.error) {
+        throw new Error(
+          "There was an error when deploying : " +
+            deployDataResponse.error.messages
+        );
+      }
     } catch (err) {
       reject(err);
       return;
@@ -77,7 +85,7 @@ export const testListenForDataAtName = () => {
       new Uint8Array(Buffer.from(privateNameFromNode, "hex"))
     );
 
-    const listenForDataAtNameResponse = await listenForDataAtName(
+    const listenForDataAtNameResponse = await listenForDataAtNameRaw(
       {
         name: {
           unforgeables: [
@@ -92,18 +100,18 @@ export const testListenForDataAtName = () => {
     );
 
     const valueFromBlocks = getValueFromBlocks(
-      listenForDataAtNameResponse.blockResults
+      listenForDataAtNameResponse.payload.blockInfo
     );
 
-    if (valueFromBlocks.exprs[0].gString === "world") {
+    if ((valueFromBlocks.exprs[0] as any).g_string === "world") {
       console.log("  ✓ grpc.listenForDataAtName");
       console.log("  ✓ utils.getValueFromBlocks");
     } else {
       console.log("  X grpc.listenForDataAtName");
       console.log("  ✓ utils.getValueFromBlocks");
       reject();
+      return;
     }
-
     resolve();
   });
 };

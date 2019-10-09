@@ -3,13 +3,7 @@ import * as protoLoader from "@grpc/proto-loader";
 
 import { getGrpcDeployClient, doDeployRaw } from "../src/grpc";
 import { deepStrictEqual } from "assert";
-import { parseEitherDoDeploy } from "../src/decoders";
-import {
-  DoDeployResponse,
-  payment,
-  privateKey,
-  publicKey
-} from "../src/models";
+import { payment, privateKey, publicKey } from "../src/models";
 import { getDeployData } from "../src/utils";
 
 export const testDoDeploy = () => {
@@ -31,26 +25,18 @@ export const testDoDeploy = () => {
       payment.validAfterBlockNumber
     );
 
-    const either = await doDeployRaw(deployDataSecp256k1, client);
+    const response = await doDeployRaw(deployDataSecp256k1, client);
 
     try {
-      if (either.content !== "success") {
-        throw new Error("Either should be success");
+      if (response.error) {
+        throw new Error(
+          "There was an error when deploying : " + response.error.messages
+        );
       }
+      deepStrictEqual(response.result.slice(0, 8), "Success!");
       console.log("  ✓ grpc.doDeploy");
     } catch (err) {
       console.log("  X grpc.doDeploy");
-      reject(err);
-      return;
-    }
-
-    let doeDeployResponse: DoDeployResponse | undefined;
-    try {
-      doeDeployResponse = await parseEitherDoDeploy(either);
-      deepStrictEqual(doeDeployResponse.message.slice(0, 8), "Success!");
-      console.log("  ✓ decoders.parseEitherDoDeploy");
-    } catch (err) {
-      console.log("  X decoders.parseEitherDoDeploy");
       reject(err);
       return;
     }

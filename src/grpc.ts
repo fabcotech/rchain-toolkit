@@ -1,37 +1,7 @@
 import { DeployData } from "./models/models";
-import * as decoders from "./decoders";
-import {
-  EitherSuccess,
-  EitherError,
-  Either,
-  PrivateNamePreviewResponse,
-  ListeningNameDataResponse
-} from "./models";
+import * as rnodeProtos from "./rnode-protos";
 
-export const getFull = (
-  options: any,
-  client: any,
-  grpcMethod: string,
-  parseMethod: string
-): Promise<any> => {
-  return new Promise(async (resolve, reject) => {
-    const either = await getRaw(options, client, grpcMethod);
-    if (either.hasOwnProperty("success")) {
-      const resp = await (decoders as any)[parseMethod](
-        either as EitherSuccess
-      );
-      resolve(resp);
-    } else {
-      reject((either as EitherError).error.messages);
-    }
-  });
-};
-
-export const getRaw = (
-  options: any,
-  client: any,
-  method: string
-): Promise<Either> => {
+export const getRaw = (options: any, client: any, method: string): any => {
   return new Promise((resolve, reject) => {
     client[method](options, async (err: any, resp: any) => {
       if (err) {
@@ -48,67 +18,31 @@ export const getRaw = (
 export const listenForDataAtNameRaw = (
   options: any,
   client: any
-): Promise<Either> => {
+): Promise<rnodeProtos.casper.v1.ListeningNameDataResponse> => {
   return getRaw(options, client, "listenForDataAtName");
-};
-export const listenForDataAtName = (
-  options: any,
-  client: any
-): Promise<ListeningNameDataResponse> => {
-  return getFull(
-    options,
-    client,
-    "listenForDataAtName",
-    "parseEitherListeningNameData"
-  );
 };
 
 // Do deploy
-
 export const doDeployRaw = (
   options: DeployData,
   client: any
-): Promise<Either> => {
-  return getRaw(options, client, "DoDeploy");
-};
-export const doDeploy = (deployData: DeployData, client: any) => {
-  return getFull(deployData, client, "DoDeploy", "parseEitherDoDeploy");
+): Promise<rnodeProtos.casper.v1.DeployResponse> => {
+  return getRaw(options, client, "doDeploy");
 };
 
 // Preview private names
-
 export const previewPrivateNamesRaw = (
   options: any,
   client: any
-): Promise<Either> => {
+): Promise<rnodeProtos.casper.v1.PrivateNamePreviewResponse> => {
   return getRaw(options, client, "previewPrivateNames");
 };
 
-export const previewPrivateNames = (
+// Propose
+export const propose = (
   options: any,
   client: any
-): Promise<PrivateNamePreviewResponse> => {
-  return getFull(
-    options,
-    client,
-    "previewPrivateNames",
-    "parseEitherPrivateNamesPreview"
-  );
-};
-
-// getBlocks
-
-export const getBlocksRaw = (options: any, client: any): Promise<Either> => {
-  return getRaw(options, client, "getBlocks");
-};
-
-export const getBlocks = (options: any, client: any): Promise<any> => {
-  return getFull(options, client, "getBlocks", "parseGetBlocks");
-};
-
-// Propose
-
-export const propose = (options: any, client: any): Promise<Either> => {
+): Promise<rnodeProtos.casper.v1.ProposeResponse> => {
   return getRaw(options, client, "propose");
 };
 
@@ -118,9 +52,9 @@ const getClient = (
   protoLoader: any,
   protoService: "deployService" | "proposeService"
 ) => {
-  let path = "/protobuf/DeployService.proto";
+  let path = "/protobuf/DeployServiceV1.proto";
   if (protoService === "proposeService") {
-    path = "/protobuf/ProposeService.proto";
+    path = "/protobuf/ProposeServiceV1.proto";
   }
   return new Promise((resolve, reject) => {
     protoLoader
@@ -135,12 +69,12 @@ const getClient = (
         const packageObject = grpc.loadPackageDefinition(packageDefinition);
         let client;
         if (protoService === "deployService") {
-          client = new (packageObject.coop as any).rchain.casper.protocol.DeployService(
+          client = new (packageObject as any).casper.v1.DeployService(
             grpcEndPoint,
             grpc.credentials.createInsecure()
           );
         } else {
-          client = new (packageObject.coop as any).rchain.casper.protocol.ProposeService(
+          client = new (packageObject as any).casper.v1.ProposeService(
             grpcEndPoint,
             grpc.credentials.createInsecure()
           );

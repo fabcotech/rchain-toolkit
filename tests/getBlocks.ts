@@ -12,10 +12,10 @@ export const testGetBlocks = () => {
       grpc,
       protoLoader
     );
-
     const either = await getBlocksRaw({ depth: 1 }, client);
 
-    let getBlocksResponse: any | undefined;
+    console.log(either);
+    /*     let getBlocksResponse: any | undefined;
     try {
       getBlocksResponse = await parseEitherGetBlocks(either);
       deepStrictEqual(getBlocksResponse.message.slice(0, 8), "Success!");
@@ -24,6 +24,6 @@ export const testGetBlocks = () => {
     } catch (err) {
       console.log("  X decoders.parseEitherGetBlocks");
       reject(err);
-    }
+    } */
   });
 };

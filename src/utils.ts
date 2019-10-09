@@ -1,22 +1,29 @@
 import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
 import * as elliptic from "elliptic";
 import { Writer } from "protobufjs";
-import { load } from "protobufjs";
 
-import { Payment, DeployData, SigAlgorithm } from "./models/models";
-import { DataWithBlockInfo, Par } from "./models";
-import { payment as p1 } from "./models";
-import * as rhoTypes from "./pbjs/RhoTypes";
+import {
+  Payment,
+  DeployData,
+  SigAlgorithm,
+  DataWithBlockInfo,
+  Par
+} from "./models";
+import * as rnodeProtos from "./rnode-protos";
 
 const ec = new elliptic.ec("secp256k1");
 
-export const getValueFromBlocks = (blockResults: DataWithBlockInfo[]): Par => {
+export const getValueFromBlocks = (
+  blockResults: rnodeProtos.casper.IDataWithBlockInfo[]
+): rnodeProtos.IPar => {
   for (let i = 0; i < blockResults.length; i += 1) {
     const block = blockResults[i];
-    for (let j = 0; j < block.postBlockData.length; j += 1) {
-      const data = block.postBlockData[j];
-      if (data) {
-        return data;
+    if (block.postBlockData) {
+      for (let j = 0; j < block.postBlockData.length; j += 1) {
+        const data = block.postBlockData[j];
+        if (data) {
+          return data;
+        }
       }
     }
   }
@@ -32,9 +39,10 @@ const rholangUnforgeablesToJs = (unfs: any) => {
 
   unfs.forEach((u: any) => {
     const x: { [key: string]: string } = {};
-    const encoded = rhoTypes.GUnforgeable.encode(u);
-
-    const decoded = rhoTypes.GUnforgeable.decode(encoded.finish());
+    const encoded = rnodeProtos.GUnforgeable.encode(u).finish();
+    const decoded = rnodeProtos.GUnforgeable.decode(encoded).toJSON();
+    console.log(decoded);
+    console.log(decoded.gPrivateBody);
 
     if (decoded.gPrivateBody) {
       x.gPrivate = Buffer.from(decoded.gPrivateBody.id).toString("hex");
@@ -107,19 +115,8 @@ export const getPayment = (
   };
 };
 
-export const getDeployDataToSign = (payment: Payment): Promise<Uint8Array> => {
-  return new Promise((resolve, reject) => {
-    load(__dirname + "/protobuf/DeployService.proto", function(err, root) {
-      if (err || !root) {
-        reject(err);
-        return;
-      }
-      const DeployDataType = root.lookupType("DeployData");
-      const b = DeployDataType.encode(payment).finish();
-
-      resolve(b);
-    });
-  });
+export const getDeployDataToSign = (payment: Payment): Uint8Array => {
+  return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
 };
 
 export const getBlake2Hash = (toHash: Uint8Array): Uint8Array => {
@@ -179,7 +176,8 @@ export const getDeployData = async (
     validAfterBlockNumber
   );
 
-  const toSign = await getDeployDataToSign(payment);
+  const toSign = getDeployDataToSign(payment);
+
   const hash = getBlake2Hash(toSign);
 
   let signature: Uint8Array;

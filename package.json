@@ -1,13 +1,22 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
+  "keywords": [
+    "rchain",
+    "rnode",
+    "rholang",
+    "blockchain",
+    "dag",
+    "smart contract",
+    "grpc"
+  ],
   "main": "dist/index.js",
   "scripts": {
     "test:jest": "jest",
     "test:full": "node test.js",
     "compile": "tsc src/index.ts --outDir dist && cp -r src/protobuf dist/protobuf && cp -r src/pbjs dist/pbjs",
-    "compile:tests": "tsc tests/index.ts --outDir testsc && cp -r src/protobuf testsc/src/protobuf && cp -r src/pbjs testsc/src/",
+    "compile:tests": "tsc tests/index.ts --outDir testsc && cp -r src/protobuf testsc/src/ && cp -r src/pbjs testsc/src/ && cp src/rnode-protos.js testsc/src/",
     "compile:examples": "rm examples/*.js && tsc examples/*"
   },
   "author": "FABCO",
