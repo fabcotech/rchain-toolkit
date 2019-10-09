@@ -1,7 +1,7 @@
 import { DeployData } from "./models/models";
 import * as rnodeProtos from "./rnode-protos";
 
-export const getRaw = (options: any, client: any, method: string): any => {
+export const getMethod = (options: any, client: any, method: string): any => {
   return new Promise((resolve, reject) => {
     client[method](options, async (err: any, resp: any) => {
       if (err) {
@@ -15,27 +15,27 @@ export const getRaw = (options: any, client: any, method: string): any => {
 
 // Listen for data at name
 
-export const listenForDataAtNameRaw = (
+export const listenForDataAtName = (
   options: any,
   client: any
 ): Promise<rnodeProtos.casper.v1.ListeningNameDataResponse> => {
-  return getRaw(options, client, "listenForDataAtName");
+  return getMethod(options, client, "listenForDataAtName");
 };
 
 // Do deploy
-export const doDeployRaw = (
+export const doDeploy = (
   options: DeployData,
   client: any
 ): Promise<rnodeProtos.casper.v1.DeployResponse> => {
-  return getRaw(options, client, "doDeploy");
+  return getMethod(options, client, "doDeploy");
 };
 
 // Preview private names
-export const previewPrivateNamesRaw = (
+export const previewPrivateNames = (
   options: any,
   client: any
 ): Promise<rnodeProtos.casper.v1.PrivateNamePreviewResponse> => {
-  return getRaw(options, client, "previewPrivateNames");
+  return getMethod(options, client, "previewPrivateNames");
 };
 
 // Propose
@@ -43,7 +43,7 @@ export const propose = (
   options: any,
   client: any
 ): Promise<rnodeProtos.casper.v1.ProposeResponse> => {
-  return getRaw(options, client, "propose");
+  return getMethod(options, client, "propose");
 };
 
 const getClient = (

@@ -3,7 +3,7 @@ import * as protoLoader from "@grpc/proto-loader";
 import { deepStrictEqual } from "assert";
 
 import { publicKey, payment, privateName } from "../src/models/models.mock";
-import { previewPrivateNamesRaw, getGrpcDeployClient } from "../src/grpc";
+import { previewPrivateNames, getGrpcDeployClient } from "../src/grpc";
 import { privateNamePreviewResponse } from "../src/models/api.mock";
 import { unforgeableWithId } from "../src/utils";
 
@@ -15,7 +15,7 @@ export const testPreviewPrivateNames = () => {
       protoLoader
     );
 
-    const response = await previewPrivateNamesRaw(
+    const response = await previewPrivateNames(
       {
         user: Buffer.from(publicKey, "hex"),
         timestamp: payment.timestamp,

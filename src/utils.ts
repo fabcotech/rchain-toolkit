@@ -2,22 +2,16 @@ import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
 import * as elliptic from "elliptic";
 import { Writer } from "protobufjs";
 
-import {
-  Payment,
-  DeployData,
-  SigAlgorithm,
-  DataWithBlockInfo,
-  Par
-} from "./models";
+import { Payment, DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
 
 const ec = new elliptic.ec("secp256k1");
 
 export const getValueFromBlocks = (
-  blockResults: rnodeProtos.casper.IDataWithBlockInfo[]
+  blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]
 ): rnodeProtos.IPar => {
-  for (let i = 0; i < blockResults.length; i += 1) {
-    const block = blockResults[i];
+  for (let i = 0; i < blockInfo.length; i += 1) {
+    const block = blockInfo[i];
     if (block.postBlockData) {
       for (let j = 0; j < block.postBlockData.length; j += 1) {
         const data = block.postBlockData[j];
@@ -39,17 +33,12 @@ const rholangUnforgeablesToJs = (unfs: any) => {
 
   unfs.forEach((u: any) => {
     const x: { [key: string]: string } = {};
-    const encoded = rnodeProtos.GUnforgeable.encode(u).finish();
-    const decoded = rnodeProtos.GUnforgeable.decode(encoded).toJSON();
-    console.log(decoded);
-    console.log(decoded.gPrivateBody);
-
-    if (decoded.gPrivateBody) {
-      x.gPrivate = Buffer.from(decoded.gPrivateBody.id).toString("hex");
-    } else if (decoded.gDeployIdBody) {
-      x.gDeployId = Buffer.from(decoded.gDeployIdBody.id).toString("hex");
-    } else if (decoded.gDeployerIdBody) {
-      x.gDeployerId = Buffer.from(decoded.gDeployerIdBody.id).toString("hex");
+    if (u.g_private_body) {
+      x.gPrivate = Buffer.from(u.g_private_body.id).toString("hex");
+    } else if (u.g_deploy_id_body) {
+      x.gDeployId = Buffer.from(u.g_deploy_id_body.id).toString("hex");
+    } else if (u.g_deployer_id_body) {
+      x.gDeployerId = Buffer.from(u.g_deployer_id_body.id).toString("hex");
     }
 
     unforgeables.push(x);
@@ -61,21 +50,21 @@ const rholangUnforgeablesToJs = (unfs: any) => {
 export const rholangMapToJsObject = (map: any) => {
   const obj: { [key: string]: any } = {};
   map.kvs.forEach((kv: any) => {
-    const k = kv.key.exprs[0].gString;
+    const k = kv.key.exprs[0].g_string;
     const val = kv.value;
     if (val.ids && val.ids[0]) {
       obj[k] = val.ids[0].id;
     } else if (val.exprs && val.exprs[0]) {
-      if (val.exprs[0].gString) {
-        obj[k] = val.exprs[0].gString;
-      } else if (val.exprs[0].gUri) {
-        obj[k] = val.exprs[0].gUri;
-      } else if (val.exprs[0].hasOwnProperty("gBool")) {
-        obj[k] = val.exprs[0].gBool;
-      } else if (val.exprs[0].gInt) {
-        obj[k] = val.exprs[0].gInt;
-      } else if (val.exprs[0].eMapBody) {
-        obj[k] = rholangMapToJsObject(val.exprs[0].eMapBody);
+      if (val.exprs[0].g_string) {
+        obj[k] = val.exprs[0].g_string;
+      } else if (val.exprs[0].g_uri) {
+        obj[k] = val.exprs[0].g_uri;
+      } else if (val.exprs[0].hasOwnProperty("g_bool")) {
+        obj[k] = val.exprs[0].g_bool;
+      } else if (val.exprs[0].g_int) {
+        obj[k] = val.exprs[0].g_int;
+      } else if (val.exprs[0].e_map_body) {
+        obj[k] = rholangMapToJsObject(val.exprs[0].e_map_body);
       } else {
         console.warn("Not implemented", val);
       }
@@ -141,7 +130,7 @@ export const signSecp256k1 = (
 ): Uint8Array => {
   const keyPair = ec.keyFromPrivate(privateKey);
 
-  const signature = keyPair.sign(Buffer.from(hash));
+  const signature = keyPair.sign(Buffer.from(hash), { canonical: true });
   const derSign = signature.toDER();
 
   if (

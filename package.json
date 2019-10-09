@@ -15,8 +15,8 @@
   "scripts": {
     "test:jest": "jest",
     "test:full": "node test.js",
-    "compile": "tsc src/index.ts --outDir dist && cp -r src/protobuf dist/protobuf && cp -r src/pbjs dist/pbjs",
-    "compile:tests": "tsc tests/index.ts --outDir testsc && cp -r src/protobuf testsc/src/ && cp -r src/pbjs testsc/src/ && cp src/rnode-protos.js testsc/src/",
+    "compile": "tsc src/index.ts --outDir dist && cp -r src/protobuf dist/ && cp src/rnode-protos.js dist/",
+    "compile:tests": "tsc tests/index.ts --outDir testsc && cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/",
     "compile:examples": "rm examples/*.js && tsc examples/*"
   },
   "author": "FABCO",

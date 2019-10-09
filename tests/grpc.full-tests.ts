@@ -1,7 +1,6 @@
 import { testListenForDataAtName } from "./listenForDataAtName";
 import { testPreviewPrivateNames } from "./previewPrivateNames";
 import { testDoDeploy } from "./doDeploy";
-import { testGetBlocks } from "./getBlocks";
 
 export const testGrpc = () => {
   return new Promise(async (resolve, reject) => {

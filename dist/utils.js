@@ -50,16 +50,17 @@ exports.__esModule = true;
 var blakejs_1 = require("blakejs");
 var elliptic = require("elliptic");
 var protobufjs_1 = require("protobufjs");
-var protobufjs_2 = require("protobufjs");
-var rhoTypes = require("./pbjs/RhoTypes");
+var rnodeProtos = require("./rnode-protos");
 var ec = new elliptic.ec("secp256k1");
-exports.getValueFromBlocks = function (blockResults) {
-    for (var i = 0; i < blockResults.length; i += 1) {
-        var block = blockResults[i];
-        for (var j = 0; j < block.postBlockData.length; j += 1) {
-            var data = block.postBlockData[j];
-            if (data) {
-                return data;
+exports.getValueFromBlocks = function (blockInfo) {
+    for (var i = 0; i < blockInfo.length; i += 1) {
+        var block = blockInfo[i];
+        if (block.postBlockData) {
+            for (var j = 0; j < block.postBlockData.length; j += 1) {
+                var data = block.postBlockData[j];
+                if (data) {
+                    return data;
+                }
             }
         }
     }
@@ -69,16 +70,14 @@ var rholangUnforgeablesToJs = function (unfs) {
     var unforgeables = [];
     unfs.forEach(function (u) {
         var x = {};
-        var encoded = rhoTypes.GUnforgeable.encode(u);
-        var decoded = rhoTypes.GUnforgeable.decode(encoded.finish());
-        if (decoded.gPrivateBody) {
-            x.gPrivate = Buffer.from(decoded.gPrivateBody.id).toString("hex");
+        if (u.g_private_body) {
+            x.gPrivate = Buffer.from(u.g_private_body.id).toString("hex");
         }
-        else if (decoded.gDeployIdBody) {
-            x.gDeployId = Buffer.from(decoded.gDeployIdBody.id).toString("hex");
+        else if (u.g_deploy_id_body) {
+            x.gDeployId = Buffer.from(u.g_deploy_id_body.id).toString("hex");
         }
-        else if (decoded.gDeployerIdBody) {
-            x.gDeployerId = Buffer.from(decoded.gDeployerIdBody.id).toString("hex");
+        else if (u.g_deployer_id_body) {
+            x.gDeployerId = Buffer.from(u.g_deployer_id_body.id).toString("hex");
         }
         unforgeables.push(x);
     });
@@ -87,26 +86,26 @@ var rholangUnforgeablesToJs = function (unfs) {
 exports.rholangMapToJsObject = function (map) {
     var obj = {};
     map.kvs.forEach(function (kv) {
-        var k = kv.key.exprs[0].gString;
+        var k = kv.key.exprs[0].g_string;
         var val = kv.value;
         if (val.ids && val.ids[0]) {
             obj[k] = val.ids[0].id;
         }
         else if (val.exprs && val.exprs[0]) {
-            if (val.exprs[0].gString) {
-                obj[k] = val.exprs[0].gString;
+            if (val.exprs[0].g_string) {
+                obj[k] = val.exprs[0].g_string;
             }
-            else if (val.exprs[0].gUri) {
-                obj[k] = val.exprs[0].gUri;
+            else if (val.exprs[0].g_uri) {
+                obj[k] = val.exprs[0].g_uri;
             }
-            else if (val.exprs[0].hasOwnProperty("gBool")) {
-                obj[k] = val.exprs[0].gBool;
+            else if (val.exprs[0].hasOwnProperty("g_bool")) {
+                obj[k] = val.exprs[0].g_bool;
             }
-            else if (val.exprs[0].gInt) {
-                obj[k] = val.exprs[0].gInt;
+            else if (val.exprs[0].g_int) {
+                obj[k] = val.exprs[0].g_int;
             }
-            else if (val.exprs[0].eMapBody) {
-                obj[k] = exports.rholangMapToJsObject(val.exprs[0].eMapBody);
+            else if (val.exprs[0].e_map_body) {
+                obj[k] = exports.rholangMapToJsObject(val.exprs[0].e_map_body);
             }
             else {
                 console.warn("Not implemented", val);
@@ -142,17 +141,7 @@ exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfter
     };
 };
 exports.getDeployDataToSign = function (payment) {
-    return new Promise(function (resolve, reject) {
-        protobufjs_2.load(__dirname + "/protobuf/DeployService.proto", function (err, root) {
-            if (err || !root) {
-                reject(err);
-                return;
-            }
-            var DeployDataType = root.lookupType("DeployData");
-            var b = DeployDataType.encode(payment).finish();
-            resolve(b);
-        });
-    });
+    return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
 };
 exports.getBlake2Hash = function (toHash) {
     var context = blakejs_1.blake2bInit(32, null);
@@ -167,7 +156,7 @@ exports.verifyPrivateAndPublicKey = function (privateKey, publicKey) {
 };
 exports.signSecp256k1 = function (hash, privateKey) {
     var keyPair = ec.keyFromPrivate(privateKey);
-    var signature = keyPair.sign(Buffer.from(hash));
+    var signature = keyPair.sign(Buffer.from(hash), { canonical: true });
     var derSign = signature.toDER();
     if (!ec.verify(Buffer.from(hash), Buffer.from(derSign), keyPair.getPublic().encode("hex"), "hex")) {
         throw new Error("Signature verification failed");
@@ -181,24 +170,19 @@ exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, pub
     return __awaiter(_this, void 0, void 0, function () {
         var payment, toSign, hash, signature;
         return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    payment = exports.getPayment(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
-                    return [4 /*yield*/, exports.getDeployDataToSign(payment)];
-                case 1:
-                    toSign = _a.sent();
-                    hash = exports.getBlake2Hash(toSign);
-                    if (sigAlgorithm === "ed25519") {
-                        throw new Error("Unsupported algorithm ed25519; please use secp256k1");
-                    }
-                    else if (sigAlgorithm === "secp256k1") {
-                        signature = exports.signSecp256k1(hash, privateKey);
-                    }
-                    else {
-                        throw new Error("Unsupported algorithm");
-                    }
-                    return [2 /*return*/, __assign({}, payment, { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm })];
+            payment = exports.getPayment(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
+            toSign = exports.getDeployDataToSign(payment);
+            hash = exports.getBlake2Hash(toSign);
+            if (sigAlgorithm === "ed25519") {
+                throw new Error("Unsupported algorithm ed25519; please use secp256k1");
             }
+            else if (sigAlgorithm === "secp256k1") {
+                signature = exports.signSecp256k1(hash, privateKey);
+            }
+            else {
+                throw new Error("Unsupported algorithm");
+            }
+            return [2 /*return*/, __assign({}, payment, { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm })];
         });
     });
 };

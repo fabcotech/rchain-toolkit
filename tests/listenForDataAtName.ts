@@ -6,9 +6,9 @@ import {
   getGrpcDeployClient,
   getGrpcProposeClient,
   propose,
-  previewPrivateNamesRaw,
-  doDeployRaw,
-  listenForDataAtNameRaw
+  previewPrivateNames,
+  doDeploy,
+  listenForDataAtName
 } from "../src/grpc";
 import {
   unforgeableWithId,
@@ -30,7 +30,7 @@ export const testListenForDataAtName = () => {
     );
 
     const timestamp = new Date().valueOf();
-    const previewPrivateNamesResponse = await previewPrivateNamesRaw(
+    const previewPrivateNamesResponse = await previewPrivateNames(
       {
         user: Buffer.from(publicKey, "hex"),
         timestamp: timestamp,
@@ -60,7 +60,7 @@ export const testListenForDataAtName = () => {
         -1
       );
 
-      const deployDataResponse = await doDeployRaw(deployData, client);
+      const deployDataResponse = await doDeploy(deployData, client);
       if (deployDataResponse.error) {
         throw new Error(
           "There was an error when deploying : " +
@@ -85,7 +85,7 @@ export const testListenForDataAtName = () => {
       new Uint8Array(Buffer.from(privateNameFromNode, "hex"))
     );
 
-    const listenForDataAtNameResponse = await listenForDataAtNameRaw(
+    const listenForDataAtNameResponse = await listenForDataAtName(
       {
         name: {
           unforgeables: [

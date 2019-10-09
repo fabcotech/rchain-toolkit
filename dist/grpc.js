@@ -36,30 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 var _this = this;
 exports.__esModule = true;
-var decoders = require("./decoders");
-exports.getFull = function (options, client, grpcMethod, parseMethod) {
-    return new Promise(function (resolve, reject) { return __awaiter(_this, void 0, void 0, function () {
-        var either, resp;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, exports.getRaw(options, client, grpcMethod)];
-                case 1:
-                    either = _a.sent();
-                    if (!either.hasOwnProperty("success")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, decoders[parseMethod](either)];
-                case 2:
-                    resp = _a.sent();
-                    resolve(resp);
-                    return [3 /*break*/, 4];
-                case 3:
-                    reject(either.error.messages);
-                    _a.label = 4;
-                case 4: return [2 /*return*/];
-            }
-        });
-    }); });
-};
-exports.getRaw = function (options, client, method) {
+exports.getMethod = function (options, client, method) {
     return new Promise(function (resolve, reject) {
         client[method](options, function (err, resp) { return __awaiter(_this, void 0, void 0, function () {
             return __generator(this, function (_a) {
@@ -75,41 +52,25 @@ exports.getRaw = function (options, client, method) {
     });
 };
 // Listen for data at name
-exports.listenForDataAtNameRaw = function (options, client) {
-    return exports.getRaw(options, client, "listenForDataAtName");
-};
 exports.listenForDataAtName = function (options, client) {
-    return exports.getFull(options, client, "listenForDataAtName", "parseEitherListeningNameData");
+    return exports.getMethod(options, client, "listenForDataAtName");
 };
 // Do deploy
-exports.doDeployRaw = function (options, client) {
-    return exports.getRaw(options, client, "DoDeploy");
-};
-exports.doDeploy = function (deployData, client) {
-    return exports.getFull(deployData, client, "DoDeploy", "parseEitherDoDeploy");
+exports.doDeploy = function (options, client) {
+    return exports.getMethod(options, client, "doDeploy");
 };
 // Preview private names
-exports.previewPrivateNamesRaw = function (options, client) {
-    return exports.getRaw(options, client, "previewPrivateNames");
-};
 exports.previewPrivateNames = function (options, client) {
-    return exports.getFull(options, client, "previewPrivateNames", "parseEitherPrivateNamesPreview");
-};
-// getBlocks
-exports.getBlocksRaw = function (options, client) {
-    return exports.getRaw(options, client, "getBlocks");
-};
-exports.getBlocks = function (options, client) {
-    return exports.getFull(options, client, "getBlocks", "parseGetBlocks");
+    return exports.getMethod(options, client, "previewPrivateNames");
 };
 // Propose
 exports.propose = function (options, client) {
-    return exports.getRaw(options, client, "propose");
+    return exports.getMethod(options, client, "propose");
 };
 var getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
-    var path = "/protobuf/DeployService.proto";
+    var path = "/protobuf/DeployServiceV1.proto";
     if (protoService === "proposeService") {
-        path = "/protobuf/ProposeService.proto";
+        path = "/protobuf/ProposeServiceV1.proto";
     }
     return new Promise(function (resolve, reject) {
         protoLoader
@@ -124,10 +85,10 @@ var getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
             var packageObject = grpc.loadPackageDefinition(packageDefinition);
             var client;
             if (protoService === "deployService") {
-                client = new packageObject.coop.rchain.casper.protocol.DeployService(grpcEndPoint, grpc.credentials.createInsecure());
+                client = new packageObject.casper.v1.DeployService(grpcEndPoint, grpc.credentials.createInsecure());
             }
             else {
-                client = new packageObject.coop.rchain.casper.protocol.ProposeService(grpcEndPoint, grpc.credentials.createInsecure());
+                client = new packageObject.casper.v1.ProposeService(grpcEndPoint, grpc.credentials.createInsecure());
             }
             resolve(client);
         })["catch"](function (err) {
