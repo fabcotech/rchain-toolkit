@@ -20,14 +20,14 @@ const main = async () => {
     -1
   );
 
-  let a;
+  let deployResponse;
   try {
-    a = await rchainToolkit.grpc.doDeploy(deployData, grpcClient);
+    deployResponse = await rchainToolkit.grpc.doDeploy(deployData, grpcClient);
   } catch (err) {
     console.log(err);
   }
 
-  console.log(a);
+  console.log(deployResponse);
 };
 
 main();

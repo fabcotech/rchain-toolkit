@@ -103,7 +103,7 @@ export const testListenForDataAtName = () => {
       listenForDataAtNameResponse.payload.blockInfo
     );
 
-    if ((valueFromBlocks.exprs[0] as any).g_string === "world") {
+    if (valueFromBlocks.exprs[0].g_string === "world") {
       console.log("  ✓ grpc.listenForDataAtName");
       console.log("  ✓ utils.getValueFromBlocks");
     } else {
