@@ -24,7 +24,7 @@ export const getValueFromBlocks = (
   throw new Error("Not data found in any block");
 };
 
-const rholangUnforgeablesToJs = (unfs: any) => {
+const rhoUnforgeablesToJs = (unfs: any) => {
   const unforgeables: {
     gPrivate?: string;
     gDeployId?: string;
@@ -47,39 +47,59 @@ const rholangUnforgeablesToJs = (unfs: any) => {
   return unforgeables;
 };
 
-export const rholangMapToJsObject = (map: any) => {
+const rholangMapToJsObject = (expr: any) => {
   const obj: { [key: string]: any } = {};
-  map.kvs.forEach((kv: any) => {
+  expr.e_map_body.kvs.forEach((kv: any) => {
     const k = kv.key.exprs[0].g_string;
-    const val = kv.value;
-    if (val.ids && val.ids[0]) {
-      obj[k] = val.ids[0].id;
-    } else if (val.exprs && val.exprs[0]) {
-      if (val.exprs[0].g_string) {
-        obj[k] = val.exprs[0].g_string;
-      } else if (val.exprs[0].g_uri) {
-        obj[k] = val.exprs[0].g_uri;
-      } else if (val.exprs[0].hasOwnProperty("g_bool")) {
-        obj[k] = val.exprs[0].g_bool;
-      } else if (val.exprs[0].g_int) {
-        obj[k] = val.exprs[0].g_int;
-      } else if (val.exprs[0].e_map_body) {
-        obj[k] = rholangMapToJsObject(val.exprs[0].e_map_body);
-      } else {
-        console.warn("Not implemented", val);
-      }
-    } else if (val.unforgeables && val.unforgeables[0]) {
-      const unfs = rholangUnforgeablesToJs(val.unforgeables);
-      obj[k] = unfs;
-    } else {
-      console.warn("Not implemented", val);
-    }
+    obj[k] = rhoValToJs(kv.value);
   });
 
   return obj;
 };
 
-export const unforgeableWithId = (id: Buffer): string => {
+const rhoIdsToJs = (ids: any) => {
+  return ids[0].id;
+};
+const rhoExprStringToJs = (expr: any) => {
+  return expr.g_string;
+};
+const rhoExprUriToJs = (expr: any) => {
+  return expr.g_uri;
+};
+const rhoExprBoolToJs = (expr: any) => {
+  return expr.g_bool;
+};
+const rhoExprIntToJs = (expr: any) => {
+  return expr.g_int;
+};
+const rhoExprListToJs = (expr: any) => {
+  return expr.e_list_body.ps.map((e: any) => rhoValToJs(e));
+};
+
+export const rhoValToJs = (val: any) => {
+  if (val.ids && val.ids[0]) {
+    return rhoIdsToJs(val.ids);
+  } else if (val.unforgeables && val.unforgeables[0]) {
+    return rhoUnforgeablesToJs(val.unforgeables);
+  } else if (val.exprs[0] && val.exprs[0].e_map_body) {
+    return rholangMapToJsObject(val.exprs[0]);
+  } else if (val.exprs[0] && val.exprs[0].g_string) {
+    return rhoExprStringToJs(val.exprs[0]);
+  } else if (val.exprs[0] && val.exprs[0].g_uri) {
+    return rhoExprUriToJs(val.exprs[0]);
+  } else if (val.exprs[0] && val.exprs[0].hasOwnProperty("g_bool")) {
+    return rhoExprBoolToJs(val.exprs[0]);
+  } else if (val.exprs[0] && val.exprs[0].g_int) {
+    return rhoExprIntToJs(val.exprs[0]);
+  } else if (val.exprs[0] && val.exprs[0].e_list_body) {
+    return rhoExprListToJs(val.exprs[0]);
+  } else {
+    console.warn("Not implemented", val);
+    return null;
+  }
+};
+
+const unforgeableWithId = (id: Buffer): string => {
   const bytes = Writer.create()
     .bytes(id)
     .finish()

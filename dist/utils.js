@@ -30,7 +30,7 @@ exports.getValueFromBlocks = function (blockInfo) {
     }
     throw new Error("Not data found in any block");
 };
-var rholangUnforgeablesToJs = function (unfs) {
+var rhoUnforgeablesToJs = function (unfs) {
     var unforgeables = [];
     unfs.forEach(function (u) {
         var x = {};
@@ -47,45 +47,63 @@ var rholangUnforgeablesToJs = function (unfs) {
     });
     return unforgeables;
 };
-exports.rholangMapToJsObject = function (map) {
+var rholangMapToJsObject = function (expr) {
     var obj = {};
-    map.kvs.forEach(function (kv) {
+    expr.e_map_body.kvs.forEach(function (kv) {
         var k = kv.key.exprs[0].g_string;
-        var val = kv.value;
-        if (val.ids && val.ids[0]) {
-            obj[k] = val.ids[0].id;
-        }
-        else if (val.exprs && val.exprs[0]) {
-            if (val.exprs[0].g_string) {
-                obj[k] = val.exprs[0].g_string;
-            }
-            else if (val.exprs[0].g_uri) {
-                obj[k] = val.exprs[0].g_uri;
-            }
-            else if (val.exprs[0].hasOwnProperty("g_bool")) {
-                obj[k] = val.exprs[0].g_bool;
-            }
-            else if (val.exprs[0].g_int) {
-                obj[k] = val.exprs[0].g_int;
-            }
-            else if (val.exprs[0].e_map_body) {
-                obj[k] = exports.rholangMapToJsObject(val.exprs[0].e_map_body);
-            }
-            else {
-                console.warn("Not implemented", val);
-            }
-        }
-        else if (val.unforgeables && val.unforgeables[0]) {
-            var unfs = rholangUnforgeablesToJs(val.unforgeables);
-            obj[k] = unfs;
-        }
-        else {
-            console.warn("Not implemented", val);
-        }
+        obj[k] = exports.rhoValToJs(kv.value);
     });
     return obj;
 };
-exports.unforgeableWithId = function (id) {
+var rhoIdsToJs = function (ids) {
+    return ids[0].id;
+};
+var rhoExprStringToJs = function (expr) {
+    return expr.g_string;
+};
+var rhoExprUriToJs = function (expr) {
+    return expr.g_uri;
+};
+var rhoExprBoolToJs = function (expr) {
+    return expr.g_bool;
+};
+var rhoExprIntToJs = function (expr) {
+    return expr.g_int;
+};
+var rhoExprListToJs = function (expr) {
+    return expr.e_list_body.ps.map(function (e) { return exports.rhoValToJs(e); });
+};
+exports.rhoValToJs = function (val) {
+    if (val.ids && val.ids[0]) {
+        return rhoIdsToJs(val.ids);
+    }
+    else if (val.unforgeables && val.unforgeables[0]) {
+        return rhoUnforgeablesToJs(val.unforgeables);
+    }
+    else if (val.exprs[0] && val.exprs[0].e_map_body) {
+        return rholangMapToJsObject(val.exprs[0]);
+    }
+    else if (val.exprs[0] && val.exprs[0].g_string) {
+        return rhoExprStringToJs(val.exprs[0]);
+    }
+    else if (val.exprs[0] && val.exprs[0].g_uri) {
+        return rhoExprUriToJs(val.exprs[0]);
+    }
+    else if (val.exprs[0] && val.exprs[0].hasOwnProperty("g_bool")) {
+        return rhoExprBoolToJs(val.exprs[0]);
+    }
+    else if (val.exprs[0] && val.exprs[0].g_int) {
+        return rhoExprIntToJs(val.exprs[0]);
+    }
+    else if (val.exprs[0] && val.exprs[0].e_list_body) {
+        return rhoExprListToJs(val.exprs[0]);
+    }
+    else {
+        console.warn("Not implemented", val);
+        return null;
+    }
+};
+var unforgeableWithId = function (id) {
     var bytes = protobufjs_1.Writer.create()
         .bytes(id)
         .finish()
