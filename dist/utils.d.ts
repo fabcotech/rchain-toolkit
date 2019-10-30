@@ -1,7 +1,9 @@
+/// <reference types="node" />
 import { Payment, DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
 export declare const getValueFromBlocks: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => rnodeProtos.IPar;
 export declare const rhoValToJs: (val: any) => any;
+export declare const unforgeableWithId: (id: Buffer) => string;
 export declare const getPayment: (timestamp: number, term: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => Payment;
 export declare const getDeployDataToSign: (payment: Payment) => Uint8Array;
 export declare const getBlake2Hash: (toHash: Uint8Array) => Uint8Array;

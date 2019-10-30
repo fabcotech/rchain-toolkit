@@ -99,7 +99,7 @@ export const rhoValToJs = (val: any) => {
   }
 };
 
-const unforgeableWithId = (id: Buffer): string => {
+export const unforgeableWithId = (id: Buffer): string => {
   const bytes = Writer.create()
     .bytes(id)
     .finish()

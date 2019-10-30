@@ -103,7 +103,7 @@ exports.rhoValToJs = function (val) {
         return null;
     }
 };
-var unforgeableWithId = function (id) {
+exports.unforgeableWithId = function (id) {
     var bytes = protobufjs_1.Writer.create()
         .bytes(id)
         .finish()
