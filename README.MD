@@ -26,7 +26,7 @@ const main = async () => {
     protoLoader
   );
 
-  const transferFundsTerm = await rchainToolkit.utils.transferRevTerm({
+  const transferFundsTerm = rchainToolkit.utils.transferRevTerm({
     from: "1111YT4aWjn7nZNi65bTKJF9GEtXL12raZ9GThLHDi5YMxtdiJkpM",
     to: "11112QRmNvfk9GaX6L7U1jC3Y9TqNanZc7wFEcNiYY8c29GA79MhRW",
     amount: 10
