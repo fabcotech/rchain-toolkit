@@ -120,7 +120,7 @@ exports.hash = new Uint8Array([
     93,
     108
 ]);
-exports.deployDataSecp256k1 = __assign({}, exports.payment, { deployer: Buffer.from(new Uint8Array([
+exports.deployDataSecp256k1 = __assign(__assign({}, exports.payment), { deployer: Buffer.from(new Uint8Array([
         4,
         50,
         98,

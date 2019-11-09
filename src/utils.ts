@@ -1,9 +1,11 @@
-import { blake2bInit, blake2bUpdate, blake2bFinal } from "blakejs";
+import { blake2bInit, blake2bUpdate, blake2bFinal, blake2bHex } from "blakejs";
 import * as elliptic from "elliptic";
+import { keccak256 } from "js-sha3";
 import { Writer } from "protobufjs";
 
 import { Payment, DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
+import * as base58 from "./base58";
 
 const ec = new elliptic.ec("secp256k1");
 
@@ -139,7 +141,7 @@ export const verifyPrivateAndPublicKey = (
   publicKey: string
 ) => {
   const keyPair = ec.keyFromPrivate(privateKey);
-  if (keyPair.getPublic().encode("hex") !== publicKey) {
+  if (keyPair.getPublic().encode("hex", false) !== publicKey) {
     throw new Error("Private key and public key do not match");
   }
 };
@@ -153,18 +155,63 @@ export const signSecp256k1 = (
   const signature = keyPair.sign(Buffer.from(hash), { canonical: true });
   const derSign = signature.toDER();
 
-  if (
-    !ec.verify(
-      Buffer.from(hash),
-      Buffer.from(derSign),
-      keyPair.getPublic().encode("hex"),
-      "hex"
-    )
-  ) {
+  if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {
     throw new Error("Signature verification failed");
   }
 
   return new Uint8Array(derSign);
+};
+
+export const transferRevTerm = (a: {
+  from: string;
+  to: string;
+  amount: number;
+}) => {
+  if (typeof a.from !== "string") {
+    throw new Error("from must be a REV address");
+  }
+  if (typeof a.to !== "string") {
+    throw new Error("to must be a REV address");
+  }
+  if (typeof a.amount !== "number") {
+    throw new Error("amount must be a number");
+  }
+
+  return `new
+  rl(\`rho:registry:lookup\`),
+  RevVaultCh,
+  stdout(\`rho:io:stdout\`)
+in {
+
+rl!(\`rho:rchain:revVault\`, *RevVaultCh) |
+for (@(_, RevVault) <- RevVaultCh) {
+
+  match (
+    "${a.from}",
+    "${a.to}",
+    ${a.amount}
+  ) {
+    (from, to, amount) => {
+
+      new vaultCh, revVaultkeyCh, deployerId(\`rho:rchain:deployerId\`) in {
+        @RevVault!("findOrCreate", from, *vaultCh) |
+        @RevVault!("deployerAuthKey", *deployerId, *revVaultkeyCh) |
+        for (@(true, vault) <- vaultCh; key <- revVaultkeyCh) {
+
+          stdout!(("Beginning transfer of ", amount, "REV from", from, "to", to)) |
+
+          new resultCh in {
+            @vault!("transfer", to, amount, *key, *resultCh) |
+            for (@result <- resultCh) {
+              stdout!(("Finished transfer of ", amount, "REV to", to, "result was:", result))
+            }
+          }
+        }
+      }
+    }
+  }
+}
+}`;
 };
 
 export const getDeployData = (
@@ -204,4 +251,60 @@ export const getDeployData = (
     sig: signature,
     sigAlgorithm: sigAlgorithm
   };
+};
+
+// Address and public key
+
+// Algorithm to generate ETH and REV address is taken from RNode source
+// https://github.com/rchain/rchain/blob/bf7a30e1d388d46aa9e5f4b8c04089fc8e31d771/rholang/src/main/scala/coop/rchain/rholang/interpreter/util/AddressTools.scala#L47
+
+// Prefix as defined in https://github.com/rchain/rchain/blob/c6721a6/rholang/src/main/scala/coop/rchain/rholang/interpreter/util/RevAddress.scala#L13
+const prefix = { coinId: "000000", version: "00" };
+
+const toBase58 = (hexStr: string) => {
+  const bytes = bytesFromHex(hexStr);
+  return base58.encode(bytes);
+};
+
+const getAddrFromEth = (ethAddr: string): string => {
+  if (!ethAddr || ethAddr.length !== 40) {
+    throw new Error("ETH address must contain 130 characters");
+  }
+
+  // Hash ETH address
+  const ethAddrBytes = bytesFromHex(ethAddr);
+  const ethHash = keccak256(ethAddrBytes);
+
+  // Add prefix with hash and calculate checksum (blake2b-256 hash)
+  const payload = `${prefix.coinId}${prefix.version}${ethHash}`;
+  const payloadBytes = bytesFromHex(payload);
+  const checksum = blake2bHex(payloadBytes, void 666, 32).slice(0, 8);
+
+  // Return REV address
+  return toBase58(`${payload}${checksum}`);
+};
+
+const bytesFromHex = (hexStr: string) => {
+  const byte2hex = ([arr, bhi]: [any[], number], x: any) =>
+    bhi ? [[...arr, parseInt(`${bhi}${x}`, 16)]] : [arr, x];
+  const [resArr] = Array.from(hexStr).reduce(byte2hex, [[]]);
+  return Uint8Array.from(resArr);
+};
+
+export const revAddressFromPublicKey = (publicKey: string) => {
+  if (!publicKey || publicKey.length !== 130) {
+    throw new Error("Public key must contain 130 characters");
+  }
+
+  // Public key bytes from hex string
+  const pubKeyBytes = bytesFromHex(publicKey);
+
+  // Remove one byte from pk bytes and hash
+  const pkHash = keccak256(pubKeyBytes.slice(1));
+
+  // Take last 40 chars from hashed pk (ETH address)
+  const pkHash40 = pkHash.slice(-40);
+
+  // Return both REV and ETH address
+  return getAddrFromEth(pkHash40);
 };

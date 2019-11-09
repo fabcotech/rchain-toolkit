@@ -3,7 +3,7 @@ import * as protoLoader from "@grpc/proto-loader";
 import * as rchainToolkit from "rchain-toolkit";
 
 const main = async () => {
-  const grpcClient = await rchainToolkit.grpc.getGrpcClient(
+  const grpcClient = await rchainToolkit.grpc.getGrpcDeployClient(
     "localhost:40401",
     grpc,
     protoLoader
