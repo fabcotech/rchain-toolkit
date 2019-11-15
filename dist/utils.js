@@ -119,16 +119,14 @@ exports.unforgeableWithId = function (id) {
         .slice(1);
     return Buffer.from(bytes).toString("hex");
 };
-exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
+exports.getPayment = function (timestamp, term, phloPrice, phloLimit) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000000; }
-    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = -1; }
     return {
         timestamp: timestamp,
         term: term,
         phloLimit: phloLimit,
-        phloPrice: phloPrice,
-        validAfterBlockNumber: validAfterBlockNumber
+        phloPrice: phloPrice
     };
 };
 exports.getDeployDataToSign = function (payment) {
@@ -141,7 +139,7 @@ exports.getBlake2Hash = function (toHash) {
 };
 exports.verifyPrivateAndPublicKey = function (privateKey, publicKey) {
     var keyPair = ec.keyFromPrivate(privateKey);
-    if (keyPair.getPublic().encode("hex", false) !== publicKey) {
+    if (keyPair.getPublic().encode("hex") !== publicKey) {
         throw new Error("Private key and public key do not match");
     }
 };
@@ -149,8 +147,8 @@ exports.signSecp256k1 = function (hash, privateKey) {
     var keyPair = ec.keyFromPrivate(privateKey);
     var signature = keyPair.sign(Buffer.from(hash), { canonical: true });
     var derSign = signature.toDER();
-    if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {
-        throw new Error("Signature verification failed");
+    if (!ec.verify(Buffer.from(hash), Buffer.from(derSign), keyPair.getPublic().encode("hex"), "hex")) {
+        throw new Error("Failed to verify signature");
     }
     return new Uint8Array(derSign);
 };
@@ -170,7 +168,7 @@ exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, pub
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000; }
     if (validAfterBlockNumber === void 0) { validAfterBlockNumber = -1; }
-    var payment = exports.getPayment(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
+    var payment = exports.getPayment(timestamp, term, phloPrice, phloLimit);
     var toSign = exports.getDeployDataToSign(payment);
     var hash = exports.getBlake2Hash(toSign);
     var signature;
@@ -183,7 +181,7 @@ exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, pub
     else {
         throw new Error("Unsupported algorithm");
     }
-    return __assign(__assign({}, payment), { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm });
+    return __assign(__assign({}, payment), { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm, validAfterBlockNumber: validAfterBlockNumber });
 };
 // Address and public key
 // Algorithm to generate ETH and REV address is taken from RNode source

@@ -114,15 +114,13 @@ export const getPayment = (
   timestamp: number,
   term: string,
   phloPrice = 1,
-  phloLimit = 10000000,
-  validAfterBlockNumber = -1
+  phloLimit = 10000000
 ): Payment => {
   return {
     timestamp: timestamp,
     term: term,
     phloLimit: phloLimit,
-    phloPrice: phloPrice,
-    validAfterBlockNumber: validAfterBlockNumber
+    phloPrice: phloPrice
   };
 };
 
@@ -141,7 +139,7 @@ export const verifyPrivateAndPublicKey = (
   publicKey: string
 ) => {
   const keyPair = ec.keyFromPrivate(privateKey);
-  if (keyPair.getPublic().encode("hex", false) !== publicKey) {
+  if (keyPair.getPublic().encode("hex") !== publicKey) {
     throw new Error("Private key and public key do not match");
   }
 };
@@ -155,8 +153,15 @@ export const signSecp256k1 = (
   const signature = keyPair.sign(Buffer.from(hash), { canonical: true });
   const derSign = signature.toDER();
 
-  if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {
-    throw new Error("Signature verification failed");
+  if (
+    !ec.verify(
+      Buffer.from(hash),
+      Buffer.from(derSign),
+      keyPair.getPublic().encode("hex"),
+      "hex"
+    )
+  ) {
+    throw new Error("Failed to verify signature");
   }
 
   return new Uint8Array(derSign);
@@ -224,13 +229,7 @@ export const getDeployData = (
   phloLimit = 10000,
   validAfterBlockNumber = -1
 ): DeployData => {
-  const payment = getPayment(
-    timestamp,
-    term,
-    phloPrice,
-    phloLimit,
-    validAfterBlockNumber
-  );
+  const payment = getPayment(timestamp, term, phloPrice, phloLimit);
 
   const toSign = getDeployDataToSign(payment);
 
@@ -249,7 +248,8 @@ export const getDeployData = (
     ...payment,
     deployer: Buffer.from(publicKey, "hex"),
     sig: signature,
-    sigAlgorithm: sigAlgorithm
+    sigAlgorithm: sigAlgorithm,
+    validAfterBlockNumber: validAfterBlockNumber
   };
 };
 
