@@ -51,6 +51,18 @@ exports.getMethod = function (options, client, method) {
         }); });
     });
 };
+// Get block
+exports.getBlock = function (options, client) {
+    return exports.getMethod(options, client, "getBlock");
+};
+// Get blocks
+exports.getBlocks = function (options, client) {
+    return exports.getMethod(options, client, "getBlocks");
+};
+// Get blocks
+exports.lastFinalizedBlock = function (client) {
+    return exports.getMethod(undefined, client, "lastFinalizedBlock");
+};
 // Listen for data at name
 exports.listenForDataAtName = function (options, client) {
     return exports.getMethod(options, client, "listenForDataAtName");

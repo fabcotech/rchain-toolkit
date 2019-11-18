@@ -13,8 +13,30 @@ export const getMethod = (options: any, client: any, method: string): any => {
   });
 };
 
-// Listen for data at name
+// Get block
+export const getBlock = (
+  options: any,
+  client: any
+): Promise<rnodeProtos.casper.v1.DeployService.getBlockCallback> => {
+  return getMethod(options, client, "getBlock");
+};
 
+// Get blocks
+export const getBlocks = (
+  options: any,
+  client: any
+): Promise<rnodeProtos.casper.v1.DeployService.getBlocksCallback> => {
+  return getMethod(options, client, "getBlocks");
+};
+
+// Get blocks
+export const lastFinalizedBlock = (
+  client: any
+): Promise<rnodeProtos.casper.v1.DeployService.lastFinalizedBlockCallback> => {
+  return getMethod(undefined, client, "lastFinalizedBlock");
+};
+
+// Listen for data at name
 export const listenForDataAtName = (
   options: any,
   client: any

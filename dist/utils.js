@@ -167,7 +167,7 @@ exports.transferRevTerm = function (a) {
 exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, publicKey, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000; }
-    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = -1; }
+    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = 0; }
     var payment = exports.getPayment(timestamp, term, phloPrice, phloLimit);
     var toSign = exports.getDeployDataToSign(payment);
     var hash = exports.getBlake2Hash(toSign);

@@ -1,6 +1,9 @@
 import { DeployData } from "./models/models";
 import * as rnodeProtos from "./rnode-protos";
 export declare const getMethod: (options: any, client: any, method: string) => any;
+export declare const getBlock: (options: any, client: any) => Promise<rnodeProtos.casper.v1.DeployService.getBlockCallback>;
+export declare const getBlocks: (options: any, client: any) => Promise<rnodeProtos.casper.v1.DeployService.getBlocksCallback>;
+export declare const lastFinalizedBlock: (client: any) => Promise<rnodeProtos.casper.v1.DeployService.lastFinalizedBlockCallback>;
 export declare const listenForDataAtName: (options: any, client: any) => Promise<rnodeProtos.casper.v1.ListeningNameDataResponse>;
 export declare const doDeploy: (options: DeployData, client: any) => Promise<rnodeProtos.casper.v1.DeployResponse>;
 export declare const previewPrivateNames: (options: any, client: any) => Promise<rnodeProtos.casper.v1.PrivateNamePreviewResponse>;

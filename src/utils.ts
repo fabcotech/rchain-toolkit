@@ -227,7 +227,7 @@ export const getDeployData = (
   publicKey: string,
   phloPrice = 1,
   phloLimit = 10000,
-  validAfterBlockNumber = -1
+  validAfterBlockNumber = 0
 ): DeployData => {
   const payment = getPayment(timestamp, term, phloPrice, phloLimit);
 
