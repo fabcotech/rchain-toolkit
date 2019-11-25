@@ -13,17 +13,18 @@ var __assign = (this && this.__assign) || function () {
 exports.__esModule = true;
 exports.privateKey = "81f1f1b3eaa563dcaf928ee5d9aefd80fdd7300d777d3538eb10b9b10089dc65";
 exports.publicKey = "043262dd06cca940aaf306084d99eae00db225091340fc9343aa4652cf38a051a673aa3d3499dd11cf67448a5a791cc8a12fda3378e5cd9c73880065aa1aedbcf8";
-exports.validAfterBlockNumber = 0;
 // Payment
 var timestamp = 1560802892221;
 var term = "new hello in { hello!(\"world\") }";
 var phloLimit = 1000000;
 var phloPrice = 1;
+exports.validAfterBlockNumber = 0;
 exports.payment = {
     timestamp: timestamp,
     term: term,
     phloLimit: phloLimit,
-    phloPrice: phloPrice
+    phloPrice: phloPrice,
+    validAfterBlockNumber: exports.validAfterBlockNumber
 };
 exports.deployDataToSign = new Uint8Array([
     18,

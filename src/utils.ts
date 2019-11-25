@@ -114,13 +114,15 @@ export const getPayment = (
   timestamp: number,
   term: string,
   phloPrice = 1,
-  phloLimit = 10000000
+  phloLimit = 10000000,
+  validAfterBlockNumber = 0
 ): Payment => {
   return {
     timestamp: timestamp,
     term: term,
     phloLimit: phloLimit,
-    phloPrice: phloPrice
+    phloPrice: phloPrice,
+    validAfterBlockNumber: validAfterBlockNumber
   };
 };
 
@@ -229,7 +231,13 @@ export const getDeployData = (
   phloLimit = 10000,
   validAfterBlockNumber = 0
 ): DeployData => {
-  const payment = getPayment(timestamp, term, phloPrice, phloLimit);
+  const payment = getPayment(
+    timestamp,
+    term,
+    phloPrice,
+    phloLimit,
+    validAfterBlockNumber
+  );
 
   const toSign = getDeployDataToSign(payment);
 
@@ -248,8 +256,7 @@ export const getDeployData = (
     ...payment,
     deployer: Buffer.from(publicKey, "hex"),
     sig: signature,
-    sigAlgorithm: sigAlgorithm,
-    validAfterBlockNumber: validAfterBlockNumber
+    sigAlgorithm: sigAlgorithm
   };
 };
 

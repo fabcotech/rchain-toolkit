@@ -119,14 +119,16 @@ exports.unforgeableWithId = function (id) {
         .slice(1);
     return Buffer.from(bytes).toString("hex");
 };
-exports.getPayment = function (timestamp, term, phloPrice, phloLimit) {
+exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000000; }
+    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = 0; }
     return {
         timestamp: timestamp,
         term: term,
         phloLimit: phloLimit,
-        phloPrice: phloPrice
+        phloPrice: phloPrice,
+        validAfterBlockNumber: validAfterBlockNumber
     };
 };
 exports.getDeployDataToSign = function (payment) {
@@ -168,7 +170,7 @@ exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, pub
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000; }
     if (validAfterBlockNumber === void 0) { validAfterBlockNumber = 0; }
-    var payment = exports.getPayment(timestamp, term, phloPrice, phloLimit);
+    var payment = exports.getPayment(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
     var toSign = exports.getDeployDataToSign(payment);
     var hash = exports.getBlake2Hash(toSign);
     var signature;
@@ -181,7 +183,7 @@ exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, pub
     else {
         throw new Error("Unsupported algorithm");
     }
-    return __assign(__assign({}, payment), { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm, validAfterBlockNumber: validAfterBlockNumber });
+    return __assign(__assign({}, payment), { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm });
 };
 // Address and public key
 // Algorithm to generate ETH and REV address is taken from RNode source

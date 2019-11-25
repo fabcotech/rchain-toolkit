@@ -3,12 +3,7 @@ import * as protoLoader from "@grpc/proto-loader";
 
 import { getGrpcDeployClient, doDeploy } from "../src/grpc";
 import { deepStrictEqual } from "assert";
-import {
-  payment,
-  privateKey,
-  publicKey,
-  validAfterBlockNumber
-} from "../src/models";
+import { payment, privateKey, publicKey } from "../src/models";
 import { getDeployData } from "../src/utils";
 
 export const testDoDeploy = () => {
@@ -27,7 +22,7 @@ export const testDoDeploy = () => {
       publicKey,
       payment.phloPrice,
       payment.phloLimit,
-      validAfterBlockNumber
+      payment.validAfterBlockNumber
     );
 
     const response = await doDeploy(deployDataSecp256k1, client);

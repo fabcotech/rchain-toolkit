@@ -13,8 +13,7 @@ import {
   privateKey,
   publicKey,
   deployDataSecp256k1,
-  hash,
-  validAfterBlockNumber
+  hash
 } from "../src/models/models.mock";
 import { DeployData } from "../src/models/models";
 
@@ -63,7 +62,7 @@ const testGetDeployDataSecp256k1 = () => {
       publicKey,
       payment.phloPrice,
       payment.phloLimit,
-      validAfterBlockNumber
+      payment.validAfterBlockNumber
     );
 
     try {
@@ -71,8 +70,7 @@ const testGetDeployDataSecp256k1 = () => {
         ...payment,
         deployer: deployDataSecp256k1.deployer,
         sig: deployDataSecp256k1.sig,
-        sigAlgorithm: deployDataSecp256k1.sigAlgorithm,
-        validAfterBlockNumber: deployDataSecp256k1.validAfterBlockNumber
+        sigAlgorithm: deployDataSecp256k1.sigAlgorithm
       } as DeployData);
     } catch (err) {
       console.log("  X utils.getDeployDataSecp256k1");
