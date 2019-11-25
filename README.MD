@@ -1,6 +1,6 @@
 ### rchain-toolkit
 
-**Up to date with rnode 0.9.16**
+**Up to date with rnode 0.9.17**
 
 rchain-toolkit is a general purpose javascript/typescript library to interact with the RChain blockchain, and play with rholang expressions in node JS or the browser. **It is not ready for production, not stable and the development is not completed yet.**
 
