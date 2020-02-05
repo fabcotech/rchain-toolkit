@@ -1,4 +1,4 @@
-import { Payment, DeployData } from "./models";
+import { DeployData } from "./models";
 
 export const privateKey =
   "81f1f1b3eaa563dcaf928ee5d9aefd80fdd7300d777d3538eb10b9b10089dc65";
@@ -12,7 +12,7 @@ const phloLimit = 1000000;
 const phloPrice = 1;
 const validAfterBlockNumber = 0;
 
-export const payment: Payment = {
+export const deployData: DeployData = {
   timestamp,
   term,
   phloLimit,
@@ -108,7 +108,7 @@ export const hash = new Uint8Array([
 ]);
 
 export const deployDataSecp256k1 = {
-  ...payment,
+  ...deployData,
   deployer: Buffer.from(
     new Uint8Array([
       4,

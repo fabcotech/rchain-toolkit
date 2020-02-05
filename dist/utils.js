@@ -1,15 +1,4 @@
 "use strict";
-var __assign = (this && this.__assign) || function () {
-    __assign = Object.assign || function(t) {
-        for (var s, i = 1, n = arguments.length; i < n; i++) {
-            s = arguments[i];
-            for (var p in s) if (Object.prototype.hasOwnProperty.call(s, p))
-                t[p] = s[p];
-        }
-        return t;
-    };
-    return __assign.apply(this, arguments);
-};
 var __spreadArrays = (this && this.__spreadArrays) || function () {
     for (var s = 0, i = 0, il = arguments.length; i < il; i++) s += arguments[i].length;
     for (var r = Array(s), k = 0, i = 0; i < il; i++)
@@ -25,6 +14,9 @@ var protobufjs_1 = require("protobufjs");
 var rnodeProtos = require("./rnode-protos");
 var base58 = require("./base58");
 var ec = new elliptic.ec("secp256k1");
+exports.getFirstBlock = function (blockInfo) {
+    return blockInfo[0];
+};
 exports.getValueFromBlocks = function (blockInfo) {
     for (var i = 0; i < blockInfo.length; i += 1) {
         var block = blockInfo[i];
@@ -39,28 +31,25 @@ exports.getValueFromBlocks = function (blockInfo) {
     }
     throw new Error("Not data found in any block");
 };
-var rhoUnforgeablesToJs = function (unfs) {
-    var unforgeables = [];
-    unfs.forEach(function (u) {
-        var x = {};
-        if (u.g_private_body) {
-            x.gPrivate = Buffer.from(u.g_private_body.id).toString("hex");
+var rhoUnforgeableToJs = function (expr) {
+    var unforgeable = {};
+    Object.keys(expr.ExprUnforg.data).forEach(function (u) {
+        if (u === "UnforgPrivate") {
+            unforgeable.UnforgPrivate = expr.ExprUnforg.data[u].data;
         }
-        else if (u.g_deploy_id_body) {
-            x.gDeployId = Buffer.from(u.g_deploy_id_body.id).toString("hex");
+        else if (u === "UnforgDeploy") {
+            unforgeable.UnforgDeploy = expr.ExprUnforg.data[u].data;
         }
-        else if (u.g_deployer_id_body) {
-            x.gDeployerId = Buffer.from(u.g_deployer_id_body.id).toString("hex");
+        else if (u === "UnforgDeployer") {
+            unforgeable.UnforgDeployer = expr.ExprUnforg.data[u].data;
         }
-        unforgeables.push(x);
     });
-    return unforgeables;
+    return unforgeable;
 };
 var rholangMapToJsObject = function (expr) {
     var obj = {};
-    expr.e_map_body.kvs.forEach(function (kv) {
-        var k = kv.key.exprs[0].g_string;
-        obj[k] = exports.rhoValToJs(kv.value);
+    Object.keys(expr.ExprMap.data).forEach(function (k) {
+        obj[k] = exports.rhoValToJs(expr.ExprMap.data[k]);
     });
     return obj;
 };
@@ -68,47 +57,47 @@ var rhoIdsToJs = function (ids) {
     return ids[0].id;
 };
 var rhoExprStringToJs = function (expr) {
-    return expr.g_string;
+    return expr.ExprString.data;
 };
 var rhoExprUriToJs = function (expr) {
-    return expr.g_uri;
+    return expr.ExprUri.data;
 };
 var rhoExprBoolToJs = function (expr) {
-    return expr.g_bool;
+    return expr.ExprBool.data;
 };
 var rhoExprIntToJs = function (expr) {
-    return expr.g_int;
+    return expr.ExprInt.data;
 };
 var rhoExprListToJs = function (expr) {
-    return expr.e_list_body.ps.map(function (e) { return exports.rhoValToJs(e); });
+    return expr.ExprList.data.map(function (e) { return exports.rhoValToJs(e); });
 };
-exports.rhoValToJs = function (val) {
-    if (val.ids && val.ids[0]) {
-        return rhoIdsToJs(val.ids);
+exports.rhoValToJs = function (expr) {
+    /* if (val.ids && val.ids[0]) {
+      return rhoIdsToJs(val.ids);
+    } else  */
+    if (expr.ExprUnforg) {
+        return rhoUnforgeableToJs(expr);
     }
-    else if (val.unforgeables && val.unforgeables[0]) {
-        return rhoUnforgeablesToJs(val.unforgeables);
+    else if (expr.ExprMap) {
+        return rholangMapToJsObject(expr);
     }
-    else if (val.exprs[0] && val.exprs[0].e_map_body) {
-        return rholangMapToJsObject(val.exprs[0]);
+    else if (expr.ExprString) {
+        return rhoExprStringToJs(expr);
     }
-    else if (val.exprs[0] && val.exprs[0].g_string) {
-        return rhoExprStringToJs(val.exprs[0]);
+    else if (expr.ExprUri) {
+        return rhoExprUriToJs(expr);
     }
-    else if (val.exprs[0] && val.exprs[0].g_uri) {
-        return rhoExprUriToJs(val.exprs[0]);
+    else if (expr.ExprBool) {
+        return rhoExprBoolToJs(expr);
     }
-    else if (val.exprs[0] && val.exprs[0].hasOwnProperty("g_bool")) {
-        return rhoExprBoolToJs(val.exprs[0]);
+    else if (expr.ExprInt) {
+        return rhoExprIntToJs(expr);
     }
-    else if (val.exprs[0] && val.exprs[0].g_int) {
-        return rhoExprIntToJs(val.exprs[0]);
-    }
-    else if (val.exprs[0] && val.exprs[0].e_list_body) {
-        return rhoExprListToJs(val.exprs[0]);
+    else if (expr.ExprList) {
+        return rhoExprListToJs(expr);
     }
     else {
-        console.warn("Not implemented", val);
+        console.warn("Not implemented", expr);
         return null;
     }
 };
@@ -119,7 +108,7 @@ exports.unforgeableWithId = function (id) {
         .slice(1);
     return Buffer.from(bytes).toString("hex");
 };
-exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
+exports.getDeployData = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000000; }
     if (validAfterBlockNumber === void 0) { validAfterBlockNumber = 0; }
@@ -134,8 +123,9 @@ exports.getPayment = function (timestamp, term, phloPrice, phloLimit, validAfter
 exports.getDeployDataToSign = function (payment) {
     return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
 };
-exports.getBlake2Hash = function (toHash) {
-    var context = blakejs_1.blake2bInit(32, null);
+exports.getBlake2Hash = function (toHash, length) {
+    if (length === void 0) { length = 32; }
+    var context = blakejs_1.blake2bInit(length, null);
     blakejs_1.blake2bUpdate(context, toHash);
     return blakejs_1.blake2bFinal(context);
 };
@@ -166,24 +156,21 @@ exports.transferRevTerm = function (a) {
     }
     return "new\n  rl(`rho:registry:lookup`),\n  RevVaultCh,\n  stdout(`rho:io:stdout`)\nin {\n\nrl!(`rho:rchain:revVault`, *RevVaultCh) |\nfor (@(_, RevVault) <- RevVaultCh) {\n\n  match (\n    \"" + a.from + "\",\n    \"" + a.to + "\",\n    " + a.amount + "\n  ) {\n    (from, to, amount) => {\n\n      new vaultCh, revVaultkeyCh, deployerId(`rho:rchain:deployerId`) in {\n        @RevVault!(\"findOrCreate\", from, *vaultCh) |\n        @RevVault!(\"deployerAuthKey\", *deployerId, *revVaultkeyCh) |\n        for (@(true, vault) <- vaultCh; key <- revVaultkeyCh) {\n\n          stdout!((\"Beginning transfer of \", amount, \"REV from\", from, \"to\", to)) |\n\n          new resultCh in {\n            @vault!(\"transfer\", to, amount, *key, *resultCh) |\n            for (@result <- resultCh) {\n              stdout!((\"Finished transfer of \", amount, \"REV to\", to, \"result was:\", result))\n            }\n          }\n        }\n      }\n    }\n  }\n}\n}";
 };
-exports.getDeployData = function (sigAlgorithm, timestamp, term, privateKey, publicKey, phloPrice, phloLimit, validAfterBlockNumber) {
+exports.getDeployOptions = function (sigAlgorithm, timestamp, term, privateKey, publicKey, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000; }
     if (validAfterBlockNumber === void 0) { validAfterBlockNumber = 0; }
-    var payment = exports.getPayment(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
-    var toSign = exports.getDeployDataToSign(payment);
+    var deployData = exports.getDeployData(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
+    var toSign = exports.getDeployDataToSign(deployData);
     var hash = exports.getBlake2Hash(toSign);
     var signature;
-    if (sigAlgorithm === "ed25519") {
-        throw new Error("Unsupported algorithm ed25519; please use secp256k1");
-    }
-    else if (sigAlgorithm === "secp256k1") {
-        signature = exports.signSecp256k1(hash, privateKey);
-    }
-    else {
-        throw new Error("Unsupported algorithm");
-    }
-    return __assign(__assign({}, payment), { deployer: Buffer.from(publicKey, "hex"), sig: signature, sigAlgorithm: sigAlgorithm });
+    signature = exports.signSecp256k1(hash, privateKey);
+    return {
+        data: deployData,
+        deployer: publicKey,
+        signature: Buffer.from(new Uint8Array(signature)).toString("hex"),
+        sigAlgorithm: sigAlgorithm
+    };
 };
 // Address and public key
 // Algorithm to generate ETH and REV address is taken from RNode source

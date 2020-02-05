@@ -1,5 +1,5 @@
 import { testUtils } from "./utils.full-tests";
-import { testGrpc } from "./grpc.full-tests";
+import { testHttp } from "./http.full-tests";
 
 export const run = async () => {
   try {
@@ -8,7 +8,7 @@ export const run = async () => {
     throw err;
   }
   try {
-    await testGrpc();
+    await testHttp();
   } catch (err) {
     throw err;
   }

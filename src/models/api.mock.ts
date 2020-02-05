@@ -2,45 +2,8 @@ import { PrivateNamePreviewResponse, EitherSuccess } from "./api";
 import * as rnodeProtos from "../rnode-protos";
 
 export const privateNamePreviewResponse: any = {
-  message: "payload",
-  payload: {
-    ids: [
-      Buffer.from([
-        252,
-        96,
-        48,
-        138,
-        85,
-        18,
-        194,
-        101,
-        185,
-        120,
-        180,
-        109,
-        114,
-        131,
-        242,
-        213,
-        247,
-        170,
-        18,
-        246,
-        74,
-        91,
-        24,
-        116,
-        223,
-        38,
-        239,
-        59,
-        232,
-        39,
-        245,
-        126
-      ])
-    ]
-  }
+  names: ["fc60308a5512c265b978b46d7283f2d5f7aa12f64a5b1874df26ef3be827f57e"],
+  blockNumber: 6
 };
 
 export const privateNamePreviewResponse2: any = {

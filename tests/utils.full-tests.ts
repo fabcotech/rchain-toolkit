@@ -8,21 +8,20 @@ import {
   revAddressFromPublicKey
 } from "../src/utils";
 import {
-  payment,
+  deployData,
   deployDataToSign,
   privateKey,
   publicKey,
   deployDataSecp256k1,
   hash
 } from "../src/models/models.mock";
-import { DeployData } from "../src/models/models";
 
 let deployDataToSignFromPayment: Uint8Array;
 let hashFromDeployDataToSign: Uint8Array;
 
 const testGetDeployDataToSign = () => {
   return new Promise(async (resolve, reject) => {
-    deployDataToSignFromPayment = getDeployDataToSign(payment);
+    deployDataToSignFromPayment = getDeployDataToSign(deployData);
     try {
       deepStrictEqual(
         Array.from(deployDataToSignFromPayment),
@@ -54,24 +53,16 @@ const testGetBlake2Hash = () => {
 
 const testGetDeployDataSecp256k1 = () => {
   return new Promise(async (resolve, reject) => {
-    const deployDataFromPayment = await getDeployData(
-      "secp256k1",
-      payment.timestamp,
-      payment.term,
-      privateKey,
-      publicKey,
-      payment.phloPrice,
-      payment.phloLimit,
-      payment.validAfterBlockNumber
+    const dd = await getDeployData(
+      deployData.timestamp,
+      deployData.term,
+      deployData.phloPrice,
+      deployData.phloLimit,
+      deployData.validAfterBlockNumber
     );
 
     try {
-      deepStrictEqual(deployDataFromPayment, {
-        ...payment,
-        deployer: deployDataSecp256k1.deployer,
-        sig: deployDataSecp256k1.sig,
-        sigAlgorithm: deployDataSecp256k1.sigAlgorithm
-      } as DeployData);
+      deepStrictEqual(dd, deployData);
     } catch (err) {
       console.log("  X utils.getDeployDataSecp256k1");
       reject(err);

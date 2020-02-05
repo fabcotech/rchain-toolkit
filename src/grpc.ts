@@ -36,15 +36,6 @@ export const lastFinalizedBlock = (
   return getMethod(undefined, client, "lastFinalizedBlock");
 };
 
-// Listen for data at name
-export const listenForDataAtName = (
-  options: any,
-  client: any
-): Promise<rnodeProtos.casper.v1.ListeningNameDataResponse> => {
-  return getMethod(options, client, "listenForDataAtName");
-};
-
-// Do deploy
 export const doDeploy = (
   options: DeployData,
   client: any
@@ -57,6 +48,7 @@ export const previewPrivateNames = (
   options: any,
   client: any
 ): Promise<rnodeProtos.casper.v1.PrivateNamePreviewResponse> => {
+  fetch();
   return getMethod(options, client, "previewPrivateNames");
 };
 
@@ -68,7 +60,7 @@ export const propose = (
   return getMethod(options, client, "propose");
 };
 
-const getClient = (
+export const getClient = (
   grpcEndPoint: string,
   grpc: any,
   protoLoader: any,
@@ -108,14 +100,6 @@ const getClient = (
         reject(err);
       });
   });
-};
-
-export const getGrpcDeployClient = (
-  grpcEndPoint: string,
-  grpc: any,
-  protoLoader: any
-) => {
-  return getClient(grpcEndPoint, grpc, protoLoader, "deployService");
 };
 
 export const getGrpcProposeClient = (

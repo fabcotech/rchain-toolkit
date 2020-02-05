@@ -1,4 +1,4 @@
-export interface Payment {
+export interface DeployData {
   timestamp: number;
   term: string;
   phloPrice: number;
@@ -6,10 +6,4 @@ export interface Payment {
   validAfterBlockNumber: number;
 }
 
-export type SigAlgorithm = "ed25519" | "secp256k1";
-
-export interface DeployData extends Payment {
-  deployer: Buffer;
-  sig: Uint8Array;
-  sigAlgorithm: SigAlgorithm;
-}
+export type SigAlgorithm = "secp256k1";

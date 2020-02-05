@@ -1,9 +1,8 @@
 /// <reference types="node" />
-import { Payment } from "./models";
+import { DeployData } from "./models";
 export declare const privateKey = "81f1f1b3eaa563dcaf928ee5d9aefd80fdd7300d777d3538eb10b9b10089dc65";
 export declare const publicKey = "043262dd06cca940aaf306084d99eae00db225091340fc9343aa4652cf38a051a673aa3d3499dd11cf67448a5a791cc8a12fda3378e5cd9c73880065aa1aedbcf8";
-export declare const validAfterBlockNumber = 0;
-export declare const payment: Payment;
+export declare const deployData: DeployData;
 export declare const deployDataToSign: Uint8Array;
 export declare const hash: Uint8Array;
 export declare const deployDataSecp256k1: {

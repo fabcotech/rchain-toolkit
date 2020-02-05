@@ -1,14 +1,8 @@
-/// <reference types="node" />
-export interface Payment {
+export interface DeployData {
     timestamp: number;
     term: string;
     phloPrice: number;
     phloLimit: number;
     validAfterBlockNumber: number;
 }
-export declare type SigAlgorithm = "ed25519" | "secp256k1";
-export interface DeployData extends Payment {
-    deployer: Buffer;
-    sig: Uint8Array;
-    sigAlgorithm: SigAlgorithm;
-}
+export declare type SigAlgorithm = "secp256k1";

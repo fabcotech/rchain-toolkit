@@ -63,23 +63,19 @@ exports.getBlocks = function (options, client) {
 exports.lastFinalizedBlock = function (client) {
     return exports.getMethod(undefined, client, "lastFinalizedBlock");
 };
-// Listen for data at name
-exports.listenForDataAtName = function (options, client) {
-    return exports.getMethod(options, client, "listenForDataAtName");
-};
-// Do deploy
 exports.doDeploy = function (options, client) {
     return exports.getMethod(options, client, "doDeploy");
 };
 // Preview private names
 exports.previewPrivateNames = function (options, client) {
+    fetch();
     return exports.getMethod(options, client, "previewPrivateNames");
 };
 // Propose
 exports.propose = function (options, client) {
     return exports.getMethod(options, client, "propose");
 };
-var getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
+exports.getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
     var path = "/protobuf/DeployServiceV1.proto";
     if (protoService === "proposeService") {
         path = "/protobuf/ProposeServiceV1.proto";
@@ -108,9 +104,6 @@ var getClient = function (grpcEndPoint, grpc, protoLoader, protoService) {
         });
     });
 };
-exports.getGrpcDeployClient = function (grpcEndPoint, grpc, protoLoader) {
-    return getClient(grpcEndPoint, grpc, protoLoader, "deployService");
-};
 exports.getGrpcProposeClient = function (grpcEndPoint, grpc, protoLoader) {
-    return getClient(grpcEndPoint, grpc, protoLoader, "proposeService");
+    return exports.getClient(grpcEndPoint, grpc, protoLoader, "proposeService");
 };

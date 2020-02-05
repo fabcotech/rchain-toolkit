@@ -1,34 +1,29 @@
-import * as grpc from "@grpc/grpc-js";
-import * as protoLoader from "@grpc/proto-loader";
 import * as rchainToolkit from "rchain-toolkit";
 
 const main = async () => {
-  const grpcClient = await rchainToolkit.grpc.getGrpcDeployClient(
-    "localhost:40401",
-    grpc,
-    protoLoader
-  );
-
   const transferFundsTerm = rchainToolkit.utils.transferRevTerm({
     from: "1111YT4aWjn7nZNi65bTKJF9GEtXL12raZ9GThLHDi5YMxtdiJkpM",
     to: "11112QRmNvfk9GaX6L7U1jC3Y9TqNanZc7wFEcNiYY8c29GA79MhRW",
     amount: 10
   });
 
-  const deployData = await rchainToolkit.utils.getDeployData(
+  const deployOptions = rchainToolkit.utils.getDeployOptions(
     "secp256k1",
     new Date().valueOf(),
     transferFundsTerm,
-    "de34f27c7a542935e64b8adc6c01511bb669e5c97e61f5fd582b1fa990fded87",
-    "041e4b07f1d4e6f3d088ad0b9fcef8e1ded5ac337a35db332ab8d8b8d42553c35cd3032d437f3a33dc9fb0ce6817ec51a2fedbce74c646b797ca0adafe5c5be24f",
+    "81f1f1b3eaa563dcaf928ee5d9aefd80fdd7300d777d3538eb10b9b10089dc65",
+    "043262dd06cca940aaf306084d99eae00db225091340fc9343aa4652cf38a051a673aa3d3499dd11cf67448a5a791cc8a12fda3378e5cd9c73880065aa1aedbcf8",
     1,
     100000,
-    0
+    1
   );
 
   let deployResponse;
   try {
-    deployResponse = await rchainToolkit.grpc.doDeploy(deployData, grpcClient);
+    deployResponse = await rchainToolkit.grpc.deploy(
+      "localhost:40403",
+      deployOptions
+    );
   } catch (err) {
     console.log(err);
   }

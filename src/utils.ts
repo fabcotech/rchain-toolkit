@@ -3,11 +3,17 @@ import * as elliptic from "elliptic";
 import { keccak256 } from "js-sha3";
 import { Writer } from "protobufjs";
 
-import { Payment, DeployData, SigAlgorithm } from "./models";
+import { DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
 import * as base58 from "./base58";
 
 const ec = new elliptic.ec("secp256k1");
+
+export const getFirstBlock = (
+  blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]
+): any => {
+  return blockInfo[0];
+};
 
 export const getValueFromBlocks = (
   blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]
@@ -26,34 +32,30 @@ export const getValueFromBlocks = (
   throw new Error("Not data found in any block");
 };
 
-const rhoUnforgeablesToJs = (unfs: any) => {
-  const unforgeables: {
-    gPrivate?: string;
-    gDeployId?: string;
-    gDeployerId?: string;
-  }[] = [];
+const rhoUnforgeableToJs = (expr: any) => {
+  const unforgeable: {
+    UnforgPrivate?: string;
+    UnforgDeploy?: string;
+    UnforgDeployer?: string;
+  } = {};
 
-  unfs.forEach((u: any) => {
-    const x: { [key: string]: string } = {};
-    if (u.g_private_body) {
-      x.gPrivate = Buffer.from(u.g_private_body.id).toString("hex");
-    } else if (u.g_deploy_id_body) {
-      x.gDeployId = Buffer.from(u.g_deploy_id_body.id).toString("hex");
-    } else if (u.g_deployer_id_body) {
-      x.gDeployerId = Buffer.from(u.g_deployer_id_body.id).toString("hex");
+  Object.keys(expr.ExprUnforg.data).forEach((u: any) => {
+    if (u === "UnforgPrivate") {
+      unforgeable.UnforgPrivate = expr.ExprUnforg.data[u].data;
+    } else if (u === "UnforgDeploy") {
+      unforgeable.UnforgDeploy = expr.ExprUnforg.data[u].data;
+    } else if (u === "UnforgDeployer") {
+      unforgeable.UnforgDeployer = expr.ExprUnforg.data[u].data;
     }
-
-    unforgeables.push(x);
   });
 
-  return unforgeables;
+  return unforgeable;
 };
 
 const rholangMapToJsObject = (expr: any) => {
   const obj: { [key: string]: any } = {};
-  expr.e_map_body.kvs.forEach((kv: any) => {
-    const k = kv.key.exprs[0].g_string;
-    obj[k] = rhoValToJs(kv.value);
+  Object.keys(expr.ExprMap.data).forEach((k: any) => {
+    obj[k] = rhoValToJs(expr.ExprMap.data[k]);
   });
 
   return obj;
@@ -63,40 +65,41 @@ const rhoIdsToJs = (ids: any) => {
   return ids[0].id;
 };
 const rhoExprStringToJs = (expr: any) => {
-  return expr.g_string;
+  return expr.ExprString.data;
 };
 const rhoExprUriToJs = (expr: any) => {
-  return expr.g_uri;
+  return expr.ExprUri.data;
 };
 const rhoExprBoolToJs = (expr: any) => {
-  return expr.g_bool;
+  return expr.ExprBool.data;
 };
 const rhoExprIntToJs = (expr: any) => {
-  return expr.g_int;
+  return expr.ExprInt.data;
 };
 const rhoExprListToJs = (expr: any) => {
-  return expr.e_list_body.ps.map((e: any) => rhoValToJs(e));
+  return expr.ExprList.data.map((e: any) => rhoValToJs(e));
 };
 
-export const rhoValToJs = (val: any) => {
-  if (val.ids && val.ids[0]) {
+export const rhoValToJs = (expr: any) => {
+  /* if (val.ids && val.ids[0]) {
     return rhoIdsToJs(val.ids);
-  } else if (val.unforgeables && val.unforgeables[0]) {
-    return rhoUnforgeablesToJs(val.unforgeables);
-  } else if (val.exprs[0] && val.exprs[0].e_map_body) {
-    return rholangMapToJsObject(val.exprs[0]);
-  } else if (val.exprs[0] && val.exprs[0].g_string) {
-    return rhoExprStringToJs(val.exprs[0]);
-  } else if (val.exprs[0] && val.exprs[0].g_uri) {
-    return rhoExprUriToJs(val.exprs[0]);
-  } else if (val.exprs[0] && val.exprs[0].hasOwnProperty("g_bool")) {
-    return rhoExprBoolToJs(val.exprs[0]);
-  } else if (val.exprs[0] && val.exprs[0].g_int) {
-    return rhoExprIntToJs(val.exprs[0]);
-  } else if (val.exprs[0] && val.exprs[0].e_list_body) {
-    return rhoExprListToJs(val.exprs[0]);
+  } else  */
+  if (expr.ExprUnforg) {
+    return rhoUnforgeableToJs(expr);
+  } else if (expr.ExprMap) {
+    return rholangMapToJsObject(expr);
+  } else if (expr.ExprString) {
+    return rhoExprStringToJs(expr);
+  } else if (expr.ExprUri) {
+    return rhoExprUriToJs(expr);
+  } else if (expr.ExprBool) {
+    return rhoExprBoolToJs(expr);
+  } else if (expr.ExprInt) {
+    return rhoExprIntToJs(expr);
+  } else if (expr.ExprList) {
+    return rhoExprListToJs(expr);
   } else {
-    console.warn("Not implemented", val);
+    console.warn("Not implemented", expr);
     return null;
   }
 };
@@ -110,13 +113,13 @@ export const unforgeableWithId = (id: Buffer): string => {
   return Buffer.from(bytes).toString("hex");
 };
 
-export const getPayment = (
+export const getDeployData = (
   timestamp: number,
   term: string,
   phloPrice = 1,
   phloLimit = 10000000,
   validAfterBlockNumber = 0
-): Payment => {
+): DeployData => {
   return {
     timestamp: timestamp,
     term: term,
@@ -126,12 +129,12 @@ export const getPayment = (
   };
 };
 
-export const getDeployDataToSign = (payment: Payment): Uint8Array => {
+export const getDeployDataToSign = (payment: DeployData): Uint8Array => {
   return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
 };
 
-export const getBlake2Hash = (toHash: Uint8Array): Uint8Array => {
-  const context = blake2bInit(32, null);
+export const getBlake2Hash = (toHash: Uint8Array, length = 32): Uint8Array => {
+  const context = blake2bInit(length, null);
   blake2bUpdate(context, toHash);
   return blake2bFinal(context);
 };
@@ -221,7 +224,7 @@ for (@(_, RevVault) <- RevVaultCh) {
 }`;
 };
 
-export const getDeployData = (
+export const getDeployOptions = (
   sigAlgorithm: SigAlgorithm,
   timestamp: number,
   term: string,
@@ -230,8 +233,13 @@ export const getDeployData = (
   phloPrice = 1,
   phloLimit = 10000,
   validAfterBlockNumber = 0
-): DeployData => {
-  const payment = getPayment(
+): {
+  data: DeployData;
+  deployer: string;
+  signature: string;
+  sigAlgorithm: SigAlgorithm;
+} => {
+  const deployData = getDeployData(
     timestamp,
     term,
     phloPrice,
@@ -239,23 +247,17 @@ export const getDeployData = (
     validAfterBlockNumber
   );
 
-  const toSign = getDeployDataToSign(payment);
+  const toSign = getDeployDataToSign(deployData);
 
   const hash = getBlake2Hash(toSign);
 
   let signature: Uint8Array;
-  if (sigAlgorithm === "ed25519") {
-    throw new Error("Unsupported algorithm ed25519; please use secp256k1");
-  } else if (sigAlgorithm === "secp256k1") {
-    signature = signSecp256k1(hash, privateKey);
-  } else {
-    throw new Error("Unsupported algorithm");
-  }
+  signature = signSecp256k1(hash, privateKey);
 
   return {
-    ...payment,
-    deployer: Buffer.from(publicKey, "hex"),
-    sig: signature,
+    data: deployData,
+    deployer: publicKey,
+    signature: Buffer.from(new Uint8Array(signature)).toString("hex"),
     sigAlgorithm: sigAlgorithm
   };
 };
