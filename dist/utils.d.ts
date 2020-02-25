@@ -22,3 +22,4 @@ export declare const getDeployOptions: (sigAlgorithm: "secp256k1", timestamp: nu
     sigAlgorithm: "secp256k1";
 };
 export declare const revAddressFromPublicKey: (publicKey: string) => string;
+export declare const publicKeyFromPrivateKey: (privateKey: string) => string;

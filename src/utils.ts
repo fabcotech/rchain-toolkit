@@ -317,3 +317,8 @@ export const revAddressFromPublicKey = (publicKey: string) => {
   // Return both REV and ETH address
   return getAddrFromEth(pkHash40);
 };
+
+export const publicKeyFromPrivateKey = (privateKey: string) => {
+  const keyPair = ec.keyFromPrivate(privateKey);
+  return keyPair.getPublic().encode("hex", false);
+};

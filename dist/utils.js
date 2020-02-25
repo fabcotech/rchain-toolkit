@@ -216,3 +216,7 @@ exports.revAddressFromPublicKey = function (publicKey) {
     // Return both REV and ETH address
     return getAddrFromEth(pkHash40);
 };
+exports.publicKeyFromPrivateKey = function (privateKey) {
+    var keyPair = ec.keyFromPrivate(privateKey);
+    return keyPair.getPublic().encode("hex", false);
+};

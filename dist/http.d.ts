@@ -1,4 +1,4 @@
-import { DeployData } from "./models";
+import { DeployData, LightBlockInfo } from "./models";
 export interface DeployOptions {
     data: DeployData;
     deployer: string;
@@ -10,6 +10,21 @@ export interface DeployResponse {
     blockNumber: number;
 }
 export declare const deploy: (url: string, options: DeployOptions) => Promise<string>;
+export interface ExploreDeployOptions {
+    term: string;
+}
+export interface ExploreDeployResponse {
+    names: string[];
+    blockNumber: number;
+}
+export declare const exploreDeploy: (url: string, options: ExploreDeployOptions) => Promise<any>;
+export interface BlocksOptions {
+    position: number;
+}
+export interface BlocksResponse {
+    blocks: LightBlockInfo[];
+}
+export declare const blocks: (url: string, options: BlocksOptions) => Promise<any>;
 export interface PrepareDeployOptions {
     deployer: string;
     timestamp: number;

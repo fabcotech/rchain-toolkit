@@ -5,7 +5,8 @@ import {
   getDeployData,
   signSecp256k1,
   getBlake2Hash,
-  revAddressFromPublicKey
+  revAddressFromPublicKey,
+  publicKeyFromPrivateKey
 } from "../src/utils";
 import {
   deployData,
@@ -107,6 +108,25 @@ const testRevAddressFromPublicKey = () => {
   });
 };
 
+const testPublicKeyFromPrivateKey = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const publicKey = publicKeyFromPrivateKey(
+        "a2803d16030f83757a5043e5c0e28573685f6d8bf4e358bf1385d82bffa8e698"
+      );
+      deepStrictEqual(
+        publicKey,
+        "04b50dbf4e03cf9abe39238086ca74f53a9ec9f1b68efc6376cb0cd88dd263ea7b987c5a0f3c655252abdfac247d8eb76b3c93f95bbc61467a0dc78c8d32a5bbb7"
+      );
+    } catch (err) {
+      console.log("  X utils.publicKeyFromPrivateKey");
+      reject(err);
+    }
+    console.log("  ✓ utils.publicKeyFromPrivateKey");
+    resolve();
+  });
+};
+
 export const testUtils = () => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -116,6 +136,7 @@ export const testUtils = () => {
       await testGetDeployDataSecp256k1();
       await testSignSecp256k1();
       await testRevAddressFromPublicKey();
+      await testPublicKeyFromPrivateKey();
       console.log("\n");
       resolve();
     } catch (err) {

@@ -1,15 +1,17 @@
-import { DeployData } from "./models";
+import { DeployData, LightBlockInfo } from "./models";
 
 const http = require("http");
 
-// deploy
+// ==============
+// Deploy
+// ==============
+
 export interface DeployOptions {
   data: DeployData;
   deployer: string;
   signature: string;
   sigAlgorithm: "secp256k1";
 }
-
 export interface DeployResponse {
   names: string[];
   blockNumber: number;
@@ -48,12 +50,101 @@ export const deploy = (
   });
 };
 
+// ==============
+// Exploratory deploy
+// ==============
+
+export interface ExploreDeployOptions {
+  term: string;
+}
+export interface ExploreDeployResponse {
+  names: string[];
+  blockNumber: number;
+}
+export const exploreDeploy = (
+  url: string,
+  options: ExploreDeployOptions
+): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const req = http.request(
+      {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        method: "POST",
+        host: url.split(":")[0],
+        path: "/api/explore-deploy",
+        port: url.split(":")[1]
+      },
+
+      res => {
+        let data = "";
+        res.on("data", chunk => {
+          data += chunk;
+          res.on("end", () => {
+            resolve(data);
+          });
+        });
+      }
+    );
+    req.write(options.term);
+    req.end();
+    req.on("error", e => {
+      reject(e);
+    });
+  });
+};
+
+// ==============
+// Blocks by position
+// ==============
+
+export interface BlocksOptions {
+  position: number;
+}
+export interface BlocksResponse {
+  blocks: LightBlockInfo[];
+}
+export const blocks = (url: string, options: BlocksOptions): Promise<any> => {
+  return new Promise((resolve, reject) => {
+    const req = http.request(
+      {
+        headers: {
+          "Content-Type": "application/json"
+        },
+        method: "GET",
+        host: url.split(":")[0],
+        path: "/api/blocks/" + options.position,
+        port: url.split(":")[1]
+      },
+
+      res => {
+        let data = "";
+        res.on("data", chunk => {
+          data += chunk;
+          res.on("end", () => {
+            resolve(data);
+          });
+        });
+      }
+    );
+
+    req.end();
+    req.on("error", e => {
+      reject(e);
+    });
+  });
+};
+
+// ==============
+// PrepareDeploy
+// ==============
+
 export interface PrepareDeployOptions {
   deployer: string;
   timestamp: number;
   nameQty: number;
 }
-
 export interface PrepareDeployResponse {
   names: string[];
   blockNumber: number;

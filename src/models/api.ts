@@ -33,6 +33,8 @@ export interface LightBlockInfo {
   parentsHashList: any[];
   blockHash: string;
   blockSize: string;
+  seqNum: number;
+  blockNumber: number;
   version: Long;
   deployCount: 14;
   tupleSpaceHash: string;
