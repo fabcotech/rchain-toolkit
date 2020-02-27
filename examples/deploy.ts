@@ -4,7 +4,7 @@ const main = async () => {
   let validAfterBlockNumber;
   try {
     validAfterBlockNumber = JSON.parse(
-      await rchainToolkit.http.blocks(`localhost:40403`, {
+      await rchainToolkit.http.blocks(`http://localhost:40403`, {
         position: 1
       })
     )[0].blockNumber;
@@ -31,7 +31,7 @@ const main = async () => {
   let deployResponse;
   try {
     deployResponse = await rchainToolkit.http.deploy(
-      "localhost:40403",
+      "http://localhost:40403",
       deployOptions
     );
   } catch (err) {

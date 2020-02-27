@@ -5,7 +5,7 @@ import * as rchainToolkit from "rchain-toolkit";
 const main = async () => {
   // The propose neeeds another grpc service
   const grpcClient = await rchainToolkit.grpc.getGrpcProposeClient(
-    "localhost:40401",
+    "localhost:40402",
     grpc,
     protoLoader
   );

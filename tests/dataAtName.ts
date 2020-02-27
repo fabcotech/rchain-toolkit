@@ -5,39 +5,25 @@ import {
   prepareDeploy,
   deploy,
   dataAtName,
-  DataAtNameReponse
+  DataAtNameReponse,
+  blocks
 } from "../src/http";
-import {
-  getGrpcProposeClient,
-  propose,
-  lastFinalizedBlock,
-  getClient
-} from "../src/grpc";
+import { getGrpcProposeClient, propose } from "../src/grpc";
 import { getDeployOptions } from "../src/utils";
 
 export const testDataAtName = () => {
   return new Promise(async (resolve, reject) => {
     const proposeClient = await getGrpcProposeClient(
-      "localhost:40401",
+      "localhost:40402",
       grpc,
       protoLoader
     );
 
-    const deployClient = await getClient(
-      "localhost:40401",
-      grpc,
-      protoLoader,
-      "deployService"
-    );
-
-    let lastFinalizedBlockValue;
-    try {
-      const response = await lastFinalizedBlock(deployClient);
-      lastFinalizedBlockValue = parseInt(response.blockInfo.blockNumber) || -1;
-    } catch (err) {
-      reject(err);
-      return;
-    }
+    const validAfterBlockNumber = JSON.parse(
+      await blocks("http://localhost:40403", {
+        position: 1
+      })
+    )[0].blockNumber;
 
     const argv = JSON.parse(process.env.npm_config_argv);
     let privateKey;
@@ -59,11 +45,14 @@ export const testDataAtName = () => {
     }
 
     const timestamp = new Date().valueOf();
-    const prepareDeployResponse = await prepareDeploy("localhost:40403", {
-      deployer: publicKey,
-      timestamp: timestamp,
-      nameQty: 1
-    });
+    const prepareDeployResponse = await prepareDeploy(
+      "http://localhost:40403",
+      {
+        deployer: publicKey,
+        timestamp: timestamp,
+        nameQty: 1
+      }
+    );
 
     try {
       const deployOptions = getDeployOptions(
@@ -74,10 +63,13 @@ export const testDataAtName = () => {
         publicKey,
         1,
         1000000,
-        lastFinalizedBlockValue
+        validAfterBlockNumber || -1
       );
 
-      const deployDataResponse = await deploy("localhost:40403", deployOptions);
+      const deployDataResponse = await deploy(
+        "http://localhost:40403",
+        deployOptions
+      );
     } catch (err) {
       reject(err);
       return;
@@ -92,7 +84,7 @@ export const testDataAtName = () => {
       return;
     }
 
-    const dataAtNameResponse = await dataAtName("localhost:40403", {
+    const dataAtNameResponse = await dataAtName("http://localhost:40403", {
       name: {
         UnforgPrivate: { data: JSON.parse(prepareDeployResponse).names[0] }
       },

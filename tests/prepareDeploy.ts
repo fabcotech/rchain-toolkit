@@ -6,7 +6,7 @@ import { privateNamePreviewResponse } from "../src/models/api.mock";
 
 export const testPrepareDeploy = () => {
   return new Promise(async (resolve, reject) => {
-    const response = await prepareDeploy("localhost:40403", {
+    const response = await prepareDeploy("http://localhost:40403", {
       deployer: publicKey,
       timestamp: deployData.timestamp,
       nameQty: 1

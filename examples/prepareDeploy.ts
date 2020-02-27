@@ -6,7 +6,7 @@ const main = async () => {
   let prepareDeployResponse;
   try {
     prepareDeployResponse = await rchainToolkit.http.prepareDeploy(
-      "localhost:40403",
+      "http://localhost:40403",
       {
         deployer:
           "043262dd06cca940aaf306084d99eae00db225091340fc9343aa4652cf38a051a673aa3d3499dd11cf67448a5a791cc8a12fda3378e5cd9c73880065aa1aedbcf8",
