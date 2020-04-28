@@ -1,4 +1,4 @@
-import * as rchainToolkit from "../dist";
+import * as rchainToolkit from "rchain-toolkit";
 
 const main = async () => {
   let validAfterBlockNumber;
