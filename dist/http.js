@@ -77,7 +77,6 @@ exports.exploreDeploy = function (url, options) {
     });
 };
 exports.blocks = function (url, options) {
-    var urlValidated = validateUrl(url);
     return new Promise(function (resolve, reject) {
         var urlValidated = validateUrl(url);
         var req = urlValidated.lib.request(__assign({ headers: {

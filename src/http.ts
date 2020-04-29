@@ -9,14 +9,14 @@ const validateUrl = (url: string) => {
       protocol: "http",
       host: url.substr(7).split(":")[0],
       port: url.substr(7).split(":")[1],
-      lib: http
+      lib: http,
     };
   } else if (url.startsWith("https://")) {
     return {
       protocol: "https",
       host: url.substr(8).split(":")[0],
       port: url.substr(8).split(":")[1],
-      lib: https
+      lib: https,
     };
   } else {
     throw new Error(
@@ -48,17 +48,17 @@ export const deploy = (
     const req = urlValidated.lib.request(
       {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/deploy",
         host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {})
+        ...(urlValidated.port ? { port: urlValidated.port } : {}),
       },
 
-      res => {
+      (res) => {
         let data = "";
-        res.on("data", chunk => {
+        res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
             resolve(data);
@@ -68,7 +68,7 @@ export const deploy = (
     );
     req.write(JSON.stringify(options));
     req.end();
-    req.on("error", e => {
+    req.on("error", (e) => {
       reject(e);
     });
   });
@@ -95,17 +95,17 @@ export const exploreDeploy = (
     const req = urlValidated.lib.request(
       {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/explore-deploy",
         host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {})
+        ...(urlValidated.port ? { port: urlValidated.port } : {}),
       },
 
-      res => {
+      (res) => {
         let data = "";
-        res.on("data", chunk => {
+        res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
             resolve(data);
@@ -115,7 +115,7 @@ export const exploreDeploy = (
     );
     req.write(options.term);
     req.end();
-    req.on("error", e => {
+    req.on("error", (e) => {
       reject(e);
     });
   });
@@ -132,25 +132,23 @@ export interface BlocksResponse {
   blocks: LightBlockInfo[];
 }
 export const blocks = (url: string, options: BlocksOptions): Promise<any> => {
-  const urlValidated = validateUrl(url);
-
   return new Promise((resolve, reject) => {
     const urlValidated = validateUrl(url);
 
     const req = urlValidated.lib.request(
       {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         method: "GET",
         path: "/api/blocks/" + options.position,
         host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {})
+        ...(urlValidated.port ? { port: urlValidated.port } : {}),
       },
 
-      res => {
+      (res) => {
         let data = "";
-        res.on("data", chunk => {
+        res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
             resolve(data);
@@ -160,7 +158,7 @@ export const blocks = (url: string, options: BlocksOptions): Promise<any> => {
     );
 
     req.end();
-    req.on("error", e => {
+    req.on("error", (e) => {
       reject(e);
     });
   });
@@ -189,17 +187,17 @@ export const prepareDeploy = (
     const req = urlValidated.lib.request(
       {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/prepare-deploy",
         host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {})
+        ...(urlValidated.port ? { port: urlValidated.port } : {}),
       },
 
-      res => {
+      (res) => {
         let data = "";
-        res.on("data", chunk => {
+        res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
             resolve(data);
@@ -210,7 +208,7 @@ export const prepareDeploy = (
 
     req.write(JSON.stringify(options));
     req.end();
-    req.on("error", e => {
+    req.on("error", (e) => {
       reject(e);
     });
   });
@@ -244,17 +242,17 @@ export const dataAtName = (
     const req = urlValidated.lib.request(
       {
         headers: {
-          "Content-Type": "application/json"
+          "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/data-at-name",
         host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {})
+        ...(urlValidated.port ? { port: urlValidated.port } : {}),
       },
 
-      res => {
+      (res) => {
         let data = "";
-        res.on("data", chunk => {
+        res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
             resolve(data);
@@ -264,7 +262,7 @@ export const dataAtName = (
     );
     req.write(JSON.stringify(options));
     req.end();
-    req.on("error", e => {
+    req.on("error", (e) => {
       reject(e);
     });
   });

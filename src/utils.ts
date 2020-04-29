@@ -105,10 +105,7 @@ export const rhoValToJs = (expr: any) => {
 };
 
 export const unforgeableWithId = (id: Buffer): string => {
-  const bytes = Writer.create()
-    .bytes(id)
-    .finish()
-    .slice(1);
+  const bytes = Writer.create().bytes(id).finish().slice(1);
 
   return Buffer.from(bytes).toString("hex");
 };
@@ -125,7 +122,7 @@ export const getDeployData = (
     term: term,
     phloLimit: phloLimit,
     phloPrice: phloPrice,
-    validAfterBlockNumber: validAfterBlockNumber
+    validAfterBlockNumber: validAfterBlockNumber,
   };
 };
 
@@ -144,7 +141,7 @@ export const verifyPrivateAndPublicKey = (
   publicKey: string
 ) => {
   const keyPair = ec.keyFromPrivate(privateKey);
-  if (keyPair.getPublic().encode("hex") !== publicKey) {
+  if (keyPair.getPublic().encode("hex", false) !== publicKey) {
     throw new Error("Private key and public key do not match");
   }
 };
@@ -158,14 +155,7 @@ export const signSecp256k1 = (
   const signature = keyPair.sign(Buffer.from(hash), { canonical: true });
   const derSign = signature.toDER();
 
-  if (
-    !ec.verify(
-      Buffer.from(hash),
-      Buffer.from(derSign),
-      keyPair.getPublic().encode("hex"),
-      "hex"
-    )
-  ) {
+  if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {
     throw new Error("Failed to verify signature");
   }
 
@@ -258,7 +248,7 @@ export const getDeployOptions = (
     data: deployData,
     deployer: publicKey,
     signature: Buffer.from(new Uint8Array(signature)).toString("hex"),
-    sigAlgorithm: sigAlgorithm
+    sigAlgorithm: sigAlgorithm,
   };
 };
 

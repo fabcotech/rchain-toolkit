@@ -68,7 +68,6 @@ exports.doDeploy = function (options, client) {
 };
 // Preview private names
 exports.previewPrivateNames = function (options, client) {
-    fetch();
     return exports.getMethod(options, client, "previewPrivateNames");
 };
 // Propose

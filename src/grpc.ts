@@ -48,7 +48,6 @@ export const previewPrivateNames = (
   options: any,
   client: any
 ): Promise<rnodeProtos.casper.v1.PrivateNamePreviewResponse> => {
-  fetch();
   return getMethod(options, client, "previewPrivateNames");
 };
 
@@ -77,7 +76,7 @@ export const getClient = (
         longs: String,
         enums: String,
         defaults: true,
-        oneofs: true
+        oneofs: true,
       })
       .then((packageDefinition: any) => {
         const packageObject = grpc.loadPackageDefinition(packageDefinition);

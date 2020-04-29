@@ -102,10 +102,7 @@ exports.rhoValToJs = function (expr) {
     }
 };
 exports.unforgeableWithId = function (id) {
-    var bytes = protobufjs_1.Writer.create()
-        .bytes(id)
-        .finish()
-        .slice(1);
+    var bytes = protobufjs_1.Writer.create().bytes(id).finish().slice(1);
     return Buffer.from(bytes).toString("hex");
 };
 exports.getDeployData = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
@@ -131,7 +128,7 @@ exports.getBlake2Hash = function (toHash, length) {
 };
 exports.verifyPrivateAndPublicKey = function (privateKey, publicKey) {
     var keyPair = ec.keyFromPrivate(privateKey);
-    if (keyPair.getPublic().encode("hex") !== publicKey) {
+    if (keyPair.getPublic().encode("hex", false) !== publicKey) {
         throw new Error("Private key and public key do not match");
     }
 };
@@ -139,7 +136,7 @@ exports.signSecp256k1 = function (hash, privateKey) {
     var keyPair = ec.keyFromPrivate(privateKey);
     var signature = keyPair.sign(Buffer.from(hash), { canonical: true });
     var derSign = signature.toDER();
-    if (!ec.verify(Buffer.from(hash), Buffer.from(derSign), keyPair.getPublic().encode("hex"), "hex")) {
+    if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {
         throw new Error("Failed to verify signature");
     }
     return new Uint8Array(derSign);
