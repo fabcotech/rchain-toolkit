@@ -10,7 +10,6 @@ exports.__esModule = true;
 var blakejs_1 = require("blakejs");
 var elliptic = require("elliptic");
 var js_sha3_1 = require("js-sha3");
-var protobufjs_1 = require("protobufjs");
 var rnodeProtos = require("./rnode-protos");
 var base58 = require("./base58");
 var ec = new elliptic.ec("secp256k1");
@@ -102,8 +101,7 @@ exports.rhoValToJs = function (expr) {
     }
 };
 exports.unforgeableWithId = function (id) {
-    var bytes = protobufjs_1.Writer.create().bytes(id).finish().slice(1);
-    return Buffer.from(bytes).toString("hex");
+    return id.toString("hex");
 };
 exports.getDeployData = function (timestamp, term, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }

@@ -5,7 +5,7 @@ const main = async () => {
   try {
     validAfterBlockNumber = JSON.parse(
       await rchainToolkit.http.blocks(`http://localhost:40403`, {
-        position: 1
+        position: 1,
       })
     )[0].blockNumber;
   } catch (err) {

@@ -105,9 +105,7 @@ export const rhoValToJs = (expr: any) => {
 };
 
 export const unforgeableWithId = (id: Buffer): string => {
-  const bytes = Writer.create().bytes(id).finish().slice(1);
-
-  return Buffer.from(bytes).toString("hex");
+  return id.toString("hex");
 };
 
 export const getDeployData = (

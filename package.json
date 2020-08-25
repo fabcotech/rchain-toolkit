@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.2.4",
+  "version": "0.2.6",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",
@@ -41,7 +41,7 @@
   },
   "dependencies": {
     "blakejs": "^1.1.0",
-    "elliptic": "^6.5.0",
+    "elliptic": "6.5.3",
     "js-sha3": "^0.8.0",
     "protobufjs": "^6.8.8",
     "typescript": "3.6.4"
