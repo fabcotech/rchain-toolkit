@@ -118,6 +118,65 @@ exports.getDeployData = function (timestamp, term, phloPrice, phloLimit, validAf
 exports.getDeployDataToSign = function (payment) {
     return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
 };
+var stringToRhoRepr = function (a) {
+    return { g_string: a };
+};
+var intToRhoRepr = function (a) {
+    return { g_int: a };
+};
+var boolToRhoRepr = function (a) {
+    return { g_bool: a };
+};
+var listToRhoRepr = function (a) {
+    return {
+        ps: a.map(function (e) { return ({ exprs: [exports.varToRhoExpr(e)] }); })
+    };
+};
+exports.mapToRhoRepr = function (a) {
+    var map = {
+        kvs: []
+    };
+    Object.keys(a)
+        .sort() // alphabetical
+        .forEach(function (key) {
+        if (typeof a[key] !== "undefined" && a[key] !== null) {
+            map.kvs.push({
+                key: { exprs: [exports.varToRhoExpr(key)] },
+                value: { exprs: [exports.varToRhoExpr(a[key])] }
+            });
+        }
+        else {
+            map.kvs.push({
+                key: { exprs: [exports.varToRhoExpr(key)] }
+            });
+        }
+    });
+    return map;
+};
+exports.varToRhoExpr = function (a) {
+    if (typeof a === "boolean") {
+        return boolToRhoRepr(a);
+    }
+    if (typeof a === "string") {
+        return stringToRhoRepr(a);
+    }
+    if (typeof a === "number") {
+        return intToRhoRepr(a);
+    }
+    if (Array.isArray(a)) {
+        return { e_list_body: listToRhoRepr(a) };
+    }
+    if (typeof a === 'object' && a !== null) {
+        return { e_map_body: exports.mapToRhoRepr(a) };
+    }
+    throw new Error('Unknown variable type');
+};
+exports.toByteArray = function (a) {
+    var expr = exports.varToRhoExpr(a);
+    return rnodeProtos.Par.encode({
+        exprs: [expr]
+    }).finish();
+};
 exports.getBlake2Hash = function (toHash, length) {
     if (length === void 0) { length = 32; }
     var context = blakejs_1.blake2bInit(length, null);

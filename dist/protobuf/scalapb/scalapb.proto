@@ -51,7 +51,7 @@ message ScalaPbOptions {
 
   // If set to true, all generated messages in this file will preserve unknown
   // fields.
-  optional bool preserve_unknown_fields = 9;
+  optional bool preserve_unknown_fields = 9 [default=true];
 
   // If defined, sets the name of the file-level object that would be generated. This
   // object extends `GeneratedFileObject` and contains descriptors, and list of message
@@ -69,7 +69,7 @@ message ScalaPbOptions {
   // Experimental: scope to apply the given options.
   optional OptionsScope scope = 11;
 
-  // If true, lenses will not be generated.
+  // If true, lenses will be generated.
   optional bool lenses = 12 [default=true];
 
   // If true, then source-code info information will be included in the
@@ -82,9 +82,91 @@ message ScalaPbOptions {
   // `scala.collection.immutable.Map` will be used.
   optional string map_type = 14;
 
+  // If true, no default values will be generated in message constructors.
+  optional bool no_default_values_in_constructor = 15;
+
+  /* Naming convention for generated enum values */
+  enum EnumValueNaming {
+    AS_IN_PROTO = 0;  // Enum value names in Scala use the same name as in the proto
+    CAMEL_CASE = 1;   // Convert enum values to CamelCase in Scala.
+  }
+  optional EnumValueNaming enum_value_naming = 16;
+
+  // Indicate if prefix (enum name + optional underscore) should be removed in scala code
+  // Strip is applied before enum value naming changes.
+  optional bool enum_strip_prefix = 17 [default=false];
+
+  // Scala type to use for bytes fields.
+  optional string bytes_type = 21;
+
+  // Enable java conversions for this file.
+  optional bool java_conversions = 23;
+
+  // AuxMessageOptions enables you to set message-level options through package-scoped options.
+  // This is useful when you can't add a dependency on scalapb.proto from the proto file that
+  // defines the message.
+  message AuxMessageOptions {
+    // The fully-qualified name of the message in the proto name space.
+    optional string target = 1;
+
+    // Options to apply to the message. If there are any options defined on the target message
+    // they take precedence over the options.
+    optional MessageOptions options = 2;
+  }
+
+  // AuxFieldOptions enables you to set field-level options through package-scoped options.
+  // This is useful when you can't add a dependency on scalapb.proto from the proto file that
+  // defines the field.
+  message AuxFieldOptions {
+    // The fully-qualified name of the field in the proto name space.
+    optional string target = 1;
+
+    // Options to apply to the field. If there are any options defined on the target message
+    // they take precedence over the options.
+    optional FieldOptions options = 2;
+  }
+
+  // AuxEnumOptions enables you to set enum-level options through package-scoped options.
+  // This is useful when you can't add a dependency on scalapb.proto from the proto file that
+  // defines the enum.
+  message AuxEnumOptions {
+    // The fully-qualified name of the enum in the proto name space.
+    optional string target = 1;
+
+    // Options to apply to the enum. If there are any options defined on the target enum
+    // they take precedence over the options.
+    optional EnumOptions options = 2;
+  }
+
+  // AuxEnumValueOptions enables you to set enum value level options through package-scoped
+  // options.  This is useful when you can't add a dependency on scalapb.proto from the proto
+  // file that defines the enum.
+  message AuxEnumValueOptions {
+    // The fully-qualified name of the enum value in the proto name space.
+    optional string target = 1;
+
+    // Options to apply to the enum value. If there are any options defined on
+    // the target enum value they take precedence over the options.
+    optional EnumValueOptions options = 2;
+  }
+
+  // List of message options to apply to some messages.
+  repeated AuxMessageOptions aux_message_options = 18;
+
+  // List of message options to apply to some fields.
+  repeated AuxFieldOptions aux_field_options = 19;
+
+  // List of message options to apply to some enums.
+  repeated AuxEnumOptions aux_enum_options = 20;
+
+  // List of enum value options to apply to some enum values.
+  repeated AuxEnumValueOptions aux_enum_value_options = 22;
+
   // For use in tests only. Inhibit Java conversions even when when generator parameters
   // request for it.
-  optional bool test_only_no_java_conversions = 100001;
+  optional bool test_only_no_java_conversions = 1001;
+
+  extensions 10000 to max;
 }
 
 extend google.protobuf.FileOptions {
@@ -112,6 +194,15 @@ message MessageOptions {
 
   // Additional classes and traits to mix in to generated sealed_oneof base trait.
   repeated string sealed_oneof_extends = 6;
+
+  // If true, when this message is used as an optional field, do not wrap it in an `Option`.
+  // This is equivalent of setting `(field).no_box` to true on each field with the message type.
+  optional bool no_box = 7;
+
+  // Custom annotations to add to the generated `unknownFields` case class field.
+  repeated string unknown_fields_annotations = 8;
+
+  extensions 10000 to max;
 }
 
 extend google.protobuf.MessageOptions {
@@ -143,8 +234,10 @@ message FieldOptions {
   // `scala.collection.immutable.Map`
   optional string map_type = 7;
 
-  // Do not box this value in Option[T]
+  // Do not box this value in Option[T]. If set, this overrides MessageOptions.no_box
   optional bool no_box = 30;
+
+  extensions 10000 to max;
 }
 
 extend google.protobuf.FieldOptions {
@@ -163,6 +256,8 @@ message EnumOptions {
   // All instances of this enum will be converted to this type. An implicit TypeMapper
   // must be present.
   optional string type = 3;
+
+  extensions 10000 to max;
 }
 
 extend google.protobuf.EnumOptions {
@@ -176,6 +271,11 @@ extend google.protobuf.EnumOptions {
 message EnumValueOptions {
   // Additional classes and traits to mix in to an individual enum value.
   repeated string extends = 1;
+
+  // Name in Scala to use for this enum value.
+  optional string scala_name = 2;
+
+  extensions 10000 to max;
 }
 
 extend google.protobuf.EnumValueOptions {
@@ -187,6 +287,11 @@ extend google.protobuf.EnumValueOptions {
 message OneofOptions {
   // Additional traits to mix in to a oneof.
   repeated string extends = 1;
+
+  // Name in Scala to use for this oneof field.
+  optional string scala_name = 2;
+
+  extensions 10000 to max;
 }
 
 extend google.protobuf.OneofOptions {

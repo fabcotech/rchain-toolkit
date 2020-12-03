@@ -88,7 +88,7 @@ export const testDataAtName = () => {
       name: {
         UnforgPrivate: { data: JSON.parse(prepareDeployResponse).names[0] }
       },
-      depth: 90
+      depth: 3
     });
 
     if (

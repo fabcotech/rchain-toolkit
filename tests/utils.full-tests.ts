@@ -6,7 +6,8 @@ import {
   signSecp256k1,
   getBlake2Hash,
   revAddressFromPublicKey,
-  publicKeyFromPrivateKey
+  publicKeyFromPrivateKey,
+  toByteArray,
 } from "../src/utils";
 import {
   deployData,
@@ -127,6 +128,53 @@ const testPublicKeyFromPrivateKey = () => {
   });
 };
 
+const testObjectToByteArray = () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const obj = toByteArray({
+        "a": 1,
+        "b": "hello",
+        "c": undefined,
+      });
+      deepStrictEqual(
+        Buffer.from(obj).toString('hex'),
+        "2a2fba012c0a0d0a052a031a016112042a0210020a120a052a031a016212092a071a0568656c6c6f0a070a052a031a0163"
+      );
+      const list = toByteArray(["aaa", "bbb"]);
+      deepStrictEqual(
+        Buffer.from(list).toString('hex'),
+        "2a15a201120a072a051a036161610a072a051a03626262"
+      );
+      const obj2 = toByteArray({
+        "a": 1,
+        "b": "hello",
+        "c": [1, 2, 3],
+      });
+      deepStrictEqual(
+        Buffer.from(obj2).toString('hex'),
+        "2a48ba01450a0d0a052a031a016112042a0210020a120a052a031a016212092a071a0568656c6c6f0a200a052a031a016312172a15a201120a042a0210020a042a0210040a042a021006"
+      );
+      const obj3 = toByteArray({
+        "a": 1,
+        "b": "hello",
+        "c": {
+          "d": 1,
+          "e": "f",
+        },
+      });
+      deepStrictEqual(
+        Buffer.from(obj3).toString('hex'),
+        "2a55ba01520a0d0a052a031a016112042a0210020a120a052a031a016212092a071a0568656c6c6f0a2d0a052a031a016312242a22ba011f0a0d0a052a031a016412042a0210020a0e0a052a031a016512052a031a0166"
+      );
+    } catch (err) {
+      console.log("  X utils.varToRhoExpr");
+      reject(err);
+    }
+    console.log("  ✓ utils.varToRhoExpr");
+    resolve();
+  });
+};
+
 export const testUtils = () => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -137,6 +185,7 @@ export const testUtils = () => {
       await testSignSecp256k1();
       await testRevAddressFromPublicKey();
       await testPublicKeyFromPrivateKey();
+      await testObjectToByteArray();
       console.log("\n");
       resolve();
     } catch (err) {

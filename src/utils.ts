@@ -128,6 +128,76 @@ export const getDeployDataToSign = (payment: DeployData): Uint8Array => {
   return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
 };
 
+const stringToRhoRepr = (a: string): rnodeProtos.IExpr => {
+  return { g_string: a };
+}
+const intToRhoRepr = (a: number): rnodeProtos.IExpr => {
+  return { g_int: a };
+}
+const boolToRhoRepr = (a: boolean): rnodeProtos.IExpr => {
+  return { g_bool: a };
+}
+const listToRhoRepr = (a: any[]): rnodeProtos.EList => {
+  return {
+    ps: a.map(e => (
+      { exprs: [varToRhoExpr(e)] }
+    ))
+  } as rnodeProtos.EList;
+}
+
+export const mapToRhoRepr = (a: any): rnodeProtos.EMap => {
+  const map: any = {
+    kvs: [],
+  };
+
+  Object.keys(a)
+    .sort() // alphabetical
+    .forEach(key => {
+      if (typeof a[key] !== "undefined" && a[key] !== null) {
+        map.kvs.push({
+          key: { exprs: [varToRhoExpr(key)] },
+          value: { exprs: [varToRhoExpr(a[key])] },
+        });
+      } else {
+        map.kvs.push({
+          key: { exprs: [varToRhoExpr(key)] },
+        });
+      }
+    });
+
+  return map as rnodeProtos.EMap;
+};
+
+export const varToRhoExpr = (a: any): rnodeProtos.IExpr => {
+  if (typeof a === "boolean") {
+    return boolToRhoRepr(a as boolean);
+  }
+  if (typeof a === "string") {
+    return stringToRhoRepr(a as string);
+  }
+  if (typeof a === "number") {
+    return intToRhoRepr(a as number);
+  }
+  if (Array.isArray(a)) {
+    return { e_list_body: listToRhoRepr(a) }
+  }
+  if(
+    typeof a === 'object' && a !== null
+  ) {
+    return { e_map_body: mapToRhoRepr(a)}
+  }
+
+  throw new Error('Unknown variable type');
+  
+}
+
+export const toByteArray = (a: any) => {
+  const expr = varToRhoExpr(a);
+  return rnodeProtos.Par.encode({
+    exprs: [expr],
+  }).finish();
+}
+
 export const getBlake2Hash = (toHash: Uint8Array, length = 32): Uint8Array => {
   const context = blake2bInit(length, null);
   blake2bUpdate(context, toHash);
