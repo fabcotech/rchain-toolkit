@@ -70,6 +70,9 @@ var rhoExprIntToJs = function (expr) {
 var rhoExprListToJs = function (expr) {
     return expr.ExprList.data.map(function (e) { return exports.rhoValToJs(e); });
 };
+var rhoExprSetToJs = function (expr) {
+    return expr.ExprSet.data.map(function (e) { return exports.rhoValToJs(e); });
+};
 exports.rhoValToJs = function (expr) {
     /* if (val.ids && val.ids[0]) {
       return rhoIdsToJs(val.ids);
@@ -94,6 +97,9 @@ exports.rhoValToJs = function (expr) {
     }
     else if (expr.ExprList) {
         return rhoExprListToJs(expr);
+    }
+    else if (expr.ExprSet) {
+        return rhoExprSetToJs(expr);
     }
     else {
         console.warn("Not implemented", expr);
@@ -166,10 +172,10 @@ exports.varToRhoExpr = function (a) {
     if (Array.isArray(a)) {
         return { e_list_body: listToRhoRepr(a) };
     }
-    if (typeof a === 'object' && a !== null) {
+    if (typeof a === "object" && a !== null) {
         return { e_map_body: exports.mapToRhoRepr(a) };
     }
-    throw new Error('Unknown variable type');
+    throw new Error("Unknown variable type");
 };
 exports.toByteArray = function (a) {
     var expr = exports.varToRhoExpr(a);

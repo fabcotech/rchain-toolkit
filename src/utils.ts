@@ -79,6 +79,9 @@ const rhoExprIntToJs = (expr: any) => {
 const rhoExprListToJs = (expr: any) => {
   return expr.ExprList.data.map((e: any) => rhoValToJs(e));
 };
+const rhoExprSetToJs = (expr: any) => {
+  return expr.ExprSet.data.map((e: any) => rhoValToJs(e));
+};
 
 export const rhoValToJs = (expr: any) => {
   /* if (val.ids && val.ids[0]) {
@@ -98,6 +101,8 @@ export const rhoValToJs = (expr: any) => {
     return rhoExprIntToJs(expr);
   } else if (expr.ExprList) {
     return rhoExprListToJs(expr);
+  } else if (expr.ExprSet) {
+    return rhoExprSetToJs(expr);
   } else {
     console.warn("Not implemented", expr);
     return null;
@@ -130,20 +135,18 @@ export const getDeployDataToSign = (payment: DeployData): Uint8Array => {
 
 const stringToRhoRepr = (a: string): rnodeProtos.IExpr => {
   return { g_string: a };
-}
+};
 const intToRhoRepr = (a: number): rnodeProtos.IExpr => {
   return { g_int: a };
-}
+};
 const boolToRhoRepr = (a: boolean): rnodeProtos.IExpr => {
   return { g_bool: a };
-}
+};
 const listToRhoRepr = (a: any[]): rnodeProtos.EList => {
   return {
-    ps: a.map(e => (
-      { exprs: [varToRhoExpr(e)] }
-    ))
+    ps: a.map((e) => ({ exprs: [varToRhoExpr(e)] })),
   } as rnodeProtos.EList;
-}
+};
 
 export const mapToRhoRepr = (a: any): rnodeProtos.EMap => {
   const map: any = {
@@ -152,15 +155,15 @@ export const mapToRhoRepr = (a: any): rnodeProtos.EMap => {
 
   Object.keys(a)
     .sort() // alphabetical
-    .forEach(key => {
+    .forEach((key) => {
       if (typeof a[key] !== "undefined" && a[key] !== null) {
         map.kvs.push({
-          key: { exprs: [varToRhoExpr(key)] },
-          value: { exprs: [varToRhoExpr(a[key])] },
+          key: { exprs: [varToRhoExpr(key)] },
+          value: { exprs: [varToRhoExpr(a[key])] },
         });
       } else {
         map.kvs.push({
-          key: { exprs: [varToRhoExpr(key)] },
+          key: { exprs: [varToRhoExpr(key)] },
         });
       }
     });
@@ -179,24 +182,21 @@ export const varToRhoExpr = (a: any): rnodeProtos.IExpr => {
     return intToRhoRepr(a as number);
   }
   if (Array.isArray(a)) {
-    return { e_list_body: listToRhoRepr(a) }
+    return { e_list_body: listToRhoRepr(a) };
   }
-  if(
-    typeof a === 'object' && a !== null
-  ) {
-    return { e_map_body: mapToRhoRepr(a)}
+  if (typeof a === "object" && a !== null) {
+    return { e_map_body: mapToRhoRepr(a) };
   }
 
-  throw new Error('Unknown variable type');
-  
-}
+  throw new Error("Unknown variable type");
+};
 
 export const toByteArray = (a: any) => {
   const expr = varToRhoExpr(a);
   return rnodeProtos.Par.encode({
     exprs: [expr],
   }).finish();
-}
+};
 
 export const getBlake2Hash = (toHash: Uint8Array, length = 32): Uint8Array => {
   const context = blake2bInit(length, null);
