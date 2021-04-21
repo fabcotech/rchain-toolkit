@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",

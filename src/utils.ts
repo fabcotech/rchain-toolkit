@@ -159,7 +159,7 @@ export const rhoExprToVar = (
   } else if (a.g_uri) {
     return a.g_uri;
   } else if (a.g_int) {
-    return a.g_int;
+    return parseInt(a.g_int as any, 10);
   } else if (a.g_bool) {
     return a.g_bool;
   } else if (a.e_list_body) {

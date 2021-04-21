@@ -150,7 +150,7 @@ exports.rhoExprToVar = function (a) {
         return a.g_uri;
     }
     else if (a.g_int) {
-        return a.g_int;
+        return parseInt(a.g_int, 10);
     }
     else if (a.g_bool) {
         return a.g_bool;
