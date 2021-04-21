@@ -146,6 +146,9 @@ exports.rhoExprToVar = function (a) {
     if (a.g_string) {
         return a.g_string;
     }
+    else if (a.g_uri) {
+        return a.g_uri;
+    }
     else if (a.g_int) {
         return a.g_int;
     }
