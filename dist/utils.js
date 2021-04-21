@@ -70,9 +70,16 @@ var rhoExprIntToJs = function (expr) {
 var rhoExprListToJs = function (expr) {
     return expr.ExprList.data.map(function (e) { return exports.rhoValToJs(e); });
 };
+var rhoExprTupleToJs = function (expr) {
+    return expr.ExprTuple.data.map(function (e) { return exports.rhoValToJs(e); });
+};
 var rhoExprSetToJs = function (expr) {
     return expr.ExprSet.data.map(function (e) { return exports.rhoValToJs(e); });
 };
+/*
+  converts expr received by data-at-name or
+  explore-deploy to javascript variables
+*/
 exports.rhoValToJs = function (expr) {
     /* if (val.ids && val.ids[0]) {
       return rhoIdsToJs(val.ids);
@@ -97,6 +104,9 @@ exports.rhoValToJs = function (expr) {
     }
     else if (expr.ExprList) {
         return rhoExprListToJs(expr);
+    }
+    else if (expr.ExprTuple) {
+        return rhoExprTupleToJs(expr);
     }
     else if (expr.ExprSet) {
         return rhoExprSetToJs(expr);
@@ -123,6 +133,93 @@ exports.getDeployData = function (timestamp, term, phloPrice, phloLimit, validAf
 };
 exports.getDeployDataToSign = function (payment) {
     return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
+};
+exports.decodePar = function (par) {
+    var a = rnodeProtos.Par.decode(par);
+    return a.toJSON();
+};
+/*
+  converts expr received by decoding buffers
+  and decoding Par to javascript variables
+*/
+exports.rhoExprToVar = function (a) {
+    if (a.g_string) {
+        return a.g_string;
+    }
+    else if (a.g_int) {
+        return a.g_int;
+    }
+    else if (a.g_bool) {
+        return a.g_bool;
+    }
+    else if (a.e_list_body) {
+        if (a.e_list_body && a.e_list_body.ps) {
+            return a.e_list_body.ps.map(function (ps) {
+                if (ps.exprs && ps.exprs[0]) {
+                    return exports.rhoExprToVar(ps.exprs[0]);
+                }
+                else {
+                    return null;
+                }
+            });
+        }
+        else {
+            return [];
+        }
+    }
+    else if (a.e_tuple_body) {
+        if (a.e_tuple_body && a.e_tuple_body.ps) {
+            return a.e_tuple_body.ps.map(function (ps) {
+                if (ps.exprs && ps.exprs[0]) {
+                    return exports.rhoExprToVar(ps.exprs[0]);
+                }
+                else {
+                    return null;
+                }
+            });
+        }
+        else {
+            return [];
+        }
+    }
+    else if (a.e_set_body) {
+        if (a.e_set_body && a.e_set_body.ps) {
+            return a.e_set_body.ps.map(function (ps) {
+                if (ps.exprs && ps.exprs[0]) {
+                    return exports.rhoExprToVar(ps.exprs[0]);
+                }
+                else {
+                    return null;
+                }
+            });
+        }
+        else {
+            return [];
+        }
+    }
+    else if (a.e_map_body) {
+        var obj_1 = {};
+        if (a.e_map_body.kvs) {
+            a.e_map_body.kvs.forEach(function (kv) {
+                if (kv.key && kv.key.exprs && kv.key.exprs[0]) {
+                    if (kv.value && kv.value.exprs && kv.value.exprs[0]) {
+                        obj_1[exports.rhoExprToVar(kv.key.exprs[0])] = exports.rhoExprToVar(kv.value.exprs[0]);
+                    }
+                    else {
+                        obj_1[exports.rhoExprToVar(kv.key.exprs[0])] = null;
+                    }
+                }
+            });
+            return obj_1;
+        }
+        else {
+            return {};
+        }
+    }
+    else {
+        console.warn("Not implemented", a);
+        return null;
+    }
 };
 var stringToRhoRepr = function (a) {
     return { g_string: a };

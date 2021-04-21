@@ -7,6 +7,10 @@ export declare const rhoValToJs: (expr: any) => any;
 export declare const unforgeableWithId: (id: Buffer) => string;
 export declare const getDeployData: (timestamp: number, term: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => DeployData;
 export declare const getDeployDataToSign: (payment: DeployData) => Uint8Array;
+export declare const decodePar: (par: any) => {
+    [k: string]: any;
+};
+export declare const rhoExprToVar: (a: rnodeProtos.IExpr) => string | number | boolean | object;
 export declare const mapToRhoRepr: (a: any) => rnodeProtos.EMap;
 export declare const varToRhoExpr: (a: any) => rnodeProtos.IExpr;
 export declare const toByteArray: (a: any) => Uint8Array;
