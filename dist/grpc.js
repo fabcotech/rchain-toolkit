@@ -36,6 +36,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.getGrpcProposeClient = exports.getClient = exports.propose = exports.previewPrivateNames = exports.doDeploy = exports.lastFinalizedBlock = exports.getBlocks = exports.getBlock = exports.getMethod = void 0;
 exports.getMethod = function (options, client, method) {
     return new Promise(function (resolve, reject) {
         client[method](options, function (err, resp) { return __awaiter(void 0, void 0, void 0, function () {

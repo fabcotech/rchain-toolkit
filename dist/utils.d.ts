@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { DeployData } from "./models";
+import { DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
 export declare const getFirstBlock: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => any;
 export declare const getValueFromBlocks: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => rnodeProtos.IPar;
@@ -10,7 +10,7 @@ export declare const getDeployDataToSign: (payment: DeployData) => Uint8Array;
 export declare const decodePar: (par: any) => {
     [k: string]: any;
 };
-export declare const rhoExprToVar: (a: rnodeProtos.IExpr) => string | number | boolean | object;
+export declare const rhoExprToVar: (a: rnodeProtos.IExpr) => boolean | string | number | object | null;
 export declare const mapToRhoRepr: (a: any) => rnodeProtos.EMap;
 export declare const varToRhoExpr: (a: any) => rnodeProtos.IExpr;
 export declare const toByteArray: (a: any) => Uint8Array;
@@ -22,11 +22,11 @@ export declare const transferRevTerm: (a: {
     to: string;
     amount: number;
 }) => string;
-export declare const getDeployOptions: (sigAlgorithm: "secp256k1", timestamp: number, term: string, privateKey: string, publicKey: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => {
+export declare const getDeployOptions: (sigAlgorithm: SigAlgorithm, timestamp: number, term: string, privateKey: string, publicKey: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => {
     data: DeployData;
     deployer: string;
     signature: string;
-    sigAlgorithm: "secp256k1";
+    sigAlgorithm: SigAlgorithm;
 };
 export declare const revAddressFromPublicKey: (publicKey: string) => string;
 export declare const publicKeyFromPrivateKey: (privateKey: string) => string;

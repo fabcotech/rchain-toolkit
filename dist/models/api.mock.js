@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.privateNamePreviewResponse2 = exports.privateNamePreviewResponse = void 0;
 exports.privateNamePreviewResponse = {
     names: ["fc60308a5512c265b978b46d7283f2d5f7aa12f64a5b1874df26ef3be827f57e"],
     blockNumber: 6
