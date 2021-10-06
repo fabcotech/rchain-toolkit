@@ -309,7 +309,9 @@ export const signSecp256k1 = (
 ): Uint8Array => {
   const keyPair = ec.keyFromPrivate(privateKey);
 
-  const signature = keyPair.sign(Buffer.from(hash), { canonical: true });
+  const signature = keyPair.sign((Buffer || Buffer).from(hash), {
+    canonical: true,
+  });
   const derSign = signature.toDER();
 
   if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {

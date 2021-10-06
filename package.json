@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",
@@ -23,25 +23,24 @@
   "license": "MIT",
   "devDependencies": {
     "@babel/preset-typescript": "^7.3.3",
-    "@grpc/grpc-js": "^0.5.0",
-    "@grpc/proto-loader": "^0.5.1",
-    "@types/elliptic": "^6.4.10",
+    "@grpc/grpc-js": "^1.3.7",
+    "@grpc/proto-loader": "^0.6.5",
+    "@types/elliptic": "^6.4.13",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.0.8",
     "deep-equal": "^1.0.1",
-    "jest": "^24.8.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-typescript": "^1.0.1",
-    "ts-jest": "^24.0.2",
+    "ts-jest": "^27.0.5",
     "ts-loader": "^6.0.3",
     "tslib": "^1.10.0",
     "typescript": "^3.5.2"
   },
   "dependencies": {
     "blakejs": "^1.1.0",
-    "elliptic": "6.5.3",
+    "elliptic": "6.5.4",
     "js-sha3": "^0.8.0",
     "protobufjs": "^6.8.8",
     "typescript": "3.6.4"

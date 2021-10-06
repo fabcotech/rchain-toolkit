@@ -6,10 +6,10 @@ import {
   deploy,
   dataAtName,
   DataAtNameReponse,
-  blocks
+  blocks,
 } from "../src/http";
 import { getGrpcProposeClient, propose } from "../src/grpc";
-import { getDeployOptions } from "../src/utils";
+import { getDeployOptions, publicKeyFromPrivateKey } from "../src/utils";
 
 export const testDataAtName = () => {
   return new Promise(async (resolve, reject) => {
@@ -21,28 +21,28 @@ export const testDataAtName = () => {
 
     const validAfterBlockNumber = JSON.parse(
       await blocks("http://localhost:40403", {
-        position: 1
+        position: 1,
       })
     )[0].blockNumber;
 
-    const argv = JSON.parse(process.env.npm_config_argv);
-    let privateKey;
-    if (argv.remain[0] === "--private-key") {
-      privateKey = argv.remain[1];
-    } else {
+    const argv = process.env.npm_lifecycle_script
+      .split(" ")
+      .map((a) => a.replace('"', "").replace('"', ""));
+    let privateKey = argv[3];
+    if (!privateKey) {
       console.log("  X http.testDataAtName");
       console.log("private-key not found in command line");
       process.exit();
     }
 
-    let publicKey;
-    if (argv.remain[2] === "--public-key") {
-      publicKey = argv.remain[3];
-    } else {
+    let publicKey = argv[5];
+    if (!publicKey) {
       console.log("  X http.testDataAtName");
       console.log("public-key not found in command line");
       process.exit();
     }
+
+    await new Promise((r) => setTimeout(r, 12000));
 
     const timestamp = new Date().valueOf();
     const prepareDeployResponse = await prepareDeploy(
@@ -50,7 +50,7 @@ export const testDataAtName = () => {
       {
         deployer: publicKey,
         timestamp: timestamp,
-        nameQty: 1
+        nameQty: 1,
       }
     );
 
@@ -86,9 +86,9 @@ export const testDataAtName = () => {
 
     const dataAtNameResponse = await dataAtName("http://localhost:40403", {
       name: {
-        UnforgPrivate: { data: JSON.parse(prepareDeployResponse).names[0] }
+        UnforgPrivate: { data: JSON.parse(prepareDeployResponse).names[0] },
       },
-      depth: 3
+      depth: 3,
     });
 
     if (

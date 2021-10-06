@@ -9,7 +9,13 @@ export interface DeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const deploy: (url: string, options: DeployOptions) => Promise<string>;
+export declare const deploy: (url: string, options: DeployOptions, timeout?: number) => Promise<string>;
+export interface DeployResponse {
+    names: string[];
+    blockNumber: number;
+}
+export declare const easyDeploy: (url: string, term: string, privateKey: string, phloPrice: number, phloLimit: number, timeout?: number) => Promise<string>;
+export declare const validAfterBlockNumber: (url: string) => Promise<number>;
 export interface ExploreDeployOptions {
     term: string;
 }

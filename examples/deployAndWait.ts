@@ -19,17 +19,18 @@ const main = async () => {
     validAfterBlockNumber
   );
 
-  let deployResponse;
+  let result;
   try {
-    deployResponse = await rchainToolkit.http.deploy(
+    result = await rchainToolkit.http.deploy(
       "http://localhost:40403",
-      deployOptions
+      deployOptions,
+      30000
     );
   } catch (err) {
     console.log(err);
   }
 
-  console.log(deployResponse);
+  console.log(result);
 };
 
 main();

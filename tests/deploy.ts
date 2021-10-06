@@ -4,20 +4,18 @@ import { deployData } from "../src/models";
 import { getDeployOptions } from "../src/utils";
 
 export const testDeploy = () => {
-  const argv = JSON.parse(process.env.npm_config_argv);
-  let privateKey;
-  if (argv.remain[0] === "--private-key") {
-    privateKey = argv.remain[1];
-  } else {
+  const argv = process.env.npm_lifecycle_script
+    .split(" ")
+    .map((a) => a.replace('"', "").replace('"', ""));
+  let privateKey = argv[3];
+  if (!privateKey) {
     console.log("  X http.testDataAtName");
     console.log("private-key not found in command line");
     process.exit();
   }
 
-  let publicKey;
-  if (argv.remain[2] === "--public-key") {
-    publicKey = argv.remain[3];
-  } else {
+  let publicKey = argv[5];
+  if (!publicKey) {
     console.log("  X http.testDataAtName");
     console.log("public-key not found in command line");
     process.exit();
@@ -26,7 +24,7 @@ export const testDeploy = () => {
   return new Promise(async (resolve, reject) => {
     const validAfterBlockNumber = JSON.parse(
       await blocks("http://localhost:40403", {
-        position: 1
+        position: 1,
       })
     )[0].blockNumber;
 

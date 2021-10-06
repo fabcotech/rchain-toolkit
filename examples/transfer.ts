@@ -1,23 +1,14 @@
 import * as rchainToolkit from "rchain-toolkit";
 
 const main = async () => {
-  let validAfterBlockNumber;
-  try {
-    validAfterBlockNumber = JSON.parse(
-      await rchainToolkit.http.blocks(`http://localhost:40403`, {
-        position: 1
-      })
-    )[0].blockNumber;
-  } catch (err) {
-    console.log("Unable to get last finalized block");
-    console.log(err);
-    process.exit();
-  }
+  const validAfterBlockNumber = await rchainToolkit.http.validAfterBlockNumber(
+    "http://localhost:40403"
+  );
 
   const transferFundsTerm = rchainToolkit.utils.transferRevTerm({
     from: "1111YT4aWjn7nZNi65bTKJF9GEtXL12raZ9GThLHDi5YMxtdiJkpM",
     to: "11112QRmNvfk9GaX6L7U1jC3Y9TqNanZc7wFEcNiYY8c29GA79MhRW",
-    amount: 10
+    amount: 10,
   });
 
   const deployOptions = rchainToolkit.utils.getDeployOptions(

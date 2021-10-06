@@ -1,4 +1,5 @@
 import { DeployData, LightBlockInfo } from "./models";
+import { getDeployOptions, publicKeyFromPrivateKey } from "./utils";
 
 const http = require("http");
 const https = require("https");
@@ -24,6 +25,7 @@ const validateUrl = (url: string) => {
     );
   }
 };
+
 // ==============
 // Deploy
 // ==============
@@ -38,11 +40,21 @@ export interface DeployResponse {
   names: string[];
   blockNumber: number;
 }
-export const deploy = (
+export const deploy = async (
   url: string,
-  options: DeployOptions
+  options: DeployOptions,
+  timeout: undefined | number = undefined
 ): Promise<string> => {
   const urlValidated = validateUrl(url);
+
+  let pd: undefined | string = undefined;
+  if (typeof timeout === "number") {
+    pd = await prepareDeploy(url, {
+      deployer: options.deployer,
+      timestamp: options.data.timestamp,
+      nameQty: 1,
+    });
+  }
 
   return new Promise((resolve, reject) => {
     const req = urlValidated.lib.request(
@@ -61,7 +73,38 @@ export const deploy = (
         res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
-            resolve(data);
+            if (typeof timeout === "number") {
+              let s = new Date().getTime();
+              let ongoning = false;
+              const interval = setInterval(async () => {
+                if (ongoning) {
+                  return;
+                }
+                ongoning = true;
+                if (new Date().getTime() - timeout > s) {
+                  clearInterval(interval);
+                  throw new Error("TIMEOUT");
+                }
+                const dan = await dataAtName(url, {
+                  name: {
+                    UnforgPrivate: { data: JSON.parse(pd as string).names[0] },
+                  },
+                  depth: 3,
+                });
+                if (
+                  dan &&
+                  JSON.parse(dan) &&
+                  JSON.parse(dan).exprs &&
+                  JSON.parse(dan).exprs.length
+                ) {
+                  resolve(dan);
+                  clearInterval(interval);
+                }
+                ongoning = false;
+              }, 4000);
+            } else {
+              resolve(data);
+            }
           });
         });
       }
@@ -72,6 +115,121 @@ export const deploy = (
       reject(e);
     });
   });
+};
+
+// ==============
+// Easy eploy
+// ==============
+
+export interface DeployResponse {
+  names: string[];
+  blockNumber: number;
+}
+export const easyDeploy = async (
+  url: string,
+  term: string,
+  privateKey: string,
+  phloPrice: number,
+  phloLimit: number,
+  timeout: undefined | number = undefined
+): Promise<string> => {
+  const urlValidated = validateUrl(url);
+
+  const publicKey = publicKeyFromPrivateKey(privateKey);
+  const vab = await validAfterBlockNumber(url);
+  const d = new Date().valueOf();
+  const options = getDeployOptions(
+    "secp256k1",
+    d,
+    term,
+    privateKey,
+    publicKey,
+    phloPrice,
+    phloLimit,
+    vab
+  );
+
+  let pd: undefined | string = undefined;
+  if (typeof timeout === "number") {
+    pd = await prepareDeploy(url, {
+      deployer: publicKey,
+      timestamp: d,
+      nameQty: 1,
+    });
+  }
+
+  return new Promise((resolve, reject) => {
+    const req = urlValidated.lib.request(
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        path: "/api/deploy",
+        host: urlValidated.host,
+        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+      },
+
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk;
+          res.on("end", () => {
+            if (typeof timeout === "number") {
+              let s = new Date().getTime();
+              let ongoning = false;
+              const interval = setInterval(async () => {
+                if (ongoning) {
+                  return;
+                }
+                ongoning = true;
+                if (new Date().getTime() - timeout > s) {
+                  clearInterval(interval);
+                  throw new Error("TIMEOUT");
+                }
+                const dan = await dataAtName(url, {
+                  name: {
+                    UnforgPrivate: { data: JSON.parse(pd as string).names[0] },
+                  },
+                  depth: 3,
+                });
+                if (
+                  dan &&
+                  JSON.parse(dan) &&
+                  JSON.parse(dan).exprs &&
+                  JSON.parse(dan).exprs.length
+                ) {
+                  resolve(dan);
+                  clearInterval(interval);
+                }
+                ongoning = false;
+              }, 4000);
+            } else {
+              resolve(data);
+            }
+          });
+        });
+      }
+    );
+    req.write(JSON.stringify(options));
+    req.end();
+    req.on("error", (e) => {
+      reject(e);
+    });
+  });
+};
+
+// ==============
+// Valid after block number
+// ==============
+export const validAfterBlockNumber = async (url: string): Promise<number> => {
+  let validAfterBlockNumberResponse;
+  validAfterBlockNumberResponse = JSON.parse(
+    await blocks(url, {
+      position: 1,
+    })
+  )[0].blockNumber;
+  return validAfterBlockNumberResponse;
 };
 
 // ==============

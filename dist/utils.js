@@ -297,7 +297,9 @@ exports.verifyPrivateAndPublicKey = function (privateKey, publicKey) {
 };
 exports.signSecp256k1 = function (hash, privateKey) {
     var keyPair = ec.keyFromPrivate(privateKey);
-    var signature = keyPair.sign(Buffer.from(hash), { canonical: true });
+    var signature = keyPair.sign((Buffer || Buffer).from(hash), {
+        canonical: true
+    });
     var derSign = signature.toDER();
     if (!ec.verify(Buffer.from(hash), signature, keyPair, "hex")) {
         throw new Error("Failed to verify signature");
