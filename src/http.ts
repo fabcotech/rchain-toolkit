@@ -4,20 +4,44 @@ import { getDeployOptions, publicKeyFromPrivateKey } from "./utils";
 const http = require("http");
 const https = require("https");
 
-const validateUrl = (url: string) => {
-  if (url.startsWith("http://")) {
+interface UrlValidated {
+  options: {
+    host: string;
+    port: string;
+    rejectUnauthorized?: boolean;
+    cert?: string;
+    ca?: string[];
+  };
+  protocol: "http" | "https";
+  lib: any;
+}
+export interface ValidateUrlOptions {
+  url: string;
+  rejectUnauthorized?: boolean;
+  cert?: string;
+  ca?: string[];
+}
+const validateUrl = (options: ValidateUrlOptions): UrlValidated => {
+  if (options.url.startsWith("http://")) {
     return {
       protocol: "http",
-      host: url.substr(7).split(":")[0],
-      port: url.substr(7).split(":")[1],
       lib: http,
+      options: {
+        host: options.url.substr(7).split(":")[0],
+        port: options.url.substr(7).split(":")[1],
+      },
     };
-  } else if (url.startsWith("https://")) {
+  } else if (options.url.startsWith("https://")) {
     return {
       protocol: "https",
-      host: url.substr(8).split(":")[0],
-      port: url.substr(8).split(":")[1],
       lib: https,
+      options: {
+        host: options.url.substr(8).split(":")[0],
+        port: options.url.substr(8).split(":")[1],
+        rejectUnauthorized: options.rejectUnauthorized,
+        cert: options.cert,
+        ca: options.ca,
+      },
     };
   } else {
     throw new Error(
@@ -41,15 +65,21 @@ export interface DeployResponse {
   blockNumber: number;
 }
 export const deploy = async (
-  url: string,
+  urlOrOptions: string | ValidateUrlOptions,
   options: DeployOptions,
   timeout: undefined | number = undefined
 ): Promise<string> => {
-  const urlValidated = validateUrl(url);
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
 
   let pd: undefined | string = undefined;
   if (typeof timeout === "number") {
-    pd = await prepareDeploy(url, {
+    pd = await prepareDeploy(urlOrOptions, {
       deployer: options.deployer,
       timestamp: options.data.timestamp,
       nameQty: 1,
@@ -57,15 +87,20 @@ export const deploy = async (
   }
 
   return new Promise((resolve, reject) => {
-    const req = urlValidated.lib.request(
+    const req = uv.lib.request(
       {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/deploy",
-        host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.port } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { port: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { port: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -85,7 +120,7 @@ export const deploy = async (
                   clearInterval(interval);
                   throw new Error("TIMEOUT");
                 }
-                const dan = await dataAtName(url, {
+                const dan = await dataAtName(urlOrOptions, {
                   name: {
                     UnforgPrivate: { data: JSON.parse(pd as string).names[0] },
                   },
@@ -126,17 +161,23 @@ export interface DeployResponse {
   blockNumber: number;
 }
 export const easyDeploy = async (
-  url: string,
+  urlOrOptions: string | ValidateUrlOptions,
   term: string,
   privateKey: string,
   phloPrice: number,
   phloLimit: number,
   timeout: undefined | number = undefined
 ): Promise<string> => {
-  const urlValidated = validateUrl(url);
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
 
   const publicKey = publicKeyFromPrivateKey(privateKey);
-  const vab = await validAfterBlockNumber(url);
+  const vab = await validAfterBlockNumber(urlOrOptions);
   const d = new Date().valueOf();
   const options = getDeployOptions(
     "secp256k1",
@@ -151,7 +192,7 @@ export const easyDeploy = async (
 
   let pd: undefined | string = undefined;
   if (typeof timeout === "number") {
-    pd = await prepareDeploy(url, {
+    pd = await prepareDeploy(urlOrOptions, {
       deployer: publicKey,
       timestamp: d,
       nameQty: 1,
@@ -159,15 +200,20 @@ export const easyDeploy = async (
   }
 
   return new Promise((resolve, reject) => {
-    const req = urlValidated.lib.request(
+    const req = uv.lib.request(
       {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/deploy",
-        host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.port } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { port: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { port: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -187,7 +233,7 @@ export const easyDeploy = async (
                   clearInterval(interval);
                   throw new Error("TIMEOUT");
                 }
-                const dan = await dataAtName(url, {
+                const dan = await dataAtName(urlOrOptions, {
                   name: {
                     UnforgPrivate: { data: JSON.parse(pd as string).names[0] },
                   },
@@ -222,10 +268,12 @@ export const easyDeploy = async (
 // ==============
 // Valid after block number
 // ==============
-export const validAfterBlockNumber = async (url: string): Promise<number> => {
+export const validAfterBlockNumber = async (
+  urlOrOptions: string | ValidateUrlOptions
+): Promise<number> => {
   let validAfterBlockNumberResponse;
   validAfterBlockNumberResponse = JSON.parse(
-    await blocks(url, {
+    await blocks(urlOrOptions, {
       position: 1,
     })
   )[0].blockNumber;
@@ -244,21 +292,32 @@ export interface ExploreDeployResponse {
   blockNumber: number;
 }
 export const exploreDeploy = (
-  url: string,
+  urlOrOptions: string | ValidateUrlOptions,
   options: ExploreDeployOptions
 ): Promise<any> => {
-  const urlValidated = validateUrl(url);
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
 
   return new Promise((resolve, reject) => {
-    const req = urlValidated.lib.request(
+    const req = uv.lib.request(
       {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/explore-deploy",
-        host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.cert } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { cert: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -289,9 +348,18 @@ export interface BlocksOptions {
 export interface BlocksResponse {
   blocks: LightBlockInfo[];
 }
-export const blocks = (url: string, options: BlocksOptions): Promise<any> => {
+export const blocks = (
+  urlOrOptions: string | ValidateUrlOptions,
+  options: BlocksOptions
+): Promise<any> => {
   return new Promise((resolve, reject) => {
-    const urlValidated = validateUrl(url);
+    let urlValidated: undefined | UrlValidated;
+    if (typeof urlOrOptions === "string") {
+      urlValidated = validateUrl({ url: urlOrOptions });
+    } else {
+      urlValidated = validateUrl(urlOrOptions);
+    }
+    const uv: UrlValidated = urlValidated;
 
     const req = urlValidated.lib.request(
       {
@@ -300,8 +368,13 @@ export const blocks = (url: string, options: BlocksOptions): Promise<any> => {
         },
         method: "GET",
         path: "/api/blocks/" + options.position,
-        host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.cert } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { cert: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -336,21 +409,32 @@ export interface PrepareDeployResponse {
   blockNumber: number;
 }
 export const prepareDeploy = (
-  url: string,
+  urlOrOptions: string | ValidateUrlOptions,
   options: PrepareDeployOptions
 ): Promise<string> => {
-  const urlValidated = validateUrl(url);
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
 
   return new Promise((resolve, reject) => {
-    const req = urlValidated.lib.request(
+    const req = uv.lib.request(
       {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/prepare-deploy",
-        host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.cert } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { cert: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -391,21 +475,32 @@ export interface DataAtNameReponse {
   blockNumber: number;
 }
 export const dataAtName = (
-  url: string,
+  urlOrOptions: string | ValidateUrlOptions,
   options: DataAtNameOptions
 ): Promise<string> => {
-  const urlValidated = validateUrl(url);
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
 
   return new Promise((resolve, reject) => {
-    const req = urlValidated.lib.request(
+    const req = uv.lib.request(
       {
         headers: {
           "Content-Type": "application/json",
         },
         method: "POST",
         path: "/api/data-at-name",
-        host: urlValidated.host,
-        ...(urlValidated.port ? { port: urlValidated.port } : {}),
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.cert } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { cert: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
       },
 
       (res) => {

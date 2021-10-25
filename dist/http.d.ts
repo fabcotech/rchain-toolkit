@@ -1,4 +1,10 @@
 import { DeployData, LightBlockInfo } from "./models";
+export interface ValidateUrlOptions {
+    url: string;
+    rejectUnauthorized?: boolean;
+    cert?: string;
+    ca?: string[];
+}
 export interface DeployOptions {
     data: DeployData;
     deployer: string;
@@ -9,13 +15,13 @@ export interface DeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const deploy: (url: string, options: DeployOptions, timeout?: undefined | number) => Promise<string>;
+export declare const deploy: (urlOrOptions: string | ValidateUrlOptions, options: DeployOptions, timeout?: undefined | number) => Promise<string>;
 export interface DeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const easyDeploy: (url: string, term: string, privateKey: string, phloPrice: number, phloLimit: number, timeout?: undefined | number) => Promise<string>;
-export declare const validAfterBlockNumber: (url: string) => Promise<number>;
+export declare const easyDeploy: (urlOrOptions: string | ValidateUrlOptions, term: string, privateKey: string, phloPrice: number, phloLimit: number, timeout?: undefined | number) => Promise<string>;
+export declare const validAfterBlockNumber: (urlOrOptions: string | ValidateUrlOptions) => Promise<number>;
 export interface ExploreDeployOptions {
     term: string;
 }
@@ -23,14 +29,14 @@ export interface ExploreDeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const exploreDeploy: (url: string, options: ExploreDeployOptions) => Promise<any>;
+export declare const exploreDeploy: (urlOrOptions: string | ValidateUrlOptions, options: ExploreDeployOptions) => Promise<any>;
 export interface BlocksOptions {
     position: number;
 }
 export interface BlocksResponse {
     blocks: LightBlockInfo[];
 }
-export declare const blocks: (url: string, options: BlocksOptions) => Promise<any>;
+export declare const blocks: (urlOrOptions: string | ValidateUrlOptions, options: BlocksOptions) => Promise<any>;
 export interface PrepareDeployOptions {
     deployer: string;
     timestamp: number;
@@ -40,7 +46,7 @@ export interface PrepareDeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const prepareDeploy: (url: string, options: PrepareDeployOptions) => Promise<string>;
+export declare const prepareDeploy: (urlOrOptions: string | ValidateUrlOptions, options: PrepareDeployOptions) => Promise<string>;
 export interface DataAtNameOptions {
     name: {
         [nameType: string]: {
@@ -63,4 +69,4 @@ export interface DataAtNameReponse {
     }[];
     blockNumber: number;
 }
-export declare const dataAtName: (url: string, options: DataAtNameOptions) => Promise<string>;
+export declare const dataAtName: (urlOrOptions: string | ValidateUrlOptions, options: DataAtNameOptions) => Promise<string>;

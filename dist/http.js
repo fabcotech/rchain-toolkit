@@ -51,38 +51,51 @@ exports.dataAtName = exports.prepareDeploy = exports.blocks = exports.exploreDep
 var utils_1 = require("./utils");
 var http = require("http");
 var https = require("https");
-var validateUrl = function (url) {
-    if (url.startsWith("http://")) {
+var validateUrl = function (options) {
+    if (options.url.startsWith("http://")) {
         return {
             protocol: "http",
-            host: url.substr(7).split(":")[0],
-            port: url.substr(7).split(":")[1],
-            lib: http
+            lib: http,
+            options: {
+                host: options.url.substr(7).split(":")[0],
+                port: options.url.substr(7).split(":")[1]
+            }
         };
     }
-    else if (url.startsWith("https://")) {
+    else if (options.url.startsWith("https://")) {
         return {
             protocol: "https",
-            host: url.substr(8).split(":")[0],
-            port: url.substr(8).split(":")[1],
-            lib: https
+            lib: https,
+            options: {
+                host: options.url.substr(8).split(":")[0],
+                port: options.url.substr(8).split(":")[1],
+                rejectUnauthorized: options.rejectUnauthorized,
+                cert: options.cert,
+                ca: options.ca
+            }
         };
     }
     else {
         throw new Error("URL most be http://ip_or_domain:port or https://ip_or_domain:port");
     }
 };
-exports.deploy = function (url, options, timeout) {
+exports.deploy = function (urlOrOptions, options, timeout) {
     if (timeout === void 0) { timeout = undefined; }
     return __awaiter(void 0, void 0, void 0, function () {
-        var urlValidated, pd;
+        var urlValidated, uv, pd;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    urlValidated = validateUrl(url);
+                    if (typeof urlOrOptions === "string") {
+                        urlValidated = validateUrl({ url: urlOrOptions });
+                    }
+                    else {
+                        urlValidated = validateUrl(urlOrOptions);
+                    }
+                    uv = urlValidated;
                     pd = undefined;
                     if (!(typeof timeout === "number")) return [3 /*break*/, 2];
-                    return [4 /*yield*/, exports.prepareDeploy(url, {
+                    return [4 /*yield*/, exports.prepareDeploy(urlOrOptions, {
                             deployer: options.deployer,
                             timestamp: options.data.timestamp,
                             nameQty: 1
@@ -91,9 +104,11 @@ exports.deploy = function (url, options, timeout) {
                     pd = _a.sent();
                     _a.label = 2;
                 case 2: return [2 /*return*/, new Promise(function (resolve, reject) {
-                        var req = urlValidated.lib.request(__assign({ headers: {
+                        var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
                                 "Content-Type": "application/json"
-                            }, method: "POST", path: "/api/deploy", host: urlValidated.host }, (urlValidated.port ? { port: urlValidated.port } : {})), function (res) {
+                            }, method: "POST", path: "/api/deploy", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.port } : {})), (uv.options.rejectUnauthorized
+                            ? { port: uv.options.rejectUnauthorized }
+                            : {})), (uv.options.ca ? { port: uv.options.ca } : {})), function (res) {
                             var data = "";
                             res.on("data", function (chunk) {
                                 data += chunk;
@@ -114,7 +129,7 @@ exports.deploy = function (url, options, timeout) {
                                                             clearInterval(interval_1);
                                                             throw new Error("TIMEOUT");
                                                         }
-                                                        return [4 /*yield*/, exports.dataAtName(url, {
+                                                        return [4 /*yield*/, exports.dataAtName(urlOrOptions, {
                                                                 name: {
                                                                     UnforgPrivate: { data: JSON.parse(pd).names[0] }
                                                                 },
@@ -151,23 +166,29 @@ exports.deploy = function (url, options, timeout) {
         });
     });
 };
-exports.easyDeploy = function (url, term, privateKey, phloPrice, phloLimit, timeout) {
+exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLimit, timeout) {
     if (timeout === void 0) { timeout = undefined; }
     return __awaiter(void 0, void 0, void 0, function () {
-        var urlValidated, publicKey, vab, d, options, pd;
+        var urlValidated, uv, publicKey, vab, d, options, pd;
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0:
-                    urlValidated = validateUrl(url);
+                    if (typeof urlOrOptions === "string") {
+                        urlValidated = validateUrl({ url: urlOrOptions });
+                    }
+                    else {
+                        urlValidated = validateUrl(urlOrOptions);
+                    }
+                    uv = urlValidated;
                     publicKey = utils_1.publicKeyFromPrivateKey(privateKey);
-                    return [4 /*yield*/, exports.validAfterBlockNumber(url)];
+                    return [4 /*yield*/, exports.validAfterBlockNumber(urlOrOptions)];
                 case 1:
                     vab = _a.sent();
                     d = new Date().valueOf();
                     options = utils_1.getDeployOptions("secp256k1", d, term, privateKey, publicKey, phloPrice, phloLimit, vab);
                     pd = undefined;
                     if (!(typeof timeout === "number")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, exports.prepareDeploy(url, {
+                    return [4 /*yield*/, exports.prepareDeploy(urlOrOptions, {
                             deployer: publicKey,
                             timestamp: d,
                             nameQty: 1
@@ -176,9 +197,11 @@ exports.easyDeploy = function (url, term, privateKey, phloPrice, phloLimit, time
                     pd = _a.sent();
                     _a.label = 3;
                 case 3: return [2 /*return*/, new Promise(function (resolve, reject) {
-                        var req = urlValidated.lib.request(__assign({ headers: {
+                        var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
                                 "Content-Type": "application/json"
-                            }, method: "POST", path: "/api/deploy", host: urlValidated.host }, (urlValidated.port ? { port: urlValidated.port } : {})), function (res) {
+                            }, method: "POST", path: "/api/deploy", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.port } : {})), (uv.options.rejectUnauthorized
+                            ? { port: uv.options.rejectUnauthorized }
+                            : {})), (uv.options.ca ? { port: uv.options.ca } : {})), function (res) {
                             var data = "";
                             res.on("data", function (chunk) {
                                 data += chunk;
@@ -199,7 +222,7 @@ exports.easyDeploy = function (url, term, privateKey, phloPrice, phloLimit, time
                                                             clearInterval(interval_2);
                                                             throw new Error("TIMEOUT");
                                                         }
-                                                        return [4 /*yield*/, exports.dataAtName(url, {
+                                                        return [4 /*yield*/, exports.dataAtName(urlOrOptions, {
                                                                 name: {
                                                                     UnforgPrivate: { data: JSON.parse(pd).names[0] }
                                                                 },
@@ -239,13 +262,13 @@ exports.easyDeploy = function (url, term, privateKey, phloPrice, phloLimit, time
 // ==============
 // Valid after block number
 // ==============
-exports.validAfterBlockNumber = function (url) { return __awaiter(void 0, void 0, void 0, function () {
+exports.validAfterBlockNumber = function (urlOrOptions) { return __awaiter(void 0, void 0, void 0, function () {
     var validAfterBlockNumberResponse, _a, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
                 _b = (_a = JSON).parse;
-                return [4 /*yield*/, exports.blocks(url, {
+                return [4 /*yield*/, exports.blocks(urlOrOptions, {
                         position: 1
                     })];
             case 1:
@@ -254,12 +277,21 @@ exports.validAfterBlockNumber = function (url) { return __awaiter(void 0, void 0
         }
     });
 }); };
-exports.exploreDeploy = function (url, options) {
-    var urlValidated = validateUrl(url);
+exports.exploreDeploy = function (urlOrOptions, options) {
+    var urlValidated;
+    if (typeof urlOrOptions === "string") {
+        urlValidated = validateUrl({ url: urlOrOptions });
+    }
+    else {
+        urlValidated = validateUrl(urlOrOptions);
+    }
+    var uv = urlValidated;
     return new Promise(function (resolve, reject) {
-        var req = urlValidated.lib.request(__assign({ headers: {
+        var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
                 "Content-Type": "application/json"
-            }, method: "POST", path: "/api/explore-deploy", host: urlValidated.host }, (urlValidated.port ? { port: urlValidated.port } : {})), function (res) {
+            }, method: "POST", path: "/api/explore-deploy", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.cert } : {})), (uv.options.rejectUnauthorized
+            ? { cert: uv.options.rejectUnauthorized }
+            : {})), (uv.options.ca ? { cert: uv.options.ca } : {})), function (res) {
             var data = "";
             res.on("data", function (chunk) {
                 data += chunk;
@@ -275,12 +307,21 @@ exports.exploreDeploy = function (url, options) {
         });
     });
 };
-exports.blocks = function (url, options) {
+exports.blocks = function (urlOrOptions, options) {
     return new Promise(function (resolve, reject) {
-        var urlValidated = validateUrl(url);
-        var req = urlValidated.lib.request(__assign({ headers: {
+        var urlValidated;
+        if (typeof urlOrOptions === "string") {
+            urlValidated = validateUrl({ url: urlOrOptions });
+        }
+        else {
+            urlValidated = validateUrl(urlOrOptions);
+        }
+        var uv = urlValidated;
+        var req = urlValidated.lib.request(__assign(__assign(__assign(__assign({ headers: {
                 "Content-Type": "application/json"
-            }, method: "GET", path: "/api/blocks/" + options.position, host: urlValidated.host }, (urlValidated.port ? { port: urlValidated.port } : {})), function (res) {
+            }, method: "GET", path: "/api/blocks/" + options.position, host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.cert } : {})), (uv.options.rejectUnauthorized
+            ? { cert: uv.options.rejectUnauthorized }
+            : {})), (uv.options.ca ? { cert: uv.options.ca } : {})), function (res) {
             var data = "";
             res.on("data", function (chunk) {
                 data += chunk;
@@ -295,12 +336,21 @@ exports.blocks = function (url, options) {
         });
     });
 };
-exports.prepareDeploy = function (url, options) {
-    var urlValidated = validateUrl(url);
+exports.prepareDeploy = function (urlOrOptions, options) {
+    var urlValidated;
+    if (typeof urlOrOptions === "string") {
+        urlValidated = validateUrl({ url: urlOrOptions });
+    }
+    else {
+        urlValidated = validateUrl(urlOrOptions);
+    }
+    var uv = urlValidated;
     return new Promise(function (resolve, reject) {
-        var req = urlValidated.lib.request(__assign({ headers: {
+        var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
                 "Content-Type": "application/json"
-            }, method: "POST", path: "/api/prepare-deploy", host: urlValidated.host }, (urlValidated.port ? { port: urlValidated.port } : {})), function (res) {
+            }, method: "POST", path: "/api/prepare-deploy", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.cert } : {})), (uv.options.rejectUnauthorized
+            ? { cert: uv.options.rejectUnauthorized }
+            : {})), (uv.options.ca ? { cert: uv.options.ca } : {})), function (res) {
             var data = "";
             res.on("data", function (chunk) {
                 data += chunk;
@@ -316,12 +366,21 @@ exports.prepareDeploy = function (url, options) {
         });
     });
 };
-exports.dataAtName = function (url, options) {
-    var urlValidated = validateUrl(url);
+exports.dataAtName = function (urlOrOptions, options) {
+    var urlValidated;
+    if (typeof urlOrOptions === "string") {
+        urlValidated = validateUrl({ url: urlOrOptions });
+    }
+    else {
+        urlValidated = validateUrl(urlOrOptions);
+    }
+    var uv = urlValidated;
     return new Promise(function (resolve, reject) {
-        var req = urlValidated.lib.request(__assign({ headers: {
+        var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
                 "Content-Type": "application/json"
-            }, method: "POST", path: "/api/data-at-name", host: urlValidated.host }, (urlValidated.port ? { port: urlValidated.port } : {})), function (res) {
+            }, method: "POST", path: "/api/data-at-name", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.cert } : {})), (uv.options.rejectUnauthorized
+            ? { cert: uv.options.rejectUnauthorized }
+            : {})), (uv.options.ca ? { cert: uv.options.ca } : {})), function (res) {
             var data = "";
             res.on("data", function (chunk) {
                 data += chunk;
