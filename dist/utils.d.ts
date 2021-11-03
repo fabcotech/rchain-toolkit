@@ -4,6 +4,8 @@ import * as rnodeProtos from "./rnode-protos";
 export * from "./utils/rhoValToJs";
 export * from "./utils/rhoExprToVar";
 export * from "./utils/decodePar";
+export * from "./utils/getBlake2Hash";
+export * from "./utils/getDeployDataToSign";
 export declare const getFirstBlock: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => any;
 export declare const getValueFromBlocks: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => rnodeProtos.IPar;
 export declare const unforgeableWithId: (id: Buffer) => string;

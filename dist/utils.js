@@ -22,6 +22,8 @@ const getBlake2Hash_1 = require("./utils/getBlake2Hash");
 __exportStar(require("./utils/rhoValToJs"), exports);
 __exportStar(require("./utils/rhoExprToVar"), exports);
 __exportStar(require("./utils/decodePar"), exports);
+__exportStar(require("./utils/getBlake2Hash"), exports);
+__exportStar(require("./utils/getDeployDataToSign"), exports);
 exports.getFirstBlock = (blockInfo) => {
     return blockInfo[0];
 };

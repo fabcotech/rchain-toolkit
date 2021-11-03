@@ -12,6 +12,8 @@ import { getBlake2Hash } from "./utils/getBlake2Hash";
 export * from "./utils/rhoValToJs";
 export * from "./utils/rhoExprToVar";
 export * from "./utils/decodePar";
+export * from "./utils/getBlake2Hash";
+export * from "./utils/getDeployDataToSign";
 
 export const getFirstBlock = (
   blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]
