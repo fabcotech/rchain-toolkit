@@ -1,20 +1,15 @@
 /// <reference types="node" />
 import { DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
+export * from "./utils/rhoValToJs";
+export * from "./utils/rhoExprToVar";
+export * from "./utils/decodePar";
 export declare const getFirstBlock: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => any;
 export declare const getValueFromBlocks: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => rnodeProtos.IPar;
-export declare const rhoValToJs: (expr: any) => any;
 export declare const unforgeableWithId: (id: Buffer) => string;
-export declare const getDeployData: (timestamp: number, term: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => DeployData;
-export declare const getDeployDataToSign: (payment: DeployData) => Uint8Array;
-export declare const decodePar: (par: any) => {
-    [k: string]: any;
-};
-export declare const rhoExprToVar: (a: rnodeProtos.IExpr) => boolean | string | number | object | null;
 export declare const mapToRhoRepr: (a: any) => rnodeProtos.EMap;
 export declare const varToRhoExpr: (a: any) => rnodeProtos.IExpr;
 export declare const toByteArray: (a: any) => Uint8Array;
-export declare const getBlake2Hash: (toHash: Uint8Array, length?: number) => Uint8Array;
 export declare const verifyPrivateAndPublicKey: (privateKey: string, publicKey: string) => void;
 export declare const signSecp256k1: (hash: Uint8Array, privateKey: string) => Uint8Array;
 export declare const transferRevTerm: (a: {

@@ -3,11 +3,18 @@ import resolve from "rollup-plugin-node-resolve";
 import typescript from "rollup-plugin-typescript";
 import json from "rollup-plugin-json";
 
+const VERSION = "0.3.6";
+
 export default {
-  input: "src/index.ts",
+  input: "src/browser-utils.ts",
   output: {
-    format: "cjs",
-    file: "roll/index.js"
+    format: "iife",
+    sourceMap: "inline",
+    file: "browser/rchain-toolkit-browser-utils@" + VERSION + ".js",
+    name: "RChainToolkitBrowserUtils",
+    globals: {
+      buffer: "Buffer",
+    },
   },
   external: [
     "electron",
@@ -25,7 +32,7 @@ export default {
     "events",
     "url",
     "util",
-    "string_decoder"
+    "string_decoder",
   ],
-  plugins: [typescript(), resolve(), commonjs(), json()]
+  plugins: [typescript(), resolve(), commonjs()],
 };

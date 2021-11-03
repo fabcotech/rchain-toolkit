@@ -1,13 +1,17 @@
-import { blake2bInit, blake2bUpdate, blake2bFinal, blake2bHex } from "blakejs";
+import { blake2bHex } from "blakejs";
 import * as elliptic from "elliptic";
-import { keccak256 } from "js-sha3";
-import { Writer } from "protobufjs";
+import keccak256 from "keccak256";
 
 import { DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
 import * as base58 from "./base58";
+import { getDeployData } from "./utils/getDeployData";
+import { getDeployDataToSign } from "./utils/getDeployDataToSign";
+import { getBlake2Hash } from "./utils/getBlake2Hash";
 
-const ec = new elliptic.ec("secp256k1");
+export * from "./utils/rhoValToJs";
+export * from "./utils/rhoExprToVar";
+export * from "./utils/decodePar";
 
 export const getFirstBlock = (
   blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]
@@ -32,194 +36,8 @@ export const getValueFromBlocks = (
   throw new Error("Not data found in any block");
 };
 
-const rhoUnforgeableToJs = (expr: any) => {
-  const unforgeable: {
-    UnforgPrivate?: string;
-    UnforgDeploy?: string;
-    UnforgDeployer?: string;
-  } = {};
-
-  Object.keys(expr.ExprUnforg.data).forEach((u: any) => {
-    if (u === "UnforgPrivate") {
-      unforgeable.UnforgPrivate = expr.ExprUnforg.data[u].data;
-    } else if (u === "UnforgDeploy") {
-      unforgeable.UnforgDeploy = expr.ExprUnforg.data[u].data;
-    } else if (u === "UnforgDeployer") {
-      unforgeable.UnforgDeployer = expr.ExprUnforg.data[u].data;
-    }
-  });
-
-  return unforgeable;
-};
-
-const rholangMapToJsObject = (expr: any) => {
-  const obj: { [key: string]: any } = {};
-  Object.keys(expr.ExprMap.data).forEach((k: any) => {
-    obj[k] = rhoValToJs(expr.ExprMap.data[k]);
-  });
-
-  return obj;
-};
-
-const rhoIdsToJs = (ids: any) => {
-  return ids[0].id;
-};
-const rhoExprStringToJs = (expr: any) => {
-  return expr.ExprString.data;
-};
-const rhoExprUriToJs = (expr: any) => {
-  return expr.ExprUri.data;
-};
-const rhoExprBoolToJs = (expr: any) => {
-  return expr.ExprBool.data;
-};
-const rhoExprIntToJs = (expr: any) => {
-  return expr.ExprInt.data;
-};
-const rhoExprListToJs = (expr: any) => {
-  return expr.ExprList.data.map((e: any) => rhoValToJs(e));
-};
-const rhoExprTupleToJs = (expr: any) => {
-  return expr.ExprTuple.data.map((e: any) => rhoValToJs(e));
-};
-const rhoExprSetToJs = (expr: any) => {
-  return expr.ExprSet.data.map((e: any) => rhoValToJs(e));
-};
-
-/*
-  converts expr received by data-at-name or
-  explore-deploy to javascript variables
-*/
-export const rhoValToJs = (expr: any) => {
-  /* if (val.ids && val.ids[0]) {
-    return rhoIdsToJs(val.ids);
-  } else  */
-  if (expr.ExprUnforg) {
-    return rhoUnforgeableToJs(expr);
-  } else if (expr.ExprMap) {
-    return rholangMapToJsObject(expr);
-  } else if (expr.ExprString) {
-    return rhoExprStringToJs(expr);
-  } else if (expr.ExprUri) {
-    return rhoExprUriToJs(expr);
-  } else if (expr.ExprBool) {
-    return rhoExprBoolToJs(expr);
-  } else if (expr.ExprInt) {
-    return rhoExprIntToJs(expr);
-  } else if (expr.ExprList) {
-    return rhoExprListToJs(expr);
-  } else if (expr.ExprTuple) {
-    return rhoExprTupleToJs(expr);
-  } else if (expr.ExprSet) {
-    return rhoExprSetToJs(expr);
-  } else {
-    console.warn("Not implemented", expr);
-    return null;
-  }
-};
-
 export const unforgeableWithId = (id: Buffer): string => {
   return id.toString("hex");
-};
-
-export const getDeployData = (
-  timestamp: number,
-  term: string,
-  phloPrice = 1,
-  phloLimit = 10000000,
-  validAfterBlockNumber = 0
-): DeployData => {
-  return {
-    timestamp: timestamp,
-    term: term,
-    phloLimit: phloLimit,
-    phloPrice: phloPrice,
-    validAfterBlockNumber: validAfterBlockNumber,
-  };
-};
-
-export const getDeployDataToSign = (payment: DeployData): Uint8Array => {
-  return rnodeProtos.casper.DeployDataProto.encode(payment).finish();
-};
-
-export const decodePar = (par: any) => {
-  const a = rnodeProtos.Par.decode(par);
-  return a.toJSON();
-};
-
-/*
-  converts expr received by decoding buffers
-  and decoding Par to javascript variables
-*/
-export const rhoExprToVar = (
-  a: rnodeProtos.IExpr
-): boolean | string | number | object | null => {
-  if (a.g_string) {
-    return a.g_string;
-  } else if (a.g_uri) {
-    return a.g_uri;
-  } else if (a.g_int) {
-    return parseInt(a.g_int as any, 10);
-  } else if (a.g_bool) {
-    return a.g_bool;
-  } else if (a.e_list_body) {
-    if (a.e_list_body && a.e_list_body.ps) {
-      return a.e_list_body.ps.map((ps) => {
-        if (ps.exprs && ps.exprs[0]) {
-          return rhoExprToVar(ps.exprs[0]);
-        } else {
-          return null;
-        }
-      });
-    } else {
-      return [];
-    }
-  } else if (a.e_tuple_body) {
-    if (a.e_tuple_body && a.e_tuple_body.ps) {
-      return a.e_tuple_body.ps.map((ps) => {
-        if (ps.exprs && ps.exprs[0]) {
-          return rhoExprToVar(ps.exprs[0]);
-        } else {
-          return null;
-        }
-      });
-    } else {
-      return [];
-    }
-  } else if (a.e_set_body) {
-    if (a.e_set_body && a.e_set_body.ps) {
-      return a.e_set_body.ps.map((ps) => {
-        if (ps.exprs && ps.exprs[0]) {
-          return rhoExprToVar(ps.exprs[0]);
-        } else {
-          return null;
-        }
-      });
-    } else {
-      return [];
-    }
-  } else if (a.e_map_body) {
-    const obj: { [key: string]: any } = {};
-    if (a.e_map_body.kvs) {
-      a.e_map_body.kvs.forEach((kv) => {
-        if (kv.key && kv.key.exprs && kv.key.exprs[0]) {
-          if (kv.value && kv.value.exprs && kv.value.exprs[0]) {
-            obj[rhoExprToVar(kv.key.exprs[0]) as string] = rhoExprToVar(
-              kv.value.exprs[0]
-            );
-          } else {
-            obj[rhoExprToVar(kv.key.exprs[0]) as string] = null;
-          }
-        }
-      });
-      return obj;
-    } else {
-      return {};
-    }
-  } else {
-    console.warn("Not implemented", a);
-    return null;
-  }
 };
 
 const stringToRhoRepr = (a: string): rnodeProtos.IExpr => {
@@ -287,16 +105,11 @@ export const toByteArray = (a: any) => {
   }).finish();
 };
 
-export const getBlake2Hash = (toHash: Uint8Array, length = 32): Uint8Array => {
-  const context = blake2bInit(length, null);
-  blake2bUpdate(context, toHash);
-  return blake2bFinal(context);
-};
-
 export const verifyPrivateAndPublicKey = (
   privateKey: string,
   publicKey: string
 ) => {
+  const ec = new elliptic.ec("secp256k1");
   const keyPair = ec.keyFromPrivate(privateKey);
   if (keyPair.getPublic().encode("hex", false) !== publicKey) {
     throw new Error("Private key and public key do not match");
@@ -307,6 +120,7 @@ export const signSecp256k1 = (
   hash: Uint8Array,
   privateKey: string
 ): Uint8Array => {
+  const ec = new elliptic.ec("secp256k1");
   const keyPair = ec.keyFromPrivate(privateKey);
 
   const signature = keyPair.sign((Buffer || Buffer).from(hash), {
@@ -431,7 +245,7 @@ const getAddrFromEth = (ethAddr: string): string => {
 
   // Hash ETH address
   const ethAddrBytes = bytesFromHex(ethAddr);
-  const ethHash = keccak256(ethAddrBytes);
+  const ethHash = keccak256(Buffer.from(ethAddrBytes)).toString("hex");
 
   // Add prefix with hash and calculate checksum (blake2b-256 hash)
   const payload = `${prefix.coinId}${prefix.version}${ethHash}`;
@@ -458,7 +272,7 @@ export const revAddressFromPublicKey = (publicKey: string) => {
   const pubKeyBytes = bytesFromHex(publicKey);
 
   // Remove one byte from pk bytes and hash
-  const pkHash = keccak256(pubKeyBytes.slice(1));
+  const pkHash = keccak256(Buffer.from(pubKeyBytes.slice(1))).toString("hex");
 
   // Take last 40 chars from hashed pk (ETH address)
   const pkHash40 = pkHash.slice(-40);
@@ -468,6 +282,7 @@ export const revAddressFromPublicKey = (publicKey: string) => {
 };
 
 export const publicKeyFromPrivateKey = (privateKey: string) => {
+  const ec = new elliptic.ec("secp256k1");
   const keyPair = ec.keyFromPrivate(privateKey);
   return keyPair.getPublic().encode("hex", false);
 };

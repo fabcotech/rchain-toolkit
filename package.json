@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.3.5",
+  "version": "0.3.6",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",
@@ -15,7 +15,9 @@
   "scripts": {
     "test:jest": "jest",
     "test:full": "node test.js",
-    "compile": "tsc src/index.ts --outDir dist -d && cp -r src/protobuf dist/ && cp src/rnode-protos* dist/",
+    "build:browser": "npx rollup -c rollup.config.iife.js",
+    "build:node": "npx rollup -c rollup.config.cjs.js",
+    "compile": "tsc --module commonjs --target es2020 src/index.ts --outDir dist -d && cp -r src/protobuf dist/ && cp src/rnode-protos* dist/",
     "compile:tests": "tsc tests/index.ts --outDir testsc && cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/",
     "compile:examples": "rm examples/*.js && tsc examples/*"
   },
@@ -27,6 +29,11 @@
     "@grpc/proto-loader": "^0.6.5",
     "@types/elliptic": "^6.4.13",
     "@types/node": "^12.0.8",
+    "rollup": "1.26.0",
+    "rollup-plugin-commonjs": "^10.1.0",
+    "rollup-plugin-json": "^4.0.0",
+    "rollup-plugin-node-resolve": "^5.2.0",
+    "rollup-plugin-typescript": "^1.0.1",
     "ts-loader": "^6.0.3",
     "tslib": "^1.10.0",
     "typescript": "^3.5.2"
@@ -34,8 +41,8 @@
   "dependencies": {
     "blakejs": "^1.1.0",
     "elliptic": "6.5.4",
-    "js-sha3": "^0.8.0",
-    "protobufjs": "^6.8.8",
+    "keccak256": "^1.0.3",
+    "protobufjs": "^6.11.2",
     "typescript": "3.6.4"
   }
 }
