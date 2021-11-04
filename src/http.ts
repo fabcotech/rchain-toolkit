@@ -315,7 +315,7 @@ export const exploreDeploy = (
         ...(uv.options.port ? { port: uv.options.port } : {}),
         ...(uv.options.cert ? { cert: uv.options.cert } : {}),
         ...(uv.options.rejectUnauthorized
-          ? { cert: uv.options.rejectUnauthorized }
+          ? { rejectUnauthorized: uv.options.rejectUnauthorized }
           : {}),
         ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
@@ -372,7 +372,7 @@ export const blocks = (
         ...(uv.options.port ? { port: uv.options.port } : {}),
         ...(uv.options.cert ? { cert: uv.options.cert } : {}),
         ...(uv.options.rejectUnauthorized
-          ? { cert: uv.options.rejectUnauthorized }
+          ? { rejectUnauthorized: uv.options.rejectUnauthorized }
           : {}),
         ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
@@ -432,7 +432,7 @@ export const prepareDeploy = (
         ...(uv.options.port ? { port: uv.options.port } : {}),
         ...(uv.options.cert ? { cert: uv.options.cert } : {}),
         ...(uv.options.rejectUnauthorized
-          ? { cert: uv.options.rejectUnauthorized }
+          ? { rejectUnauthorized: uv.options.rejectUnauthorized }
           : {}),
         ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
@@ -498,7 +498,7 @@ export const dataAtName = (
         ...(uv.options.port ? { port: uv.options.port } : {}),
         ...(uv.options.cert ? { cert: uv.options.cert } : {}),
         ...(uv.options.rejectUnauthorized
-          ? { cert: uv.options.rejectUnauthorized }
+          ? { rejectUnauthorized: uv.options.rejectUnauthorized }
           : {}),
         ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },

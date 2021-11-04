@@ -220,9 +220,9 @@ exports.exploreDeploy = (urlOrOptions, options) => {
             ...(uv.options.port ? { port: uv.options.port } : {}),
             ...(uv.options.cert ? { cert: uv.options.cert } : {}),
             ...(uv.options.rejectUnauthorized
-                ? { cert: uv.options.rejectUnauthorized }
+                ? { rejectUnauthorized: uv.options.rejectUnauthorized }
                 : {}),
-            ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+            ...(uv.options.ca ? { ca: uv.options.ca } : {}),
         }, (res) => {
             let data = "";
             res.on("data", (chunk) => {
@@ -259,9 +259,9 @@ exports.blocks = (urlOrOptions, options) => {
             ...(uv.options.port ? { port: uv.options.port } : {}),
             ...(uv.options.cert ? { cert: uv.options.cert } : {}),
             ...(uv.options.rejectUnauthorized
-                ? { cert: uv.options.rejectUnauthorized }
+                ? { rejectUnauthorized: uv.options.rejectUnauthorized }
                 : {}),
-            ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+            ...(uv.options.ca ? { ca: uv.options.ca } : {}),
         }, (res) => {
             let data = "";
             res.on("data", (chunk) => {
@@ -297,9 +297,9 @@ exports.prepareDeploy = (urlOrOptions, options) => {
             ...(uv.options.port ? { port: uv.options.port } : {}),
             ...(uv.options.cert ? { cert: uv.options.cert } : {}),
             ...(uv.options.rejectUnauthorized
-                ? { cert: uv.options.rejectUnauthorized }
+                ? { rejectUnauthorized: uv.options.rejectUnauthorized }
                 : {}),
-            ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+            ...(uv.options.ca ? { ca: uv.options.ca } : {}),
         }, (res) => {
             let data = "";
             res.on("data", (chunk) => {
@@ -336,9 +336,9 @@ exports.dataAtName = (urlOrOptions, options) => {
             ...(uv.options.port ? { port: uv.options.port } : {}),
             ...(uv.options.cert ? { cert: uv.options.cert } : {}),
             ...(uv.options.rejectUnauthorized
-                ? { cert: uv.options.rejectUnauthorized }
+                ? { rejectUnauthorized: uv.options.rejectUnauthorized }
                 : {}),
-            ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+            ...(uv.options.ca ? { ca: uv.options.ca } : {}),
         }, (res) => {
             let data = "";
             res.on("data", (chunk) => {
