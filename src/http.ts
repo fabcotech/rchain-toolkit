@@ -317,7 +317,7 @@ export const exploreDeploy = (
         ...(uv.options.rejectUnauthorized
           ? { cert: uv.options.rejectUnauthorized }
           : {}),
-        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+        ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -374,7 +374,7 @@ export const blocks = (
         ...(uv.options.rejectUnauthorized
           ? { cert: uv.options.rejectUnauthorized }
           : {}),
-        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+        ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -434,7 +434,7 @@ export const prepareDeploy = (
         ...(uv.options.rejectUnauthorized
           ? { cert: uv.options.rejectUnauthorized }
           : {}),
-        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+        ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
 
       (res) => {
@@ -500,7 +500,7 @@ export const dataAtName = (
         ...(uv.options.rejectUnauthorized
           ? { cert: uv.options.rejectUnauthorized }
           : {}),
-        ...(uv.options.ca ? { cert: uv.options.ca } : {}),
+        ...(uv.options.ca ? { ca: uv.options.ca } : {}),
       },
 
       (res) => {
