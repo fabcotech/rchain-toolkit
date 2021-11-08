@@ -5,7 +5,9 @@ exports.rhoExprToVar = void 0;
   converts expr received by decoding buffers
   and decoding Par to javascript variables
 */
-exports.rhoExprToVar = (a) => {
+exports.rhoExprToVar = (a
+//a: rnodeProtos.IExpr
+) => {
     if (a.g_string) {
         return a.g_string;
     }

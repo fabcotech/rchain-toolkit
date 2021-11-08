@@ -6,6 +6,7 @@ export * from "./utils/rhoExprToVar";
 export * from "./utils/decodePar";
 export * from "./utils/getBlake2Hash";
 export * from "./utils/getDeployDataToSign";
+export * from "./utils/revAddressFromPublicKey";
 export declare const getFirstBlock: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => any;
 export declare const getValueFromBlocks: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => rnodeProtos.IPar;
 export declare const unforgeableWithId: (id: Buffer) => string;
@@ -25,5 +26,4 @@ export declare const getDeployOptions: (sigAlgorithm: SigAlgorithm, timestamp: n
     signature: string;
     sigAlgorithm: SigAlgorithm;
 };
-export declare const revAddressFromPublicKey: (publicKey: string) => string;
 export declare const publicKeyFromPrivateKey: (privateKey: string) => string;

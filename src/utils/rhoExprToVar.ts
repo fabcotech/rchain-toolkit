@@ -1,11 +1,10 @@
-import * as rnodeProtos from "../rnode-protos";
-
 /*
   converts expr received by decoding buffers
   and decoding Par to javascript variables
 */
 export const rhoExprToVar = (
-  a: rnodeProtos.IExpr
+  a: any
+  //a: rnodeProtos.IExpr
 ): boolean | string | number | object | null => {
   if (a.g_string) {
     return a.g_string;
