@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.revAddressFromPublicKey = void 0;
 const keccak256 = require("keccak256");
 const blakejs_1 = require("blakejs");
 const base58 = require("../base58");

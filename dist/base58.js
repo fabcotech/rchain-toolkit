@@ -1,7 +1,6 @@
 "use strict";
 // https://github.com/45678/Base58/blob/master/Base58.js
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.encode = void 0;
 const ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
 exports.encode = function (buffer) {
     var carry, digits, j;

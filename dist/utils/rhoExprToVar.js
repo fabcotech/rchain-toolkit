@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.rhoExprToVar = void 0;
 /*
   converts expr received by decoding buffers
   and decoding Par to javascript variables

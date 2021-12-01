@@ -1,27 +1,20 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !exports.hasOwnProperty(p)) __createBinding(exports, m, p);
-};
+function __export(m) {
+    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
+}
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.publicKeyFromPrivateKey = exports.getDeployOptions = exports.transferRevTerm = exports.signSecp256k1 = exports.verifyPrivateAndPublicKey = exports.toByteArray = exports.varToRhoExpr = exports.mapToRhoRepr = exports.unforgeableWithId = exports.getValueFromBlocks = exports.getFirstBlock = void 0;
 const elliptic = require("elliptic");
-const rnodeProtos = require("./rnode-protos");
+const rnode_protos_1 = require("./rnode-protos");
 const getDeployData_1 = require("./utils/getDeployData");
 const getDeployDataToSign_1 = require("./utils/getDeployDataToSign");
 const getBlake2Hash_1 = require("./utils/getBlake2Hash");
-__exportStar(require("./utils/rhoValToJs"), exports);
-__exportStar(require("./utils/rhoExprToVar"), exports);
-__exportStar(require("./utils/decodePar"), exports);
-__exportStar(require("./utils/getBlake2Hash"), exports);
-__exportStar(require("./utils/getDeployDataToSign"), exports);
-__exportStar(require("./utils/revAddressFromPublicKey"), exports);
+__export(require("./utils/rhoValToJs"));
+__export(require("./utils/rhoExprToVar"));
+__export(require("./utils/decodePar"));
+__export(require("./utils/getBlake2Hash"));
+__export(require("./utils/getDeployData"));
+__export(require("./utils/getDeployDataToSign"));
+__export(require("./utils/revAddressFromPublicKey"));
 exports.getFirstBlock = (blockInfo) => {
     return blockInfo[0];
 };
@@ -97,7 +90,7 @@ exports.varToRhoExpr = (a) => {
 };
 exports.toByteArray = (a) => {
     const expr = exports.varToRhoExpr(a);
-    return rnodeProtos.Par.encode({
+    return rnode_protos_1.default.Par.encode({
         exprs: [expr],
     }).finish();
 };

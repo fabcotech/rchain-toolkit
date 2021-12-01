@@ -1,7 +1,7 @@
 import * as elliptic from "elliptic";
 
 import { DeployData, SigAlgorithm } from "./models";
-import * as rnodeProtos from "./rnode-protos";
+import rnodeProtos from "./rnode-protos";
 import { getDeployData } from "./utils/getDeployData";
 import { getDeployDataToSign } from "./utils/getDeployDataToSign";
 import { getBlake2Hash } from "./utils/getBlake2Hash";

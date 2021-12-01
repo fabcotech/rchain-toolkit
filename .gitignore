@@ -4,3 +4,4 @@ examples/*.js
 browser/rchain-token@14.0.0.js
 browser/buffer@6.0.3.js
 testbrowserutils.html
+.parcel-cache

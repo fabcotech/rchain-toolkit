@@ -1,6 +1,5 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getGrpcProposeClient = exports.getClient = exports.propose = exports.previewPrivateNames = exports.doDeploy = exports.lastFinalizedBlock = exports.getBlocks = exports.getBlock = exports.getMethod = void 0;
 exports.getMethod = (options, client, method) => {
     return new Promise((resolve, reject) => {
         client[method](options, async (err, resp) => {

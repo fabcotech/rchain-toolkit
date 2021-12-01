@@ -1,1 +1,1 @@
-export declare const rhoExprToVar: (a: any) => boolean | string | number | object | null;
+export declare const rhoExprToVar: (a: any) => string | number | boolean | object;

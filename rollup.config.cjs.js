@@ -3,14 +3,13 @@ import resolve from "rollup-plugin-node-resolve";
 import typescript from "rollup-plugin-typescript";
 import json from "rollup-plugin-json";
 
-/* 
 
-This compilation does not work yet, use npm run compile
+/* This compilation does not work yet, use npm run compile */
 
 export default {
   input: "src/index.ts",
   output: {
-    format: "es",
+    format: "cjs",
     sourceMap: "inline",
     file: "dist/index.js",
   },
@@ -22,6 +21,7 @@ export default {
     "path",
     "http",
     "https",
+    "Buffer",
     "stream",
     "net",
     "tls",
@@ -33,4 +33,4 @@ export default {
   ],
   plugins: [typescript(), resolve(), commonjs(), json()],
 };
- */
+
