@@ -9,7 +9,7 @@ import json from "rollup-plugin-json";
 export default {
   input: "src/index.ts",
   output: {
-    format: "cjs",
+    format: "umd",
     sourceMap: "inline",
     file: "dist/index.js",
   },

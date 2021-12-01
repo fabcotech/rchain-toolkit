@@ -1,5 +1,5 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 exports.privateNamePreviewResponse = {
     names: ["fc60308a5512c265b978b46d7283f2d5f7aa12f64a5b1874df26ef3be827f57e"],
     blockNumber: 6

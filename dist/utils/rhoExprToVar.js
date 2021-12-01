@@ -1,12 +1,12 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
+exports.__esModule = true;
 /*
   converts expr received by decoding buffers
   and decoding Par to javascript variables
 */
-exports.rhoExprToVar = (a
+exports.rhoExprToVar = function (a
 //a: rnodeProtos.IExpr
-) => {
+) {
     if (a.g_string) {
         return a.g_string;
     }
@@ -21,7 +21,7 @@ exports.rhoExprToVar = (a
     }
     else if (a.e_list_body) {
         if (a.e_list_body && a.e_list_body.ps) {
-            return a.e_list_body.ps.map((ps) => {
+            return a.e_list_body.ps.map(function (ps) {
                 if (ps.exprs && ps.exprs[0]) {
                     return exports.rhoExprToVar(ps.exprs[0]);
                 }
@@ -36,7 +36,7 @@ exports.rhoExprToVar = (a
     }
     else if (a.e_tuple_body) {
         if (a.e_tuple_body && a.e_tuple_body.ps) {
-            return a.e_tuple_body.ps.map((ps) => {
+            return a.e_tuple_body.ps.map(function (ps) {
                 if (ps.exprs && ps.exprs[0]) {
                     return exports.rhoExprToVar(ps.exprs[0]);
                 }
@@ -51,7 +51,7 @@ exports.rhoExprToVar = (a
     }
     else if (a.e_set_body) {
         if (a.e_set_body && a.e_set_body.ps) {
-            return a.e_set_body.ps.map((ps) => {
+            return a.e_set_body.ps.map(function (ps) {
                 if (ps.exprs && ps.exprs[0]) {
                     return exports.rhoExprToVar(ps.exprs[0]);
                 }
@@ -65,19 +65,19 @@ exports.rhoExprToVar = (a
         }
     }
     else if (a.e_map_body) {
-        const obj = {};
+        var obj_1 = {};
         if (a.e_map_body.kvs) {
-            a.e_map_body.kvs.forEach((kv) => {
+            a.e_map_body.kvs.forEach(function (kv) {
                 if (kv.key && kv.key.exprs && kv.key.exprs[0]) {
                     if (kv.value && kv.value.exprs && kv.value.exprs[0]) {
-                        obj[exports.rhoExprToVar(kv.key.exprs[0])] = exports.rhoExprToVar(kv.value.exprs[0]);
+                        obj_1[exports.rhoExprToVar(kv.key.exprs[0])] = exports.rhoExprToVar(kv.value.exprs[0]);
                     }
                     else {
-                        obj[exports.rhoExprToVar(kv.key.exprs[0])] = null;
+                        obj_1[exports.rhoExprToVar(kv.key.exprs[0])] = null;
                     }
                 }
             });
-            return obj;
+            return obj_1;
         }
         else {
             return {};

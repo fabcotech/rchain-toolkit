@@ -1,8 +1,8 @@
 "use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const rhoUnforgeableToJs = (expr) => {
-    const unforgeable = {};
-    Object.keys(expr.ExprUnforg.data).forEach((u) => {
+exports.__esModule = true;
+var rhoUnforgeableToJs = function (expr) {
+    var unforgeable = {};
+    Object.keys(expr.ExprUnforg.data).forEach(function (u) {
         if (u === "UnforgPrivate") {
             unforgeable.UnforgPrivate = expr.ExprUnforg.data[u].data;
         }
@@ -15,35 +15,35 @@ const rhoUnforgeableToJs = (expr) => {
     });
     return unforgeable;
 };
-const rholangMapToJsObject = (expr) => {
-    const obj = {};
-    Object.keys(expr.ExprMap.data).forEach((k) => {
+var rholangMapToJsObject = function (expr) {
+    var obj = {};
+    Object.keys(expr.ExprMap.data).forEach(function (k) {
         obj[k] = exports.rhoValToJs(expr.ExprMap.data[k]);
     });
     return obj;
 };
-const rhoExprStringToJs = (expr) => {
+var rhoExprStringToJs = function (expr) {
     return expr.ExprString.data;
 };
-const rhoExprUriToJs = (expr) => {
+var rhoExprUriToJs = function (expr) {
     return expr.ExprUri.data;
 };
-const rhoExprBoolToJs = (expr) => {
+var rhoExprBoolToJs = function (expr) {
     return expr.ExprBool.data;
 };
-const rhoExprIntToJs = (expr) => {
+var rhoExprIntToJs = function (expr) {
     return expr.ExprInt.data;
 };
-const rhoExprListToJs = (expr) => {
-    return expr.ExprList.data.map((e) => exports.rhoValToJs(e));
+var rhoExprListToJs = function (expr) {
+    return expr.ExprList.data.map(function (e) { return exports.rhoValToJs(e); });
 };
-const rhoExprTupleToJs = (expr) => {
-    return expr.ExprTuple.data.map((e) => exports.rhoValToJs(e));
+var rhoExprTupleToJs = function (expr) {
+    return expr.ExprTuple.data.map(function (e) { return exports.rhoValToJs(e); });
 };
-const rhoExprSetToJs = (expr) => {
-    return expr.ExprSet.data.map((e) => exports.rhoValToJs(e));
+var rhoExprSetToJs = function (expr) {
+    return expr.ExprSet.data.map(function (e) { return exports.rhoValToJs(e); });
 };
-exports.rhoValToJs = (expr) => {
+exports.rhoValToJs = function (expr) {
     /* if (val.ids && val.ids[0]) {
           return rhoIdsToJs(val.ids);
         } else  */
