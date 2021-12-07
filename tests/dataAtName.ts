@@ -42,7 +42,7 @@ export const testDataAtName = () => {
       process.exit();
     }
 
-    await new Promise((r) => setTimeout(r, 12000));
+    await new Promise((r) => setTimeout(r, 16000));
 
     const timestamp = new Date().valueOf();
     const prepareDeployResponse = await prepareDeploy(
@@ -84,7 +84,8 @@ export const testDataAtName = () => {
       return;
     }
 
-    await new Promise((r) => setTimeout(r, 6000));
+    await new Promise((r) => setTimeout(r, 16000));
+
     const dataAtNameResponse = await dataAtName("http://localhost:40403", {
       name: {
         UnforgPrivate: { data: JSON.parse(prepareDeployResponse).names[0] },
