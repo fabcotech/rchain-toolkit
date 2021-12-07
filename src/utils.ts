@@ -196,7 +196,7 @@ export const getDeployOptions = (
   publicKey: string,
   phloPrice = 1,
   phloLimit = 10000,
-  validAfterBlockNumber = 0
+  validAfterBlockNumber = -1
 ): {
   data: DeployData;
   deployer: string;
@@ -208,7 +208,7 @@ export const getDeployOptions = (
     term,
     phloPrice,
     phloLimit,
-    validAfterBlockNumber
+    validAfterBlockNumber || -1
   );
 
   const toSign = getDeployDataToSign(deployData);

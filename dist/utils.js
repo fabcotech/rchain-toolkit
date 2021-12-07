@@ -128,8 +128,8 @@ exports.transferRevTerm = function (a) {
 exports.getDeployOptions = function (sigAlgorithm, timestamp, term, privateKey, publicKey, phloPrice, phloLimit, validAfterBlockNumber) {
     if (phloPrice === void 0) { phloPrice = 1; }
     if (phloLimit === void 0) { phloLimit = 10000; }
-    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = 0; }
-    var deployData = getDeployData_1.getDeployData(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber);
+    if (validAfterBlockNumber === void 0) { validAfterBlockNumber = -1; }
+    var deployData = getDeployData_1.getDeployData(timestamp, term, phloPrice, phloLimit, validAfterBlockNumber || -1);
     var toSign = getDeployDataToSign_1.getDeployDataToSign(deployData);
     var hash = getBlake2Hash_1.getBlake2Hash(toSign);
     var signature;
