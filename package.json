@@ -27,7 +27,8 @@
     "build:node": "npx rollup -c rollup.config.cjs.js",
     "compile": "tsc --module commonjs src/index.ts --outDir dist -d && cp -r src/protobuf dist/ && cp src/rnode-protos* dist/",
     "compile:tests": "cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/ && tsc tests/index.ts --outDir testsc",
-    "compile:examples": "rm examples/*.js && tsc examples/*"
+    "compile:examples": "rm examples/*.js && tsc examples/*",
+    "generate": "pbjs --keep-case -t static-module -w commonjs -o ./src/rnode-protos.js ./src/protobuf/*.proto && pbts -o src/rnode-protos.d.ts src/rnode-protos.js"
   },
   "author": "FABCO",
   "license": "MIT",
