@@ -2,6 +2,8 @@ import * as keccak256 from "keccak256";
 import { blake2bHex } from "blakejs";
 
 import * as base58 from "../base58";
+import { ethAddressFromPublicKey } from './ethAddressFromPublicKey';
+import { bytesFromHex } from './bytesFromHex';
 
 const toBase58 = (hexStr: string) => {
   const bytes = bytesFromHex(hexStr);
@@ -35,27 +37,7 @@ const getAddrFromEth = (ethAddr: string): string => {
   return toBase58(`${payload}${checksum}`);
 };
 
-const bytesFromHex = (hexStr: string) => {
-  const byte2hex = ([arr, bhi]: [any[], number], x: any) =>
-    bhi ? [[...arr, parseInt(`${bhi}${x}`, 16)]] : [arr, x];
-  const [resArr] = Array.from(hexStr).reduce(byte2hex, [[]]);
-  return Uint8Array.from(resArr);
-};
-
 export const revAddressFromPublicKey = (publicKey: string) => {
-  if (!publicKey || publicKey.length !== 130) {
-    throw new Error("Public key must contain 130 characters");
-  }
-
-  // Public key bytes from hex string
-  const pubKeyBytes = bytesFromHex(publicKey);
-
-  // Remove one byte from pk bytes and hash
-  const pkHash = keccak256(Buffer.from(pubKeyBytes.slice(1))).toString("hex");
-
-  // Take last 40 chars from hashed pk (ETH address)
-  const pkHash40 = pkHash.slice(-40);
-
-  // Return both REV and ETH address
-  return getAddrFromEth(pkHash40);
+  const ethAddressWithoutPrefix = ethAddressFromPublicKey(publicKey).slice(2)
+  return getAddrFromEth(ethAddressWithoutPrefix);
 };

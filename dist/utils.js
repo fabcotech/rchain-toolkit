@@ -15,6 +15,7 @@ __export(require("./utils/getBlake2Hash"));
 __export(require("./utils/getDeployData"));
 __export(require("./utils/getDeployDataToSign"));
 __export(require("./utils/revAddressFromPublicKey"));
+__export(require("./utils/ethAddressFromPublicKey"));
 exports.getFirstBlock = function (blockInfo) {
     return blockInfo[0];
 };

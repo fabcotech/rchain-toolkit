@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",
@@ -26,7 +26,7 @@
     "test:full": "node test.js",
     "build:node": "npx rollup -c rollup.config.cjs.js",
     "compile": "tsc --module commonjs src/index.ts --outDir dist -d && cp -r src/protobuf dist/ && cp src/rnode-protos* dist/",
-    "compile:tests": "tsc tests/index.ts --outDir testsc && cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/",
+    "compile:tests": "cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/ && tsc tests/index.ts --outDir testsc",
     "compile:examples": "rm examples/*.js && tsc examples/*"
   },
   "author": "FABCO",

@@ -8,6 +8,7 @@ export * from "./utils/getBlake2Hash";
 export * from "./utils/getDeployData";
 export * from "./utils/getDeployDataToSign";
 export * from "./utils/revAddressFromPublicKey";
+export * from "./utils/ethAddressFromPublicKey";
 export declare const getFirstBlock: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => any;
 export declare const getValueFromBlocks: (blockInfo: rnodeProtos.casper.IDataWithBlockInfo[]) => rnodeProtos.IPar;
 export declare const unforgeableWithId: (id: Buffer) => string;
