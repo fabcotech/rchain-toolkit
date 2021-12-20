@@ -108,6 +108,9 @@ export const deploy = async (
         res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
+            if (!data.toString('utf8').startsWith('"Success!')) {
+              throw new Error(data.toString('utf8'))
+            }
             if (typeof timeout === "number") {
               let s = new Date().getTime();
               let ongoning = false;
@@ -221,6 +224,9 @@ export const easyDeploy = async (
         res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
+            if (!data.toString('utf8').startsWith('"Success!')) {
+              throw new Error(data.toString('utf8'))
+            }
             if (typeof timeout === "number") {
               let s = new Date().getTime();
               let ongoning = false;
