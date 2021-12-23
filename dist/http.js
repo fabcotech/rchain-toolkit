@@ -112,6 +112,9 @@ exports.deploy = function (urlOrOptions, options, timeout) {
                             res.on("data", function (chunk) {
                                 data += chunk;
                                 res.on("end", function () {
+                                    if (!data.toString('utf8').startsWith('"Success!')) {
+                                        throw new Error(data.toString('utf8'));
+                                    }
                                     if (typeof timeout === "number") {
                                         var s_1 = new Date().getTime();
                                         var ongoning_1 = false;
@@ -205,6 +208,9 @@ exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLi
                             res.on("data", function (chunk) {
                                 data += chunk;
                                 res.on("end", function () {
+                                    if (!data.toString('utf8').startsWith('"Success!')) {
+                                        throw new Error(data.toString('utf8'));
+                                    }
                                     if (typeof timeout === "number") {
                                         var s_2 = new Date().getTime();
                                         var ongoning_2 = false;
