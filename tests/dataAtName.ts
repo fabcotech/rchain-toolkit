@@ -103,6 +103,6 @@ export const testDataAtName = () => {
       reject();
       return;
     }
-    resolve();
+    resolve(null);
   });
 };

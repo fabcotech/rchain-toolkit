@@ -1,8 +1,9 @@
 "use strict";
 // https://github.com/45678/Base58/blob/master/Base58.js
 exports.__esModule = true;
+exports.encode = void 0;
 var ALPHABET = "123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz";
-exports.encode = function (buffer) {
+var encode = function (buffer) {
     var carry, digits, j;
     if (buffer.length === 0) {
         return "";
@@ -42,3 +43,4 @@ exports.encode = function (buffer) {
     })
         .join("");
 };
+exports.encode = encode;

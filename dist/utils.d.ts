@@ -1,5 +1,5 @@
 /// <reference types="node" />
-import { DeployData } from "./models";
+import { DeployData, SigAlgorithm } from "./models";
 import * as rnodeProtos from "./rnode-protos";
 export * from "./utils/rhoValToJs";
 export * from "./utils/rhoExprToVar";
@@ -22,10 +22,10 @@ export declare const transferRevTerm: (a: {
     to: string;
     amount: number;
 }) => string;
-export declare const getDeployOptions: (sigAlgorithm: "secp256k1", timestamp: number, term: string, privateKey: string, publicKey: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => {
+export declare const getDeployOptions: (sigAlgorithm: SigAlgorithm, timestamp: number, term: string, privateKey: string, publicKey: string, phloPrice?: number, phloLimit?: number, validAfterBlockNumber?: number) => {
     data: DeployData;
     deployer: string;
     signature: string;
-    sigAlgorithm: "secp256k1";
+    sigAlgorithm: SigAlgorithm;
 };
 export declare const publicKeyFromPrivateKey: (privateKey: string) => string;

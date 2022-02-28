@@ -1,5 +1,6 @@
 "use strict";
 exports.__esModule = true;
+exports.rhoValToJs = void 0;
 var rhoUnforgeableToJs = function (expr) {
     var unforgeable = {};
     Object.keys(expr.ExprUnforg.data).forEach(function (u) {
@@ -18,7 +19,7 @@ var rhoUnforgeableToJs = function (expr) {
 var rholangMapToJsObject = function (expr) {
     var obj = {};
     Object.keys(expr.ExprMap.data).forEach(function (k) {
-        obj[k] = exports.rhoValToJs(expr.ExprMap.data[k]);
+        obj[k] = (0, exports.rhoValToJs)(expr.ExprMap.data[k]);
     });
     return obj;
 };
@@ -35,15 +36,15 @@ var rhoExprIntToJs = function (expr) {
     return expr.ExprInt.data;
 };
 var rhoExprListToJs = function (expr) {
-    return expr.ExprList.data.map(function (e) { return exports.rhoValToJs(e); });
+    return expr.ExprList.data.map(function (e) { return (0, exports.rhoValToJs)(e); });
 };
 var rhoExprTupleToJs = function (expr) {
-    return expr.ExprTuple.data.map(function (e) { return exports.rhoValToJs(e); });
+    return expr.ExprTuple.data.map(function (e) { return (0, exports.rhoValToJs)(e); });
 };
 var rhoExprSetToJs = function (expr) {
-    return expr.ExprSet.data.map(function (e) { return exports.rhoValToJs(e); });
+    return expr.ExprSet.data.map(function (e) { return (0, exports.rhoValToJs)(e); });
 };
-exports.rhoValToJs = function (expr) {
+var rhoValToJs = function (expr) {
     /* if (val.ids && val.ids[0]) {
           return rhoIdsToJs(val.ids);
         } else  */
@@ -79,3 +80,4 @@ exports.rhoValToJs = function (expr) {
         return null;
     }
 };
+exports.rhoValToJs = rhoValToJs;

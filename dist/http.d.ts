@@ -15,12 +15,23 @@ export interface DeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const deploy: (urlOrOptions: string | ValidateUrlOptions, options: DeployOptions, timeout?: number) => Promise<string>;
+export declare const deploy: (urlOrOptions: string | ValidateUrlOptions, options: DeployOptions, timeout?: undefined | number) => Promise<string>;
 export interface DeployResponse {
     names: string[];
     blockNumber: number;
 }
-export declare const easyDeploy: (urlOrOptions: string | ValidateUrlOptions, term: string, privateKey: string, phloPrice: number, phloLimit: number, timeout?: number) => Promise<string>;
+export declare const easyDeploy: (urlOrOptions: string | ValidateUrlOptions, term: string, privateKey: string, phloPrice: number | 'auto', phloLimit: number, timeout?: undefined | number) => Promise<string>;
+export interface StatusResponse {
+    address: string;
+    version: {
+        api: string;
+        node: string;
+    };
+    peers: number;
+    nodes: number;
+    minPhloPrice: string;
+}
+export declare const status: (urlOrOptions: string | ValidateUrlOptions) => Promise<string>;
 export declare const validAfterBlockNumber: (urlOrOptions: string | ValidateUrlOptions) => Promise<number>;
 export interface ExploreDeployOptions {
     term: string;

@@ -23,6 +23,6 @@ export const testPrepareDeploy = () => {
       reject(err);
     }
 
-    resolve();
+    resolve(null);
   });
 };

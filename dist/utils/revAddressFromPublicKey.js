@@ -1,12 +1,13 @@
 "use strict";
 exports.__esModule = true;
+exports.revAddressFromPublicKey = void 0;
 var keccak256 = require("keccak256");
 var blakejs_1 = require("blakejs");
 var base58 = require("../base58");
 var ethAddressFromPublicKey_1 = require("./ethAddressFromPublicKey");
 var bytesFromHex_1 = require("./bytesFromHex");
 var toBase58 = function (hexStr) {
-    var bytes = bytesFromHex_1.bytesFromHex(hexStr);
+    var bytes = (0, bytesFromHex_1.bytesFromHex)(hexStr);
     return base58.encode(bytes);
 };
 // Address and public key
@@ -19,16 +20,17 @@ var getAddrFromEth = function (ethAddr) {
         throw new Error("ETH address must contain 130 characters");
     }
     // Hash ETH address
-    var ethAddrBytes = bytesFromHex_1.bytesFromHex(ethAddr);
+    var ethAddrBytes = (0, bytesFromHex_1.bytesFromHex)(ethAddr);
     var ethHash = keccak256(Buffer.from(ethAddrBytes)).toString("hex");
     // Add prefix with hash and calculate checksum (blake2b-256 hash)
-    var payload = "" + prefix.coinId + prefix.version + ethHash;
-    var payloadBytes = bytesFromHex_1.bytesFromHex(payload);
-    var checksum = blakejs_1.blake2bHex(payloadBytes, void 666, 32).slice(0, 8);
+    var payload = "".concat(prefix.coinId).concat(prefix.version).concat(ethHash);
+    var payloadBytes = (0, bytesFromHex_1.bytesFromHex)(payload);
+    var checksum = (0, blakejs_1.blake2bHex)(payloadBytes, void 666, 32).slice(0, 8);
     // Return REV address
-    return toBase58("" + payload + checksum);
+    return toBase58("".concat(payload).concat(checksum));
 };
-exports.revAddressFromPublicKey = function (publicKey) {
-    var ethAddressWithoutPrefix = ethAddressFromPublicKey_1.ethAddressFromPublicKey(publicKey).slice(2);
+var revAddressFromPublicKey = function (publicKey) {
+    var ethAddressWithoutPrefix = (0, ethAddressFromPublicKey_1.ethAddressFromPublicKey)(publicKey).slice(2);
     return getAddrFromEth(ethAddressWithoutPrefix);
 };
+exports.revAddressFromPublicKey = revAddressFromPublicKey;

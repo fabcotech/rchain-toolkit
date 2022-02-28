@@ -35,7 +35,7 @@ const testGetDeployDataToSign = () => {
       reject(err);
     }
     console.log("  ✓ utils.getDeployDataToSign");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -50,7 +50,7 @@ const testGetBlake2Hash = () => {
       return;
     }
     console.log("  ✓ utils.getBlake2Hash");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -72,7 +72,7 @@ const testGetDeployDataSecp256k1 = () => {
       return;
     }
     console.log("  ✓ utils.getDeployDataSecp256k1");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -89,7 +89,7 @@ const testSignSecp256k1 = () => {
       reject(err);
     }
     console.log("  ✓ utils.signSecp256k1");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -106,7 +106,7 @@ const testRevAddressFromPublicKey = () => {
       reject(err);
     }
     console.log("  ✓ utils.revAddressFromPublicKey");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -128,7 +128,7 @@ const testEthAddressFromPublicKey = () => {
       reject(err);
     }
     console.log("  ✓ utils.ethAddressFromPublicKey");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -147,7 +147,7 @@ const testPublicKeyFromPrivateKey = () => {
       reject(err);
     }
     console.log("  ✓ utils.publicKeyFromPrivateKey");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -194,7 +194,7 @@ const testObjectToByteArray = () => {
       reject(err);
     }
     console.log("  ✓ utils.varToRhoExpr");
-    resolve();
+    resolve(null);
   });
 };
 
@@ -211,7 +211,7 @@ export const testUtils = () => {
       await testPublicKeyFromPrivateKey();
       await testObjectToByteArray();
       console.log("\n");
-      resolve();
+      resolve(null);
     } catch (err) {
       reject(err);
     }

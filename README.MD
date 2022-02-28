@@ -27,7 +27,7 @@ npm install -g typescript
 Compile the `.ts` files in `src` directory to the main `dist` directory.
 
 ```
-npm run compile
+npm run build
 ```
 
 **Jest tests**
@@ -47,7 +47,7 @@ The full tests are the tests that interact with the `.proto` files, and rnode. A
 Run the full tests
 
 ```
-npm run compile:tests
+npm run build:tests
 npm run test:full -- --private-key AAA --public-key BBB
 ```
 

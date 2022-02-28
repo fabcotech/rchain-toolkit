@@ -36,7 +36,7 @@ export const testDeploy = () => {
       publicKey,
       deployData.phloPrice,
       deployData.phloLimit,
-      validAfterBlockNumber || 1
+      validAfterBlockNumber || -1
     );
     const response = await deploy("http://localhost:40403", deployOptions);
 
@@ -49,6 +49,6 @@ export const testDeploy = () => {
       return;
     }
 
-    resolve();
+    resolve(null);
   });
 };

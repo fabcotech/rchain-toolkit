@@ -1,6 +1,6 @@
 {
   "name": "rchain-toolkit",
-  "version": "0.4.5",
+  "version": "0.4.6",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",
@@ -25,9 +25,9 @@
     "test:jest": "jest",
     "test:full": "node test.js",
     "build:node": "npx rollup -c rollup.config.cjs.js",
-    "compile": "tsc --module commonjs src/index.ts --outDir dist -d && cp -r src/protobuf dist/ && cp src/rnode-protos* dist/",
-    "compile:tests": "cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/ && tsc tests/index.ts --outDir testsc",
-    "compile:examples": "rm examples/*.js && tsc examples/*"
+    "build": "tsc --module commonjs src/index.ts --outDir dist -d && cp -r src/protobuf dist/ && cp src/rnode-protos* dist/",
+    "build:tests": "cp -r src/protobuf testsc/src/ && cp src/rnode-protos.js testsc/src/ && tsc tests/index.ts --outDir testsc",
+    "build:examples": "rm examples/*.js && tsc examples/*"
   },
   "author": "FABCO",
   "license": "MIT",
@@ -36,7 +36,7 @@
     "@grpc/grpc-js": "^1.3.7",
     "@grpc/proto-loader": "^0.6.5",
     "@types/elliptic": "^6.4.13",
-    "@types/node": "^12.0.8",
+    "@types/node": "17.0.2",
     "rollup": "1.26.0",
     "rollup-plugin-commonjs": "^10.1.0",
     "rollup-plugin-json": "^4.0.0",
@@ -44,15 +44,14 @@
     "rollup-plugin-typescript": "^1.0.1",
     "ts-loader": "^6.0.3",
     "tslib": "^1.10.0",
-    "typescript": "^3.5.2"
+    "typescript": "4.5.5"
   },
   "dependencies": {
     "blakejs": "^1.1.0",
     "buffer": "^6.0.3",
     "elliptic": "6.5.4",
     "google-protobuf": "^3.19.1",
-    "keccak256": "^1.0.3",
-    "protobufjs": "^6.11.2",
-    "typescript": "3.6.4"
+    "keccak256": "^1.0.6",
+    "protobufjs": "^6.11.2"
   }
 }

@@ -1,10 +1,11 @@
 "use strict";
 exports.__esModule = true;
+exports.rhoExprToVar = void 0;
 /*
   converts expr received by decoding buffers
   and decoding Par to javascript variables
 */
-exports.rhoExprToVar = function (a
+var rhoExprToVar = function (a
 //a: rnodeProtos.IExpr
 ) {
     if (a.g_string) {
@@ -23,7 +24,7 @@ exports.rhoExprToVar = function (a
         if (a.e_list_body && a.e_list_body.ps) {
             return a.e_list_body.ps.map(function (ps) {
                 if (ps.exprs && ps.exprs[0]) {
-                    return exports.rhoExprToVar(ps.exprs[0]);
+                    return (0, exports.rhoExprToVar)(ps.exprs[0]);
                 }
                 else {
                     return null;
@@ -38,7 +39,7 @@ exports.rhoExprToVar = function (a
         if (a.e_tuple_body && a.e_tuple_body.ps) {
             return a.e_tuple_body.ps.map(function (ps) {
                 if (ps.exprs && ps.exprs[0]) {
-                    return exports.rhoExprToVar(ps.exprs[0]);
+                    return (0, exports.rhoExprToVar)(ps.exprs[0]);
                 }
                 else {
                     return null;
@@ -53,7 +54,7 @@ exports.rhoExprToVar = function (a
         if (a.e_set_body && a.e_set_body.ps) {
             return a.e_set_body.ps.map(function (ps) {
                 if (ps.exprs && ps.exprs[0]) {
-                    return exports.rhoExprToVar(ps.exprs[0]);
+                    return (0, exports.rhoExprToVar)(ps.exprs[0]);
                 }
                 else {
                     return null;
@@ -70,10 +71,10 @@ exports.rhoExprToVar = function (a
             a.e_map_body.kvs.forEach(function (kv) {
                 if (kv.key && kv.key.exprs && kv.key.exprs[0]) {
                     if (kv.value && kv.value.exprs && kv.value.exprs[0]) {
-                        obj_1[exports.rhoExprToVar(kv.key.exprs[0])] = exports.rhoExprToVar(kv.value.exprs[0]);
+                        obj_1[(0, exports.rhoExprToVar)(kv.key.exprs[0])] = (0, exports.rhoExprToVar)(kv.value.exprs[0]);
                     }
                     else {
-                        obj_1[exports.rhoExprToVar(kv.key.exprs[0])] = null;
+                        obj_1[(0, exports.rhoExprToVar)(kv.key.exprs[0])] = null;
                     }
                 }
             });
@@ -88,3 +89,4 @@ exports.rhoExprToVar = function (a
         return null;
     }
 };
+exports.rhoExprToVar = rhoExprToVar;

@@ -1,8 +1,8 @@
 import { DeployData, LightBlockInfo } from "./models";
 import { getDeployOptions, publicKeyFromPrivateKey } from "./utils";
+import * as https from 'https';
+import * as http from 'http';
 
-const http = require("http");
-const https = require("https");
 
 interface UrlValidated {
   options: {
@@ -108,8 +108,8 @@ export const deploy = async (
         res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
-            if (!data.toString('utf8').startsWith('"Success!')) {
-              throw new Error(data.toString('utf8'))
+            if (!data.toString().startsWith('"Success!')) {
+              throw new Error(data.toString())
             }
             if (typeof timeout === "number") {
               let s = new Date().getTime();
@@ -167,8 +167,8 @@ export const easyDeploy = async (
   urlOrOptions: string | ValidateUrlOptions,
   term: string,
   privateKey: string,
-  phloPrice: number,
-  phloLimit: number,
+  phloPrice: number | 'auto',
+  phloLimit: number ,
   timeout: undefined | number = undefined
 ): Promise<string> => {
   let urlValidated: undefined | UrlValidated;
@@ -179,6 +179,13 @@ export const easyDeploy = async (
   }
   const uv: UrlValidated = urlValidated;
 
+  let phloPriceOk = 1;
+  if (phloPrice === 'auto') {
+    phloPriceOk = JSON.parse(await status(urlOrOptions)).minPhloPrice as number;
+  } else {
+    phloPriceOk = phloPrice;
+  }
+
   const publicKey = publicKeyFromPrivateKey(privateKey);
   const vab = await validAfterBlockNumber(urlOrOptions);
   const d = new Date().valueOf();
@@ -188,10 +195,11 @@ export const easyDeploy = async (
     term,
     privateKey,
     publicKey,
-    phloPrice,
+    phloPriceOk,
     phloLimit,
     vab
   );
+
 
   let pd: undefined | string = undefined;
   if (typeof timeout === "number") {
@@ -224,8 +232,8 @@ export const easyDeploy = async (
         res.on("data", (chunk) => {
           data += chunk;
           res.on("end", () => {
-            if (!data.toString('utf8').startsWith('"Success!')) {
-              throw new Error(data.toString('utf8'))
+            if (!data.toString().startsWith('"Success!')) {
+              throw new Error(data.toString())
             }
             if (typeof timeout === "number") {
               let s = new Date().getTime();
@@ -271,6 +279,65 @@ export const easyDeploy = async (
   });
 };
 
+// ==============
+// Status
+// ==============
+
+export interface StatusResponse {
+  address: string;
+  version: {
+    api: string;
+    node: string;
+  };
+  peers: number;
+  nodes: number;
+  minPhloPrice: string;
+}
+export const status = (
+  urlOrOptions: string | ValidateUrlOptions
+): Promise<string> => {
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
+
+  return new Promise((resolve, reject) => {
+    const req = uv.lib.request(
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "GET",
+        path: "/api/status",
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.cert } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { rejectUnauthorized: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { ca: uv.options.ca } : {}),
+      },
+
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk;
+          res.on("end", () => {
+            resolve(data);
+          });
+        });
+      }
+    );
+
+    req.end();
+    req.on("error", (e) => {
+      reject(e);
+    });
+  });
+};
 // ==============
 // Valid after block number
 // ==============

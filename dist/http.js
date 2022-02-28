@@ -47,9 +47,10 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+exports.dataAtName = exports.prepareDeploy = exports.blocks = exports.exploreDeploy = exports.validAfterBlockNumber = exports.status = exports.easyDeploy = exports.deploy = void 0;
 var utils_1 = require("./utils");
-var http = require("http");
 var https = require("https");
+var http = require("http");
 var validateUrl = function (options) {
     if (options.url.startsWith("http://")) {
         return {
@@ -78,7 +79,7 @@ var validateUrl = function (options) {
         throw new Error("URL most be http://ip_or_domain:port or https://ip_or_domain:port");
     }
 };
-exports.deploy = function (urlOrOptions, options, timeout) {
+var deploy = function (urlOrOptions, options, timeout) {
     if (timeout === void 0) { timeout = undefined; }
     return __awaiter(void 0, void 0, void 0, function () {
         var urlValidated, uv, pd;
@@ -94,7 +95,7 @@ exports.deploy = function (urlOrOptions, options, timeout) {
                     uv = urlValidated;
                     pd = undefined;
                     if (!(typeof timeout === "number")) return [3 /*break*/, 2];
-                    return [4 /*yield*/, exports.prepareDeploy(urlOrOptions, {
+                    return [4 /*yield*/, (0, exports.prepareDeploy)(urlOrOptions, {
                             deployer: options.deployer,
                             timestamp: options.data.timestamp,
                             nameQty: 1
@@ -112,8 +113,8 @@ exports.deploy = function (urlOrOptions, options, timeout) {
                             res.on("data", function (chunk) {
                                 data += chunk;
                                 res.on("end", function () {
-                                    if (!data.toString('utf8').startsWith('"Success!')) {
-                                        throw new Error(data.toString('utf8'));
+                                    if (!data.toString().startsWith('"Success!')) {
+                                        throw new Error(data.toString());
                                     }
                                     if (typeof timeout === "number") {
                                         var s_1 = new Date().getTime();
@@ -131,7 +132,7 @@ exports.deploy = function (urlOrOptions, options, timeout) {
                                                             clearInterval(interval_1);
                                                             throw new Error("TIMEOUT");
                                                         }
-                                                        return [4 /*yield*/, exports.dataAtName(urlOrOptions, {
+                                                        return [4 /*yield*/, (0, exports.dataAtName)(urlOrOptions, {
                                                                 name: {
                                                                     UnforgPrivate: { data: JSON.parse(pd).names[0] }
                                                                 },
@@ -168,12 +169,13 @@ exports.deploy = function (urlOrOptions, options, timeout) {
         });
     });
 };
-exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLimit, timeout) {
+exports.deploy = deploy;
+var easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLimit, timeout) {
     if (timeout === void 0) { timeout = undefined; }
     return __awaiter(void 0, void 0, void 0, function () {
-        var urlValidated, uv, publicKey, vab, d, options, pd;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
+        var urlValidated, uv, phloPriceOk, _a, _b, publicKey, vab, d, options, pd;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
                 case 0:
                     if (typeof urlOrOptions === "string") {
                         urlValidated = validateUrl({ url: urlOrOptions });
@@ -182,23 +184,34 @@ exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLi
                         urlValidated = validateUrl(urlOrOptions);
                     }
                     uv = urlValidated;
-                    publicKey = utils_1.publicKeyFromPrivateKey(privateKey);
-                    return [4 /*yield*/, exports.validAfterBlockNumber(urlOrOptions)];
+                    phloPriceOk = 1;
+                    if (!(phloPrice === 'auto')) return [3 /*break*/, 2];
+                    _b = (_a = JSON).parse;
+                    return [4 /*yield*/, (0, exports.status)(urlOrOptions)];
                 case 1:
-                    vab = _a.sent();
+                    phloPriceOk = _b.apply(_a, [_c.sent()]).minPhloPrice;
+                    return [3 /*break*/, 3];
+                case 2:
+                    phloPriceOk = phloPrice;
+                    _c.label = 3;
+                case 3:
+                    publicKey = (0, utils_1.publicKeyFromPrivateKey)(privateKey);
+                    return [4 /*yield*/, (0, exports.validAfterBlockNumber)(urlOrOptions)];
+                case 4:
+                    vab = _c.sent();
                     d = new Date().valueOf();
-                    options = utils_1.getDeployOptions("secp256k1", d, term, privateKey, publicKey, phloPrice, phloLimit, vab);
+                    options = (0, utils_1.getDeployOptions)("secp256k1", d, term, privateKey, publicKey, phloPriceOk, phloLimit, vab);
                     pd = undefined;
-                    if (!(typeof timeout === "number")) return [3 /*break*/, 3];
-                    return [4 /*yield*/, exports.prepareDeploy(urlOrOptions, {
+                    if (!(typeof timeout === "number")) return [3 /*break*/, 6];
+                    return [4 /*yield*/, (0, exports.prepareDeploy)(urlOrOptions, {
                             deployer: publicKey,
                             timestamp: d,
                             nameQty: 1
                         })];
-                case 2:
-                    pd = _a.sent();
-                    _a.label = 3;
-                case 3: return [2 /*return*/, new Promise(function (resolve, reject) {
+                case 5:
+                    pd = _c.sent();
+                    _c.label = 6;
+                case 6: return [2 /*return*/, new Promise(function (resolve, reject) {
                         var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
                                 "Content-Type": "application/json"
                             }, method: "POST", path: "/api/deploy", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.port } : {})), (uv.options.rejectUnauthorized
@@ -208,8 +221,8 @@ exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLi
                             res.on("data", function (chunk) {
                                 data += chunk;
                                 res.on("end", function () {
-                                    if (!data.toString('utf8').startsWith('"Success!')) {
-                                        throw new Error(data.toString('utf8'));
+                                    if (!data.toString().startsWith('"Success!')) {
+                                        throw new Error(data.toString());
                                     }
                                     if (typeof timeout === "number") {
                                         var s_2 = new Date().getTime();
@@ -227,7 +240,7 @@ exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLi
                                                             clearInterval(interval_2);
                                                             throw new Error("TIMEOUT");
                                                         }
-                                                        return [4 /*yield*/, exports.dataAtName(urlOrOptions, {
+                                                        return [4 /*yield*/, (0, exports.dataAtName)(urlOrOptions, {
                                                                 name: {
                                                                     UnforgPrivate: { data: JSON.parse(pd).names[0] }
                                                                 },
@@ -264,16 +277,47 @@ exports.easyDeploy = function (urlOrOptions, term, privateKey, phloPrice, phloLi
         });
     });
 };
+exports.easyDeploy = easyDeploy;
+var status = function (urlOrOptions) {
+    var urlValidated;
+    if (typeof urlOrOptions === "string") {
+        urlValidated = validateUrl({ url: urlOrOptions });
+    }
+    else {
+        urlValidated = validateUrl(urlOrOptions);
+    }
+    var uv = urlValidated;
+    return new Promise(function (resolve, reject) {
+        var req = uv.lib.request(__assign(__assign(__assign(__assign({ headers: {
+                "Content-Type": "application/json"
+            }, method: "GET", path: "/api/status", host: uv.options.host }, (uv.options.port ? { port: uv.options.port } : {})), (uv.options.cert ? { cert: uv.options.cert } : {})), (uv.options.rejectUnauthorized
+            ? { rejectUnauthorized: uv.options.rejectUnauthorized }
+            : {})), (uv.options.ca ? { ca: uv.options.ca } : {})), function (res) {
+            var data = "";
+            res.on("data", function (chunk) {
+                data += chunk;
+                res.on("end", function () {
+                    resolve(data);
+                });
+            });
+        });
+        req.end();
+        req.on("error", function (e) {
+            reject(e);
+        });
+    });
+};
+exports.status = status;
 // ==============
 // Valid after block number
 // ==============
-exports.validAfterBlockNumber = function (urlOrOptions) { return __awaiter(void 0, void 0, void 0, function () {
+var validAfterBlockNumber = function (urlOrOptions) { return __awaiter(void 0, void 0, void 0, function () {
     var validAfterBlockNumberResponse, _a, _b;
     return __generator(this, function (_c) {
         switch (_c.label) {
             case 0:
                 _b = (_a = JSON).parse;
-                return [4 /*yield*/, exports.blocks(urlOrOptions, {
+                return [4 /*yield*/, (0, exports.blocks)(urlOrOptions, {
                         position: 1
                     })];
             case 1:
@@ -282,7 +326,8 @@ exports.validAfterBlockNumber = function (urlOrOptions) { return __awaiter(void 
         }
     });
 }); };
-exports.exploreDeploy = function (urlOrOptions, options) {
+exports.validAfterBlockNumber = validAfterBlockNumber;
+var exploreDeploy = function (urlOrOptions, options) {
     var urlValidated;
     if (typeof urlOrOptions === "string") {
         urlValidated = validateUrl({ url: urlOrOptions });
@@ -312,7 +357,8 @@ exports.exploreDeploy = function (urlOrOptions, options) {
         });
     });
 };
-exports.blocks = function (urlOrOptions, options) {
+exports.exploreDeploy = exploreDeploy;
+var blocks = function (urlOrOptions, options) {
     return new Promise(function (resolve, reject) {
         var urlValidated;
         if (typeof urlOrOptions === "string") {
@@ -341,7 +387,8 @@ exports.blocks = function (urlOrOptions, options) {
         });
     });
 };
-exports.prepareDeploy = function (urlOrOptions, options) {
+exports.blocks = blocks;
+var prepareDeploy = function (urlOrOptions, options) {
     var urlValidated;
     if (typeof urlOrOptions === "string") {
         urlValidated = validateUrl({ url: urlOrOptions });
@@ -371,7 +418,8 @@ exports.prepareDeploy = function (urlOrOptions, options) {
         });
     });
 };
-exports.dataAtName = function (urlOrOptions, options) {
+exports.prepareDeploy = prepareDeploy;
+var dataAtName = function (urlOrOptions, options) {
     var urlValidated;
     if (typeof urlOrOptions === "string") {
         urlValidated = validateUrl({ url: urlOrOptions });
@@ -401,3 +449,4 @@ exports.dataAtName = function (urlOrOptions, options) {
         });
     });
 };
+exports.dataAtName = dataAtName;

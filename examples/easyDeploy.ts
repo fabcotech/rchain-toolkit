@@ -10,7 +10,7 @@ const main = async () => {
         stdout!(*hello)
       }`,
       "28a5c9ac133b4449ca38e9bdf7cacdce31079ef6b3ac2f0a080af83ecff98b36",
-      1,
+      "auto",
       100000,
       30000
     );

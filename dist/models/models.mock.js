@@ -11,6 +11,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 exports.__esModule = true;
+exports.privateName = exports.deployDataSecp256k1 = exports.hash = exports.deployDataToSign = exports.deployData = exports.publicKey = exports.privateKey = void 0;
 exports.privateKey = "81f1f1b3eaa563dcaf928ee5d9aefd80fdd7300d777d3538eb10b9b10089dc65";
 exports.publicKey = "043262dd06cca940aaf306084d99eae00db225091340fc9343aa4652cf38a051a673aa3d3499dd11cf67448a5a791cc8a12fda3378e5cd9c73880065aa1aedbcf8";
 // Payment

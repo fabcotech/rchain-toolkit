@@ -1,7 +1,8 @@
 "use strict";
 exports.__esModule = true;
+exports.getDeployDataToSign = void 0;
 var jspb = require("google-protobuf");
-exports.getDeployDataToSign = function (payment) {
+var getDeployDataToSign = function (payment) {
     // Create binary stream writer
     var writer = new jspb.BinaryWriter();
     // Write fields (protobuf doesn't serialize default values)
@@ -15,3 +16,4 @@ exports.getDeployDataToSign = function (payment) {
     writeInt64(10, payment.validAfterBlockNumber);
     return Buffer.from(writer.getResultBuffer());
 };
+exports.getDeployDataToSign = getDeployDataToSign;
