@@ -1,4 +1,4 @@
-import * as keccak256 from "keccak256";
+import keccak256 from "keccak256";
 import { blake2bHex } from "blakejs";
 
 import * as base58 from "../base58";

@@ -1,5 +1,4 @@
-import * as keccak256 from "keccak256";
-import { blake2bHex } from "blakejs";
+import keccak256 from "keccak256";
 
 import { bytesFromHex } from './bytesFromHex'
 

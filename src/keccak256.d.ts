@@ -1,1 +1,1 @@
-declare module "keccak256";
+declare var window: any; 
