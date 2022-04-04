@@ -1,5 +1,5 @@
 {
-  "name": "rchain-toolkit",
+  "name": "@fabcotech/rchain-toolkit",
   "version": "0.4.6",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
@@ -12,15 +12,9 @@
     "grpc"
   ],
   "main": "dist/index.js",
-  "targets": {
-    "browser": {
-      "engines": {
-        "browsers": [
-          "last 1 chrome version"
-        ]
-      }
-    }
-  },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "test:jest": "jest",
     "test:full": "node test.js",
