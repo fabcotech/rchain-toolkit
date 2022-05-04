@@ -6,17 +6,18 @@ const main = async () => {
   );
 
   const deployOptions = rchainToolkit.utils.getDeployOptions(
-    "secp256k1",
-    new Date().valueOf(),
-    `new hello, stdout(\`rho:io:stdout\`) in {
-      hello!("world") |
-      stdout!(*hello)
-    }`,
-    "28a5c9ac133b4449ca38e9bdf7cacdce31079ef6b3ac2f0a080af83ecff98b36",
-    "04be064356846e36e485408df50b877dd99ba406d87208add4c92b3c7d4e4c663c2fbc6a1e6534c7e5c0aec00b26486fad1daf20079423b7c8ebffbbdff3682b58",
-    1,
-    100000,
-    validAfterBlockNumber
+    {
+      timestamp: new Date().valueOf(),
+      term: `new hello, stdout(\`rho:io:stdout\`) in {
+        hello!("world") |
+        stdout!(*hello)
+      }`,
+      shardId: 'root2',
+      privateKey: "28a5c9ac133b4449ca38e9bdf7cacdce31079ef6b3ac2f0a080af83ecff98b36",
+      phloPrice: 1,
+      phloLimit: 100000,
+      validAfterBlockNumber:  validAfterBlockNumber
+    }
   );
 
   let result;

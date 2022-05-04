@@ -189,15 +189,16 @@ for (@(_, RevVault) <- RevVaultCh) {
 }`;
 };
 
-export const getDeployOptions = (
-  sigAlgorithm: SigAlgorithm,
+export const getDeployOptions = (payload: {
+  sigAlgorithm?: SigAlgorithm | undefined,
   timestamp: number,
   term: string,
+  shardId?: string | undefined,
   privateKey: string,
-  publicKey: string,
-  phloPrice = 1,
-  phloLimit = 10000,
-  validAfterBlockNumber = -1
+  phloPrice: number,
+  phloLimit: number,
+  validAfterBlockNumber: number
+}
 ): {
   data: DeployData;
   deployer: string;
@@ -205,25 +206,30 @@ export const getDeployOptions = (
   sigAlgorithm: SigAlgorithm;
 } => {
   const deployData = getDeployData(
-    timestamp,
-    term,
-    phloPrice,
-    phloLimit,
-    validAfterBlockNumber || -1
+    {
+      timestamp: payload.timestamp,
+      shardId: payload.shardId || "",
+      term: payload.term,
+      phloPrice: typeof payload.phloPrice === 'number' ? payload.phloPrice : 1,
+      phloLimit: typeof payload.phloLimit === 'number' ? payload.phloLimit : 10000,
+      validAfterBlockNumber: typeof payload.validAfterBlockNumber === 'number' ? payload.validAfterBlockNumber : -1
+    }
   );
+
+  const publicKey = publicKeyFromPrivateKey(payload.privateKey);
 
   const toSign = getDeployDataToSign(deployData);
 
   const hash = getBlake2Hash(toSign);
 
   let signature: Uint8Array;
-  signature = signSecp256k1(hash, privateKey);
+  signature = signSecp256k1(hash, payload.privateKey);
 
   return {
     data: deployData,
     deployer: publicKey,
     signature: Buffer.from(new Uint8Array(signature)).toString("hex"),
-    sigAlgorithm: sigAlgorithm,
+    sigAlgorithm: payload.sigAlgorithm || "secp256k1",
   };
 };
 

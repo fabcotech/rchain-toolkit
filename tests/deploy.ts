@@ -29,14 +29,15 @@ export const testDeploy = () => {
     )[0].blockNumber;
 
     const deployOptions = getDeployOptions(
-      "secp256k1",
-      new Date().valueOf(),
-      deployData.term,
-      privateKey,
-      publicKey,
-      deployData.phloPrice,
-      deployData.phloLimit,
-      validAfterBlockNumber || -1
+      {
+        timestamp: new Date().valueOf(),
+        term: deployData.term,
+        privateKey,
+        shardId: 'dev',
+        phloPrice: deployData.phloPrice,
+        phloLimit: deployData.phloLimit,
+        validAfterBlockNumber: validAfterBlockNumber || -1
+      }
     );
     const response = await deploy("http://localhost:40403", deployOptions);
 

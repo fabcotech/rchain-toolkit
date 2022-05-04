@@ -1,8 +1,8 @@
 ### rchain-toolkit
 
-**Up to date with rnode 0.12.0**
+**Up to date with rnode 0.13 alpha3**
 
-rchain-toolkit is a general purpose javascript/typescript library to interact with the RChain blockchain, and play with rholang expressions in node JS or the browser. **It is not ready for production, not stable and the development is not completed yet.**
+rchain-toolkit is a general purpose avascript/typescript library to interact with the RChain blockchain, and play with rholang expressions in node JS or the browser. **It is not ready for production, not stable and the development is not completed yet.**
 
 It includes utils for easily deploying rholang code (smart contract), sending REV transactions, retreiving blocks, listen for data at unforgeable names, public names etc... All of the methods, parameters, and returned values are typed using typescript so the developer can comfortably code.
 
@@ -42,13 +42,14 @@ npm run test:jest
 
 **Full tests**
 
-The full tests are the tests that interact with the `.proto` files, and rnode. A local rnode instance must be running on `localhost:40401`.
+The full tests are the tests that interact with the `.proto` files, and rnode. A local rnode instance must be running on `localhost:40401` with `--shard-name dev` and automatic proposal (every 5 seconds for example).
 
 Run the full tests
 
 ```
 npm run build:tests
 npm run test:full -- --private-key AAA --public-key BBB
+npm run test:full -- --private-key 28a5c9ac133b4449ca38e9bdf7cacdce31079ef6b3ac2f0a080af83ecff98b36 --public-key 04be064356846e36e485408df50b877dd99ba406d87208add4c92b3c7d4e4c663c2fbc6a1e6534c7e5c0aec00b26486fad1daf20079423b7c8ebffbbdff3682b58
 ```
 
 **Generate javascript and typescript protos**

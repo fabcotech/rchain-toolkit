@@ -14,12 +14,16 @@ export const testEasyDeploy = () => {
 
   return new Promise(async (resolve, reject) => {
 
-    const response = await easyDeploy("http://localhost:40403",
-      deployData.term,
-      privateKey,
-      'auto',
-      deployData.phloLimit,
-      30000
+    const response = await easyDeploy(
+      "http://localhost:40403",
+      {
+        term: deployData.term,
+        privateKey: privateKey,
+        phloPrice: 'auto',
+        shardId: 'dev',
+        phloLimit: deployData.phloLimit,
+        timeout: 30000,
+      }
     );
 
     try {

@@ -56,14 +56,15 @@ export const testDataAtName = () => {
 
     try {
       const deployOptions = getDeployOptions(
-        "secp256k1",
-        timestamp,
-        'new hello, stdout(`rho:io:stdout`) in { hello!("world") | stdout!(*hello) }',
-        privateKey,
-        publicKey,
-        1,
-        1000000,
-        validAfterBlockNumber || -1
+        {
+          timestamp: timestamp,
+          term: 'new hello, stdout(`rho:io:stdout`) in { hello!("world") | stdout!(*hello) }',
+          privateKey: privateKey,
+          phloPrice: 1,
+          shardId: 'dev',
+          phloLimit: 1000000,
+          validAfterBlockNumber: validAfterBlockNumber || -1
+        }
       );
 
       const deployDataResponse = await deploy(

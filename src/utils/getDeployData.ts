@@ -1,17 +1,19 @@
 import { DeployData } from "../models";
 
-export const getDeployData = (
+export const getDeployData = (payload: {
   timestamp: number,
   term: string,
-  phloPrice = 1,
-  phloLimit = 10000000,
-  validAfterBlockNumber = 0
-): DeployData => {
+  shardId: string,
+  phloPrice: number,
+  phloLimit: number,
+  validAfterBlockNumber: number
+}): DeployData => {
   return {
-    timestamp: timestamp,
-    term: term,
-    phloLimit: phloLimit,
-    phloPrice: phloPrice,
-    validAfterBlockNumber: validAfterBlockNumber,
+    shardId: payload.shardId,
+    timestamp: payload.timestamp,
+    term: payload.term,
+    phloLimit: typeof payload.phloLimit === 'number' ? payload.phloLimit : 10000000,
+    phloPrice: typeof payload.phloPrice === 'number' ? payload.phloPrice : 1,
+    validAfterBlockNumber: typeof payload.validAfterBlockNumber === 'number' ? payload.validAfterBlockNumber : 0,
   };
 };

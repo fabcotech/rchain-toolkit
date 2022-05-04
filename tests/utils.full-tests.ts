@@ -57,11 +57,14 @@ const testGetBlake2Hash = () => {
 const testGetDeployDataSecp256k1 = () => {
   return new Promise(async (resolve, reject) => {
     const dd = await getDeployData(
-      deployData.timestamp,
-      deployData.term,
-      deployData.phloPrice,
-      deployData.phloLimit,
-      deployData.validAfterBlockNumber
+      {
+        timestamp: deployData.timestamp,
+        term: deployData.term,
+        shardId: 'dev',
+        phloPrice: deployData.phloPrice,
+        phloLimit: deployData.phloLimit,
+        validAfterBlockNumber: deployData.validAfterBlockNumber
+      }
     );
 
     try {

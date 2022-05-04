@@ -1,7 +1,7 @@
 import { DeployData } from "../models";
 import * as jspb from 'google-protobuf'
 
-export const getDeployDataToSign = (payment: DeployData): Uint8Array => {
+export const getDeployDataToSign = (dd: DeployData): Uint8Array => {
 
   // Create binary stream writer
   const writer = new jspb.BinaryWriter()
@@ -10,11 +10,12 @@ export const getDeployDataToSign = (payment: DeployData): Uint8Array => {
   const writeInt64  = (order: number, val: number) => val != 0  && writer.writeInt64(order, val)
 
   // Serialize fields
-  writeString(2, payment.term)
-  writeInt64(3, payment.timestamp)
-  writeInt64(7, payment.phloPrice)
-  writeInt64(8, payment.phloLimit)
-  writeInt64(10, payment.validAfterBlockNumber)
+  writeString(2, dd.term)
+  writeInt64(3, dd.timestamp)
+  writeInt64(7, dd.phloPrice)
+  writeInt64(8, dd.phloLimit)
+  writeInt64(10, dd.validAfterBlockNumber)
+  writeString(11, dd.shardId)
 
   return Buffer.from(writer.getResultBuffer());
 };

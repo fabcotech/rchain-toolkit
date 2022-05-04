@@ -165,11 +165,14 @@ export interface DeployResponse {
 }
 export const easyDeploy = async (
   urlOrOptions: string | ValidateUrlOptions,
-  term: string,
-  privateKey: string,
-  phloPrice: number | 'auto',
-  phloLimit: number ,
-  timeout: undefined | number = undefined
+  payload: {
+    term: string,
+    shardId?: string | undefined,
+    privateKey: string,
+    phloPrice: number | 'auto',
+    phloLimit: number,
+    timeout: undefined | number
+  }
 ): Promise<string> => {
   let urlValidated: undefined | UrlValidated;
   if (typeof urlOrOptions === "string") {
@@ -180,27 +183,28 @@ export const easyDeploy = async (
   const uv: UrlValidated = urlValidated;
 
   let phloPriceOk = 1;
-  if (phloPrice === 'auto') {
+  if (payload.phloPrice === 'auto') {
     phloPriceOk = JSON.parse(await status(urlOrOptions)).minPhloPrice as number;
   } else {
-    phloPriceOk = phloPrice;
+    phloPriceOk = payload.phloPrice;
   }
 
-  const publicKey = publicKeyFromPrivateKey(privateKey);
+  const publicKey = publicKeyFromPrivateKey(payload.privateKey);
   const vab = await validAfterBlockNumber(urlOrOptions);
   const d = new Date().valueOf();
   const options = getDeployOptions(
-    "secp256k1",
-    d,
-    term,
-    privateKey,
-    publicKey,
-    phloPriceOk,
-    phloLimit,
-    vab
+    {
+      timestamp: d,
+      term: payload.term,
+      shardId: payload.shardId,
+      privateKey: payload.privateKey,
+      phloPrice: phloPriceOk,
+      phloLimit: payload.phloLimit,
+      validAfterBlockNumber: vab
+    }
   );
 
-
+  let timeout = payload.timeout || undefined;
   let pd: undefined | string = undefined;
   if (typeof timeout === "number") {
     pd = await prepareDeploy(urlOrOptions, {
@@ -243,7 +247,7 @@ export const easyDeploy = async (
                   return;
                 }
                 ongoning = true;
-                if (new Date().getTime() - timeout > s) {
+                if (new Date().getTime() - (timeout as number) > s) {
                   clearInterval(interval);
                   throw new Error("TIMEOUT");
                 }
@@ -567,6 +571,62 @@ export const dataAtName = (
         },
         method: "POST",
         path: "/api/data-at-name",
+        host: uv.options.host,
+        ...(uv.options.port ? { port: uv.options.port } : {}),
+        ...(uv.options.cert ? { cert: uv.options.cert } : {}),
+        ...(uv.options.rejectUnauthorized
+          ? { rejectUnauthorized: uv.options.rejectUnauthorized }
+          : {}),
+        ...(uv.options.ca ? { ca: uv.options.ca } : {}),
+      },
+
+      (res) => {
+        let data = "";
+        res.on("data", (chunk) => {
+          data += chunk;
+          res.on("end", () => {
+            resolve(data);
+          });
+        });
+      }
+    );
+    req.write(JSON.stringify(options));
+    req.end();
+    req.on("error", (e) => {
+      reject(e);
+    });
+  });
+};
+
+export interface DataAtNameByBlockHashOptions {
+  name: {
+    [nameType: string]: {
+      data: string;
+    };
+  };
+  blockHash: string;
+  usePreStateHash: Boolean;
+}
+export const dataAtNameByBlockHash = (
+  urlOrOptions: string | ValidateUrlOptions,
+  options: DataAtNameByBlockHashOptions
+): Promise<string> => {
+  let urlValidated: undefined | UrlValidated;
+  if (typeof urlOrOptions === "string") {
+    urlValidated = validateUrl({ url: urlOrOptions });
+  } else {
+    urlValidated = validateUrl(urlOrOptions);
+  }
+  const uv: UrlValidated = urlValidated;
+
+  return new Promise((resolve, reject) => {
+    const req = uv.lib.request(
+      {
+        headers: {
+          "Content-Type": "application/json",
+        },
+        method: "POST",
+        path: "/api/data-at-name-by-block-hash",
         host: uv.options.host,
         ...(uv.options.port ? { port: uv.options.port } : {}),
         ...(uv.options.cert ? { cert: uv.options.cert } : {}),
