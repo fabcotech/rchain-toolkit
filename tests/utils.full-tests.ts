@@ -90,6 +90,7 @@ const testSignSecp256k1 = () => {
     } catch (err) {
       console.log("  X utils.signSecp256k1");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.signSecp256k1");
     resolve(null);
