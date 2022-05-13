@@ -1,4 +1,4 @@
-import * as rchainToolkit from "rchain-toolkit";
+import * as rchainToolkit from "@fabcotech/rchain-toolkit";
 
 const main = async () => {
   const validAfterBlockNumber = await rchainToolkit.http.validAfterBlockNumber(

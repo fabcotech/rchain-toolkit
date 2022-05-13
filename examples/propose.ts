@@ -1,6 +1,6 @@
 import * as grpc from "@grpc/grpc-js";
 import * as protoLoader from "@grpc/proto-loader";
-import * as rchainToolkit from "rchain-toolkit";
+import * as rchainToolkit from "@fabcotech/rchain-toolkit";
 
 const main = async () => {
   // The propose neeeds another grpc service
