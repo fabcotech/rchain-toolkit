@@ -1,4 +1,4 @@
-import * as keccak256 from "keccak256";
+import { keccak256 } from "@ethersproject/keccak256";
 
 import { bytesFromHex } from './bytesFromHex'
 
@@ -8,6 +8,5 @@ export const ethAddressFromPublicKey = (publicKey: string) => {
   }
 
   const pubKeyBytes = bytesFromHex(publicKey);
-  const pkHash = keccak256(Buffer.from(pubKeyBytes.slice(1))).toString("hex");
-  return `0x${pkHash.slice(-40).toLowerCase()}`
+  return `0x${keccak256(pubKeyBytes.slice(1)).slice(-40)}`
 };

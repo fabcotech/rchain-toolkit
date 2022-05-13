@@ -21,6 +21,7 @@ export const testPrepareDeploy = () => {
     } catch (err) {
       console.log("  X http.prepareDeploy");
       reject(err);
+      return;
     }
 
     resolve(null);

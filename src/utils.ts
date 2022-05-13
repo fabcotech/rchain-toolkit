@@ -153,6 +153,7 @@ export const transferRevTerm = (a: {
   }
 
   return `new
+  deployId(\`rho:rchain:deployId\`),
   rl(\`rho:registry:lookup\`),
   RevVaultCh,
   stdout(\`rho:io:stdout\`)

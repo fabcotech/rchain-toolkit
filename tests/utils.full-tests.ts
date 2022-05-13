@@ -33,6 +33,7 @@ const testGetDeployDataToSign = () => {
     } catch (err) {
       console.log("  X utils.getDeployDataToSign");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.getDeployDataToSign");
     resolve(null);
@@ -108,6 +109,7 @@ const testRevAddressFromPublicKey = () => {
     } catch (err) {
       console.log("  X utils.revAddressFromPublicKey");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.revAddressFromPublicKey");
     resolve(null);
@@ -130,6 +132,7 @@ const testEthAddressFromPublicKey = () => {
     } catch (err) {
       console.log("  X utils.ethAddressFromPublicKey");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.ethAddressFromPublicKey");
     resolve(null);
@@ -149,6 +152,7 @@ const testPublicKeyFromPrivateKey = () => {
     } catch (err) {
       console.log("  X utils.publicKeyFromPrivateKey");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.publicKeyFromPrivateKey");
     resolve(null);
@@ -196,6 +200,7 @@ const testObjectToByteArray = () => {
     } catch (err) {
       console.log("  X utils.varToRhoExpr");
       reject(err);
+      return;
     }
     console.log("  ✓ utils.varToRhoExpr");
     resolve(null);

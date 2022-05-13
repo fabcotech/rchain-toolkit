@@ -77,15 +77,11 @@ export const deploy = async (
   }
   const uv: UrlValidated = urlValidated;
 
-  let pd: undefined | string = undefined;
-  if (typeof timeout === "number") {
-    pd = await prepareDeploy(urlOrOptions, {
-      deployer: options.deployer,
-      timestamp: options.data.timestamp,
-      nameQty: 1,
-    });
+  if (typeof timeout === 'number') {
+    if ((options.data.term || '').indexOf("(`rho:rchain:deployId`)")=== -1) {
+      console.warn('timeout is set and term does not include (`rho:rchain:deployId`), data-at-name may not work')
+    }
   }
-
   return new Promise((resolve, reject) => {
     const req = uv.lib.request(
       {
@@ -111,6 +107,7 @@ export const deploy = async (
             if (!data.toString().startsWith('"Success!')) {
               throw new Error(data.toString())
             }
+            const unforgeableId = data.toString().slice(data.toString().indexOf(': ') + 2).replace('"', '');
             if (typeof timeout === "number") {
               let s = new Date().getTime();
               let ongoning = false;
@@ -125,7 +122,7 @@ export const deploy = async (
                 }
                 const dan = await dataAtName(urlOrOptions, {
                   name: {
-                    UnforgPrivate: { data: JSON.parse(pd as string).names[0] },
+                    UnforgDeploy: { data: unforgeableId },
                   },
                   depth: 3,
                 });
@@ -205,15 +202,12 @@ export const easyDeploy = async (
   );
 
   let timeout = payload.timeout || undefined;
-  let pd: undefined | string = undefined;
-  if (typeof timeout === "number") {
-    pd = await prepareDeploy(urlOrOptions, {
-      deployer: publicKey,
-      timestamp: d,
-      nameQty: 1,
-    });
-  }
 
+  if (typeof timeout === 'number') {
+    if ((payload.term || '').indexOf("(`rho:rchain:deployId`)")=== -1) {
+      console.warn('timeout is set and term does not include (`rho:rchain:deployId`), data-at-name may not work')
+    }
+  }
   return new Promise((resolve, reject) => {
     const req = uv.lib.request(
       {
@@ -239,6 +233,7 @@ export const easyDeploy = async (
             if (!data.toString().startsWith('"Success!')) {
               throw new Error(data.toString())
             }
+            const unforgeableId = data.toString().slice(data.toString().indexOf(': ') + 2).replace('"', '');
             if (typeof timeout === "number") {
               let s = new Date().getTime();
               let ongoning = false;
@@ -253,7 +248,7 @@ export const easyDeploy = async (
                 }
                 const dan = await dataAtName(urlOrOptions, {
                   name: {
-                    UnforgPrivate: { data: JSON.parse(pd as string).names[0] },
+                    UnforgDeploy: { data: unforgeableId },
                   },
                   depth: 3,
                 });

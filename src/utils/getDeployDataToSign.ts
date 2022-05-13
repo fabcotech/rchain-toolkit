@@ -2,10 +2,10 @@ import { DeployData } from "../models";
 import { Type, Field } from 'protobufjs';
 
 const dd = new Type(
-    'DeployData',
-    {}
+  'DeployData',
+  {}
 );
-dd.fields = {
+  dd.fields = {
   term: new Field('term', 2, 'string'),
   timestamp: new Field('timestamp', 3, 'int64'),
   phloPrice: new Field('phloPrice', 7, 'int64'),
@@ -15,5 +15,5 @@ dd.fields = {
 }
 
 export const getDeployDataToSign = (deployData: DeployData): Uint8Array => {
-  return dd.encode(deployData).finish();
+return dd.encode(deployData).finish();
 };

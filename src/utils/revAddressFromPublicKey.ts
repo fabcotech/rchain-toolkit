@@ -1,4 +1,4 @@
-import * as keccak256 from "keccak256";
+import { keccak256 } from '@ethersproject/keccak256'
 import { blake2bHex } from "blakejs";
 
 import * as base58 from "../base58";
@@ -26,7 +26,7 @@ const getAddrFromEth = (ethAddr: string): string => {
 
   // Hash ETH address
   const ethAddrBytes = bytesFromHex(ethAddr);
-  const ethHash = keccak256(Buffer.from(ethAddrBytes)).toString("hex");
+  const ethHash = keccak256(ethAddrBytes).slice(2);
 
   // Add prefix with hash and calculate checksum (blake2b-256 hash)
   const payload = `${prefix.coinId}${prefix.version}${ethHash}`;
