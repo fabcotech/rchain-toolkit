@@ -187,7 +187,7 @@ export const easyDeploy = async (
   }
 
   const publicKey = publicKeyFromPrivateKey(payload.privateKey);
-  const vab = await validAfterBlockNumber(urlOrOptions);
+  const vab = await validAfterBlockNumber(urlOrOptions) || -1;
   const d = new Date().valueOf();
   const options = getDeployOptions(
     {
