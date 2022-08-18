@@ -1,6 +1,6 @@
 {
   "name": "@fabcotech/rchain-toolkit",
-  "version": "3.0.1",
+  "version": "3.0.2",
   "description": "Node JS utils and methods to interact with rchain's rnode api and proto interfaces",
   "keywords": [
     "rchain",
