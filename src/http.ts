@@ -118,7 +118,8 @@ export const deploy = async (
                 ongoning = true;
                 if (new Date().getTime() - timeout > s) {
                   clearInterval(interval);
-                  throw new Error("TIMEOUT");
+                  reject(`Timeout exceeded ${timeout}ms`);
+                  return;
                 }
                 const dan = await dataAtName(urlOrOptions, {
                   name: {
@@ -244,7 +245,8 @@ export const easyDeploy = async (
                 ongoning = true;
                 if (new Date().getTime() - (timeout as number) > s) {
                   clearInterval(interval);
-                  throw new Error("TIMEOUT");
+                  reject(`Timeout exceeded ${timeout}ms`);
+                  return;
                 }
                 const dan = await dataAtName(urlOrOptions, {
                   name: {
